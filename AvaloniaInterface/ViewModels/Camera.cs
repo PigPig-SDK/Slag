@@ -1,0 +1,89 @@
+﻿using Avalonia;
+using Avalonia.Input;
+using Avalonia.OpenGL.Controls;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+//using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
+
+
+public class Camera
+{
+    //camera controls
+    private float _pitch, _yaw;
+    private float _zoom = 1.0f;
+
+    private bool _isDragging = false;
+    private Point _lastDragLocation;
+    private Vector3 _cameraOffset;
+
+    private const float ZoomAmmount = 0.1f;
+    private const float MoveAmmount = 0.025f;
+
+    private OpenGlControlBase _glBase;
+
+    public Camera(OpenGlControlBase glBase)
+    {
+        _glBase = glBase;
+    }
+
+    public void OnWheel(object? sender, PointerWheelEventArgs e)
+    {
+        _zoom -= ZoomAmmount * (float)e.Delta.Y;
+    }
+
+    public void OnPointerMove(object? sender, Avalonia.Input.PointerEventArgs e)
+    {
+        if (!_isDragging) return;
+        Point dragDelta = _lastDragLocation - e.GetPosition(_glBase);
+        _lastDragLocation = e.GetPosition(_glBase);
+
+        if (e.GetCurrentPoint(_glBase).Properties.IsMiddleButtonPressed)
+        {
+            //Compute realitive directions
+            (Vector3 realitiveRight, Vector3 realitiveUp) dirs = GetRealitiveDirections();
+            _cameraOffset += (dirs.realitiveRight * (float)dragDelta.X + dirs.realitiveUp * (float)dragDelta.Y) * MoveAmmount;
+        }
+        else
+        {
+            _pitch -= (float)dragDelta.Y * 0.01f;
+            _yaw += (float)dragDelta.X * 0.01f;
+        }
+    }
+    public void OnMouseUp(object? sender, Avalonia.Input.PointerReleasedEventArgs e)
+    {
+        _isDragging = false;
+    }
+
+    public void OnMouseDown(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+    {
+        _lastDragLocation = e.GetPosition(_glBase);
+        _isDragging = true;
+    }
+
+    public Vector3 Origin => (new Vector3(MathF.Cos(_pitch) * MathF.Sin(_yaw), MathF.Sin(_pitch), MathF.Cos(_pitch) * MathF.Cos(_yaw)) * _zoom) + _cameraOffset;
+
+    public Vector3 LookAt => _cameraOffset;
+
+    public Vector3 Up => Vector3.UnitY;
+
+    public (Vector3 realitiveRight, Vector3 realitiveUp) GetRealitiveDirections()
+    {
+        Vector3 lookDir = Vector3.Normalize(Origin - LookAt);
+        Vector3 realitiveRight = Vector3.Cross(Up, lookDir);
+        Vector3 realitiveUp = Vector3.Cross(realitiveRight, lookDir);
+        return (realitiveRight, realitiveUp);
+    }
+
+    public Matrix4x4 CreateLookAt() => Matrix4x4.CreateLookAt(Origin, LookAt, Up);
+
+    public Matrix4x4 CreatePrespective(float aspect) => Matrix4x4.CreatePerspectiveFieldOfView(FOV, aspect, 0.1f, 100f);
+
+    /// <summary>
+    /// Gets FOV in Radians
+    /// </summary>
+    public float FOV => (MathF.PI/180.0f) * 90.0f;
+}

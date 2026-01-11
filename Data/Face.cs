@@ -1,0 +1,58 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Models;
+
+/// <summary>
+/// The ParentModel property is ignored in hashcode and Equals
+/// </summary>
+/// <param name="indicies">The indicies which define a face. The data for the indicies is stored within ParentModel</param>
+public class Face
+{
+    public List<uint> Indicies;
+
+    public Model? ParentModel = null;
+
+    public Face(List<uint> indicies) => Indicies = indicies;
+
+    public Face(params uint[] values) => Indicies = [.. values];
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Face face && EqualityComparer<List<uint>>.Default.Equals(Indicies, face.Indicies);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Indicies);
+    }
+
+    public bool Contains(uint index) => Indicies.Contains(index);
+
+    public void DecrementForIndex(int index)
+    {
+        for (int i = 0; i < Indicies.Count; i++)
+        {
+            if(Indicies[i] > index) Indicies[i]--;
+        }
+    }
+
+    public void Triangulate(ref List<uint> list)
+    {
+        FanTriangulate(ref list);
+    }
+
+    private void FanTriangulate(ref List<uint> list)
+    {
+        uint fanSource = Indicies.First();
+        for(int i = 1; i < Indicies.Count - 1; i++)
+        {
+            list.Add(fanSource);
+            list.Add(Indicies[i]);
+            list.Add(Indicies[i + 1]);
+        }
+    }
+}

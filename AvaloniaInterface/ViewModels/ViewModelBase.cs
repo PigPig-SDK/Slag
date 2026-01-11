@@ -1,0 +1,8 @@
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace OpenglAvaloniaTest.ViewModels
+{
+    public abstract class ViewModelBase : ObservableObject
+    {
+    }
+}

@@ -1,0 +1,5 @@
+{
+  "msbuild-sdks": {
+    "Avalonia.NET.Sdk": "11.3.9"
+  }
+}

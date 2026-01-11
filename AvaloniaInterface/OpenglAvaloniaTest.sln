@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36203.30
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenglAvaloniaTest", "OpenglAvaloniaTest.csproj", "{8A1DDA8E-E66A-42C9-ABF5-90BBCAD65FC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "..\Data\Models.csproj", "{7A3132F9-A5B3-6A88-5644-F1487933B6C0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A1DDA8E-E66A-42C9-ABF5-90BBCAD65FC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A1DDA8E-E66A-42C9-ABF5-90BBCAD65FC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A1DDA8E-E66A-42C9-ABF5-90BBCAD65FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A1DDA8E-E66A-42C9-ABF5-90BBCAD65FC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A3132F9-A5B3-6A88-5644-F1487933B6C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A3132F9-A5B3-6A88-5644-F1487933B6C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A3132F9-A5B3-6A88-5644-F1487933B6C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A3132F9-A5B3-6A88-5644-F1487933B6C0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8823E372-7AD6-4EC8-8018-860DF0D1BCDC}
+	EndGlobalSection
+EndGlobal
