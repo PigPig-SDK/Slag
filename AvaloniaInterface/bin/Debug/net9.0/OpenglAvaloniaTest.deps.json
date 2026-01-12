@@ -16,7 +16,8 @@
           "Avalonia.Themes.Fluent": "11.3.9",
           "AvaloniaEdit.TextMate": "11.3.0",
           "CommunityToolkit.Mvvm": "8.2.1",
-          "Models": "1.0.0"
+          "Models": "1.0.0",
+          "OpenTK.Mathematics": "4.9.4"
         },
         "runtime": {
           "OpenglAvaloniaTest.dll": {}
@@ -443,6 +444,17 @@
           }
         }
       },
+      "OpenTK.Mathematics/4.9.4": {
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/OpenTK.Mathematics.dll": {
+            "assemblyVersion": "4.9.4.0",
+            "fileVersion": "4.9.4.0"
+          }
+        }
+      },
       "SkiaSharp/2.88.9": {
         "dependencies": {
           "SkiaSharp.NativeAssets.Win32": "2.88.9",
@@ -512,6 +524,7 @@
         }
       },
       "System.IO.Pipelines/8.0.0": {},
+      "System.Runtime.CompilerServices.Unsafe/6.0.0": {},
       "System.Text.Json/8.0.5": {},
       "TextMateSharp/1.0.65": {
         "dependencies": {
@@ -739,6 +752,13 @@
       "path": "onigwrap/1.0.6",
       "hashPath": "onigwrap.1.0.6.nupkg.sha512"
     },
+    "OpenTK.Mathematics/4.9.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-2ucF25RVJzdSLXUHgjAgB058gVfSgerrR5pLCn9J+Bnyqi45NrBfPu9wyTT35ZCjYwLJCu/HJMnzKFLjq+uFIA==",
+      "path": "opentk.mathematics/4.9.4",
+      "hashPath": "opentk.mathematics.4.9.4.nupkg.sha512"
+    },
     "SkiaSharp/2.88.9": {
       "type": "package",
       "serviceable": true,
@@ -780,6 +800,13 @@
       "sha512": "sha512-FHNOatmUq0sqJOkTx+UF/9YK1f180cnW5FVqnQMvYUN0elp6wFzbtPSiqbo1/ru8ICp43JM1i7kKkk6GsNGHlA==",
       "path": "system.io.pipelines/8.0.0",
       "hashPath": "system.io.pipelines.8.0.0.nupkg.sha512"
+    },
+    "System.Runtime.CompilerServices.Unsafe/6.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/iUeP3tq1S0XdNNoMz5C9twLSrM/TH+qElHkXWaPvuNOt+99G75NrV0OS2EqHx5wMN7popYjpc8oTjC1y16DLg==",
+      "path": "system.runtime.compilerservices.unsafe/6.0.0",
+      "hashPath": "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
     },
     "System.Text.Json/8.0.5": {
       "type": "package",

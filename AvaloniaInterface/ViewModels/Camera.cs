@@ -4,10 +4,10 @@ using Avalonia.OpenGL.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 //using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Mathematics;
 
 
 public class Camera
@@ -78,9 +78,11 @@ public class Camera
         return (realitiveRight, realitiveUp);
     }
 
-    public Matrix4x4 CreateLookAt() => Matrix4x4.CreateLookAt(Origin, LookAt, Up);
+    public Matrix4 CreateLookAt() => Matrix4.LookAt(Origin, LookAt, Up);
 
-    public Matrix4x4 CreatePrespective(float aspect) => Matrix4x4.CreatePerspectiveFieldOfView(FOV, aspect, 0.1f, 100f);
+    
+
+    public Matrix4 CreatePrespective(float aspect) => Matrix4.CreatePerspectiveFieldOfView(FOV, aspect, 0.01f, 100000f);
 
     /// <summary>
     /// Gets FOV in Radians

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OpenglAvaloniaTest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e062702936c2672d23eefc005ca1d9a8bb240e28")]
 [assembly: System.Reflection.AssemblyProductAttribute("OpenglAvaloniaTest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OpenglAvaloniaTest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

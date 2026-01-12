@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Models;
 
 [StructLayout(LayoutKind.Sequential)]
-public class Vertex(Vector3 position, Vector2 uv)
+public struct Vertex(Vector3 position, Vector2 uv)
 {
     Vector3 Position = position;
     Vector2 UV = uv;

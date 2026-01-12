@@ -547,6 +547,22 @@
           }
         }
       },
+      "OpenTK.Mathematics/4.9.4": {
+        "type": "package",
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+        },
+        "compile": {
+          "lib/netcoreapp3.1/OpenTK.Mathematics.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/OpenTK.Mathematics.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "SkiaSharp/2.88.9": {
         "type": "package",
         "dependencies": {
@@ -659,6 +675,22 @@
         },
         "build": {
           "buildTransitive/net6.0/_._": {}
+        }
+      },
+      "System.Runtime.CompilerServices.Unsafe/6.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/System.Runtime.CompilerServices.Unsafe.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/System.Runtime.CompilerServices.Unsafe.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/netcoreapp3.1/_._": {}
         }
       },
       "System.Text.Json/8.0.5": {
@@ -1414,6 +1446,25 @@
         "runtimes/win-x86/native/libonigwrap.dll"
       ]
     },
+    "OpenTK.Mathematics/4.9.4": {
+      "sha512": "2ucF25RVJzdSLXUHgjAgB058gVfSgerrR5pLCn9J+Bnyqi45NrBfPu9wyTT35ZCjYwLJCu/HJMnzKFLjq+uFIA==",
+      "type": "package",
+      "path": "opentk.mathematics/4.9.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "docs/README.md",
+        "images/opentk-blue-hexagon.png",
+        "lib/netcoreapp3.1/OpenTK.Mathematics.dll",
+        "lib/netcoreapp3.1/OpenTK.Mathematics.pdb",
+        "lib/netcoreapp3.1/OpenTK.Mathematics.xml",
+        "lib/netstandard2.1/OpenTK.Mathematics.dll",
+        "lib/netstandard2.1/OpenTK.Mathematics.pdb",
+        "lib/netstandard2.1/OpenTK.Mathematics.xml",
+        "opentk.mathematics.4.9.4.nupkg.sha512",
+        "opentk.mathematics.nuspec"
+      ]
+    },
     "SkiaSharp/2.88.9": {
       "sha512": "3MD5VHjXXieSHCleRLuaTXmL2pD0mB7CcOB1x2kA1I4bhptf4e3R27iM93264ZYuAq6mkUyX5XbcxnZvMJYc1Q==",
       "type": "package",
@@ -1621,6 +1672,31 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "System.Runtime.CompilerServices.Unsafe/6.0.0": {
+      "sha512": "/iUeP3tq1S0XdNNoMz5C9twLSrM/TH+qElHkXWaPvuNOt+99G75NrV0OS2EqHx5wMN7popYjpc8oTjC1y16DLg==",
+      "type": "package",
+      "path": "system.runtime.compilerservices.unsafe/6.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.targets",
+        "buildTransitive/netcoreapp3.1/_._",
+        "lib/net461/System.Runtime.CompilerServices.Unsafe.dll",
+        "lib/net461/System.Runtime.CompilerServices.Unsafe.xml",
+        "lib/net6.0/System.Runtime.CompilerServices.Unsafe.dll",
+        "lib/net6.0/System.Runtime.CompilerServices.Unsafe.xml",
+        "lib/netcoreapp3.1/System.Runtime.CompilerServices.Unsafe.dll",
+        "lib/netcoreapp3.1/System.Runtime.CompilerServices.Unsafe.xml",
+        "lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
+        "lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.xml",
+        "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+        "system.runtime.compilerservices.unsafe.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
     "System.Text.Json/8.0.5": {
       "sha512": "0f1B50Ss7rqxXiaBJyzUu9bWFOO2/zSlifZ/UNMdiIpDYe4cY4LQQicP4nirK1OS31I43rn062UIJ1Q9bpmHpg==",
       "type": "package",
@@ -1749,7 +1825,8 @@
       "Avalonia.Themes.Fluent >= 11.3.9",
       "AvaloniaEdit.TextMate >= 11.3.0",
       "CommunityToolkit.Mvvm >= 8.2.1",
-      "Models >= 1.0.0"
+      "Models >= 1.0.0",
+      "OpenTK.Mathematics >= 4.9.4"
     ]
   },
   "packageFolders": {
@@ -1759,11 +1836,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\DjPig\\OneDrive\\Documents\\GitHub\\3dModeling\\AvaloniaInterface\\OpenglAvaloniaTest.csproj",
+      "projectUniqueName": "C:\\Users\\DjPig\\Documents\\GitHub\\Slag\\AvaloniaInterface\\OpenglAvaloniaTest.csproj",
       "projectName": "OpenglAvaloniaTest",
-      "projectPath": "C:\\Users\\DjPig\\OneDrive\\Documents\\GitHub\\3dModeling\\AvaloniaInterface\\OpenglAvaloniaTest.csproj",
+      "projectPath": "C:\\Users\\DjPig\\Documents\\GitHub\\Slag\\AvaloniaInterface\\OpenglAvaloniaTest.csproj",
       "packagesPath": "C:\\Users\\DjPig\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\DjPig\\OneDrive\\Documents\\GitHub\\3dModeling\\AvaloniaInterface\\obj\\",
+      "outputPath": "C:\\Users\\DjPig\\Documents\\GitHub\\Slag\\AvaloniaInterface\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1785,8 +1862,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\DjPig\\OneDrive\\Documents\\GitHub\\3dModeling\\Data\\Models.csproj": {
-              "projectPath": "C:\\Users\\DjPig\\OneDrive\\Documents\\GitHub\\3dModeling\\Data\\Models.csproj"
+            "C:\\Users\\DjPig\\Documents\\GitHub\\Slag\\Data\\Models.csproj": {
+              "projectPath": "C:\\Users\\DjPig\\Documents\\GitHub\\Slag\\Data\\Models.csproj"
             }
           }
         }
@@ -1838,6 +1915,10 @@
           "CommunityToolkit.Mvvm": {
             "target": "Package",
             "version": "[8.2.1, )"
+          },
+          "OpenTK.Mathematics": {
+            "target": "Package",
+            "version": "[4.9.4, )"
           }
         },
         "imports": [
@@ -1856,7 +1937,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

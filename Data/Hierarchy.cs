@@ -10,6 +10,6 @@ public class Hierarchy
 {
     public static Hierarchy Instance = new();
 
-    public List<Model> Models = [Model.InstanceBasicTriangle()];
+    public List<Model> Models = [Model.InstanceBasicCube()];
 
 }

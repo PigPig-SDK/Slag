@@ -55,16 +55,21 @@ public class GLModelComponent : ModelComponent
         UpdateBuffers(gl);
 
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
+        Console.WriteLine($"{nameof(_VertexBufferObject)} Bind Error: {gl.GetError()}");
 
         //Setup location info inside VAO
         gl.VertexAttribPointer(0, 3, GL_FLOAT, 0, Vertex.GetSize(), 0);
         gl.EnableVertexAttribArray(0);
+        Console.WriteLine($"Attrib0 Error: {gl.GetError()}");
+
 
         gl.VertexAttribPointer(1, 3, GL_FLOAT, 0, Vertex.GetSize(), Marshal.OffsetOf<Vertex>("Normal"));
         gl.EnableVertexAttribArray(1);
+        Console.WriteLine($"Attrib1 Error: {gl.GetError()}");
 
         gl.VertexAttribPointer(2, 2, GL_FLOAT, 0, Vertex.GetSize(), Marshal.OffsetOf<Vertex>("UV"));
         gl.EnableVertexAttribArray(2);
+        Console.WriteLine($"Attrib2 Error: {gl.GetError()}");
     }
 
     public unsafe void UpdateBuffers(GlInterface gl)
@@ -76,7 +81,7 @@ public class GLModelComponent : ModelComponent
         {
             gl.BufferData(GL_ARRAY_BUFFER, Vertex.GetSize() * _Verts.Length, (nint)ptr, GL_STATIC_DRAW);
         }
-
+        Console.WriteLine($"{nameof(_Verts)} Upload Error: {gl.GetError()}");
         //Inform of indicies
         PopulateTriangulatedIndicies();
         gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _IndiciesBuffer!.Value);
@@ -84,6 +89,7 @@ public class GLModelComponent : ModelComponent
         {
             gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * _Indicies.Length, (nint)ptr, GL_STATIC_DRAW);
         }
+        Console.WriteLine($"{nameof(_Indicies)} Upload Error: {gl.GetError()}");
     }
 
     public void RenderModel(GlInterface gl)
@@ -93,10 +99,13 @@ public class GLModelComponent : ModelComponent
             Console.WriteLine($"Tried to render object while : {getInvalidBuffer()} is null! Discarded draw call.");
             return;
         }
-
+        
         gl.BindVertexArray(_VertexArrayObject!.Value);
+        //Console.WriteLine($"{nameof(_VertexArrayObject)} Bind Error: {gl.GetError()}");
+
         //Render triangles
         gl.DrawElements(GL_TRIANGLES, _Indicies.Length, GL_UNSIGNED_INT, 0);
+        //Console.WriteLine($"{nameof(_Indicies)} Draw error: {gl.GetError()}");
         gl.BindVertexArray(0);
     }
 

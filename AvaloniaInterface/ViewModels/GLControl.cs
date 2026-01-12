@@ -15,10 +15,9 @@ using Avalonia.OpenGL.Controls;
 using Models;
 using System;
 using System.IO;
-using System.Numerics;
 using System.Runtime.InteropServices;
 using static Avalonia.OpenGL.GlConsts;
-
+using OpenTK.Mathematics;
 
 public class GLControl : OpenGlControlBase
 {
@@ -96,11 +95,11 @@ public class GLControl : OpenGlControlBase
         gl.ClearColor(0.1f, 0.1f, 0.1f, 1f);
         gl.Clear(GlConsts.GL_COLOR_BUFFER_BIT | GlConsts.GL_DEPTH_BUFFER_BIT);
 
-        Matrix4x4 model = Matrix4x4.Identity;
+        Matrix4 model = Matrix4.Identity;
         //Camera controls
-        Matrix4x4 view = _camera.CreateLookAt();
+        Matrix4 view = _camera.CreateLookAt();
         float aspect = (float)(Bounds.Width / (double)Bounds.Height);
-        Matrix4x4 proj = _camera.CreatePrespective(aspect);
+        Matrix4 proj = _camera.CreatePrespective(aspect);
 
         gl.UniformMatrix4fv(_modelMatrixLoc, 1, false, &model);
         gl.UniformMatrix4fv(_viewMatrixLoc, 1, false, &view);
