@@ -12,6 +12,6 @@ public class SceneHierarchy
 
     public List<Model> Models = [Model.InstanceBasicCube()];
 
-    public List<Model> ToolModels = [Model.InstanceBasicCube()];
+    public List<Model> ToolModels = [Model.InstanceAxisTriad()];
 
 }

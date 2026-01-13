@@ -15,14 +15,11 @@ public struct Vertex
         Position = position;
         UV = uv;
     }
-    public Vertex(params float[] paramPositions)
+    public Vertex(float x, float y, float z)
     {
-        if(paramPositions == null || paramPositions.Length != 3)
-            throw new ArgumentException($"{nameof(paramPositions)} was of invalid length, Please only give 3 params!");
-
-        Position.X = paramPositions[0];
-        Position.Y = paramPositions[1];
-        Position.Z = paramPositions[2];
+        Position.X = x;
+        Position.Y = y;
+        Position.Z = z;
     }
 
     public static int GetSize()

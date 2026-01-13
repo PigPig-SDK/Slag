@@ -121,14 +121,14 @@ public class Model
         Model cube = new();
 
         //Add verts
-        cube.AddVertex(new Vertex(new Vector3(-1, -1, -1), Vector2.Zero));//0
-        cube.AddVertex(new Vertex(new Vector3(-1, 1, -1), Vector2.Zero));//1
-        cube.AddVertex(new Vertex(new Vector3(1, 1, -1), Vector2.Zero));//2
-        cube.AddVertex(new Vertex(new Vector3(1, -1, -1), Vector2.Zero));//3
-        cube.AddVertex(new Vertex(new Vector3(-1, 1, 1), Vector2.Zero));//4
-        cube.AddVertex(new Vertex(new Vector3(-1, -1, 1), Vector2.Zero));//5
-        cube.AddVertex(new Vertex(new Vector3(1, -1, 1), Vector2.Zero));//6
-        cube.AddVertex(new Vertex(new Vector3(1, 1, 1), Vector2.Zero));//7
+        cube.AddVertex(new Vertex(-1, -1, -1)); // 0
+        cube.AddVertex(new Vertex(-1, 1, -1)); // 1
+        cube.AddVertex(new Vertex(1, 1, -1)); // 2
+        cube.AddVertex(new Vertex(1, -1, -1)); // 3
+        cube.AddVertex(new Vertex(-1, 1, 1)); // 4
+        cube.AddVertex(new Vertex(-1, -1, 1)); // 5
+        cube.AddVertex(new Vertex(1, -1, 1)); // 6
+        cube.AddVertex(new Vertex(1, 1, 1)); // 7
 
         //AddFace
         cube.AddFace(0, 1, 2, 3);//Left
@@ -147,28 +147,37 @@ public class Model
         Model triangle = new();
 
         //Add verts
-        triangle.AddVertex(new Vertex(new Vector3(1, 1, -1), Vector2.Zero));//0
-        triangle.AddVertex(new Vertex(new Vector3(0, 1, -1), Vector2.Zero));//1
-        triangle.AddVertex(new Vertex(new Vector3(1, 0, -1), Vector2.Zero));//2
+        triangle.AddVertex(new Vertex(1, 1, -1));//0
+        triangle.AddVertex(new Vertex(0, 1, -1));//1
+        triangle.AddVertex(new Vertex(1, 0, -1));//2
 
         //AddFace
         triangle.AddFace(0, 1, 2);
 
         return triangle;
     }
-    /// <returns>A axi shape for edge debugging</returns>
+    /// <returns>An XYZ axis triad shape for debugging</returns>
     public static Model InstanceAxisTriad()
     {
-        Model cube = new();
+        Model triad = new Model();
 
-        //Add verts
-        cube.AddVertex(new Vertex(1, 1, -1));//0
-        cube.AddVertex(new Vertex(0, 1, -1));//1
-        cube.AddVertex(new Vertex(1, 0, -1));//2
+        float arrowLength = 2.0f;
+        float arrowWidth = 0.05f;
 
-        //AddFace
-        cube.AddFace(0, 1, 2);
+        triad.AddVertex(new Vertex(0, 0, 0));
+        triad.AddVertex(new Vertex(arrowLength, arrowWidth, 0));
+        triad.AddVertex(new Vertex(arrowLength, -arrowWidth, 0));
+        triad.AddFace(0, 1, 2);
 
-        return cube;
+        triad.AddVertex(new Vertex(-arrowWidth, arrowLength, 0));
+        triad.AddVertex(new Vertex(arrowWidth, arrowLength, 0));
+        triad.AddFace(0, 3, 4);
+
+        triad.AddVertex(new Vertex(-arrowWidth, 0, arrowLength));
+        triad.AddVertex(new Vertex(arrowWidth, 0, arrowLength));
+        triad.AddFace(0, 5, 6);
+
+        return triad;
     }
+
 }

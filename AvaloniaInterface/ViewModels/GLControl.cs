@@ -77,11 +77,14 @@ public class GLControl : OpenGlControlBase
         _viewMatrixLoc = gl.GetUniformLocationString(_shaderProgram, "view_matrix");
 
         gl.UseProgram(_shaderProgram);
-        //Enable depth
         gl.Enable(GL_DEPTH_TEST);
 
         //Push models to Opengl
-        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance))
+        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.Models))
+        {
+            c.GenerateBuffers(gl);
+        }
+        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.ToolModels))
         {
             c.GenerateBuffers(gl);
         }
@@ -104,17 +107,18 @@ public class GLControl : OpenGlControlBase
         gl.UniformMatrix4fv(_viewMatrixLoc, 1, false, &view);
         gl.UniformMatrix4fv(_projectionMatrixLoc, 1, false, &proj);
 
-        //Draw tools models
-        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.ToolModels))
-        {
-            c.RenderModel(gl, _modelMatrixLoc);
-        }
         //Draw all models
+        gl.Enable(GL_DEPTH_TEST);
         foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.Models))
         {
             c.RenderModel(gl, _modelMatrixLoc);
         }
-
+        //Draw tools models
+        gl.Disable(GL_DEPTH_TEST);
+        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.ToolModels))
+        {
+            c.RenderModel(gl, _modelMatrixLoc);
+        }
         RequestNextFrameRendering();
     }
 

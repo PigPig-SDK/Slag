@@ -119,13 +119,6 @@ public class GLModelComponent : ModelComponent
             * rotationMat 
             * Matrix4.CreateScale(model.Scale);
 
-
-        model.Position.Y = (float)Math.Sin(DateTime.Now.Ticks * 0.0000005);
-        model.Position.Z = (float)Math.Cos(DateTime.Now.Ticks * 0.0000005);
-
-        model.Rotation.Z = (float)Math.Cos(DateTime.Now.Ticks * 0.0000005);
-
-
         gl.UniformMatrix4fv(modelMatrixUniform, 1, false, &modelTransformation);
 
         gl.BindVertexArray(_VertexArrayObject!.Value);
