@@ -6,10 +6,10 @@ uniform mat4 model_matrix;
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
 
-out vec3 normal;
+out vec4 normal;
 
 void main()
 {
-    normal = aNormal;
+    normal = view_matrix * model_matrix * vec4(aNormal,1.0);
     gl_Position = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
 }
