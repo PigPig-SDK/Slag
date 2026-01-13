@@ -13,9 +13,9 @@ public class Model
 
     private Dictionary<Type, ModelComponent> _Components = [];
 
-    public Vector3 Position;
-    public Vector3 Rotation;
-    public Vector3 Scale;
+    public Vector3 Position = Vector3.Zero;
+    public Vector3 Rotation = Vector3.Zero;
+    public Vector3 Scale = Vector3.One;
 
 
     public Vertex GetVertex(int index) => Verticies[index];
@@ -144,12 +144,27 @@ public class Model
     /// <returns>A basic triangle for debugging</returns>
     public static Model InstanceBasicTriangle()
     {
+        Model triangle = new();
+
+        //Add verts
+        triangle.AddVertex(new Vertex(new Vector3(1, 1, -1), Vector2.Zero));//0
+        triangle.AddVertex(new Vertex(new Vector3(0, 1, -1), Vector2.Zero));//1
+        triangle.AddVertex(new Vertex(new Vector3(1, 0, -1), Vector2.Zero));//2
+
+        //AddFace
+        triangle.AddFace(0, 1, 2);
+
+        return triangle;
+    }
+    /// <returns>A axi shape for edge debugging</returns>
+    public static Model InstanceAxisTriad()
+    {
         Model cube = new();
 
         //Add verts
-        cube.AddVertex(new Vertex(new Vector3(1, 1, -1), Vector2.Zero));//0
-        cube.AddVertex(new Vertex(new Vector3(0, 1, -1), Vector2.Zero));//1
-        cube.AddVertex(new Vertex(new Vector3(1, 0, -1), Vector2.Zero));//2
+        cube.AddVertex(new Vertex(1, 1, -1));//0
+        cube.AddVertex(new Vertex(0, 1, -1));//1
+        cube.AddVertex(new Vertex(1, 0, -1));//2
 
         //AddFace
         cube.AddFace(0, 1, 2);

@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace Models;
 
-public class Hierarchy
+public class SceneHierarchy
 {
-    public static Hierarchy Instance = new();
+    public static SceneHierarchy Instance = new();
 
     public List<Model> Models = [Model.InstanceBasicCube()];
+
+    public List<Model> ToolModels = [Model.InstanceBasicCube()];
 
 }

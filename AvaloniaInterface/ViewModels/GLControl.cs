@@ -81,7 +81,7 @@ public class GLControl : OpenGlControlBase
         gl.Enable(GL_DEPTH_TEST);
 
         //Push models to Opengl
-        foreach (GLModelComponent c in GLModelComponent.AllComponents(Hierarchy.Instance))
+        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance))
         {
             c.GenerateBuffers(gl);
         }
@@ -96,20 +96,23 @@ public class GLControl : OpenGlControlBase
         gl.ClearColor(0.1f, 0.1f, 0.1f, 1f);
         gl.Clear(GlConsts.GL_COLOR_BUFFER_BIT | GlConsts.GL_DEPTH_BUFFER_BIT);
 
-        Matrix4 model = Matrix4.Identity;
         //Camera controls
         Matrix4 view = _camera.CreateLookAt();
         float aspect = (float)(Bounds.Width / (double)Bounds.Height);
         Matrix4 proj = _camera.CreatePrespective(aspect);
-
-        gl.UniformMatrix4fv(_modelMatrixLoc, 1, false, &model);
+        
         gl.UniformMatrix4fv(_viewMatrixLoc, 1, false, &view);
         gl.UniformMatrix4fv(_projectionMatrixLoc, 1, false, &proj);
 
-        //Draw all models
-        foreach (GLModelComponent c in GLModelComponent.AllComponents(Hierarchy.Instance))
+        //Draw tools models
+        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.ToolModels))
         {
-            c.RenderModel(gl, ref model);
+            c.RenderModel(gl, _modelMatrixLoc);
+        }
+        //Draw all models
+        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.Models))
+        {
+            c.RenderModel(gl, _modelMatrixLoc);
         }
 
         RequestNextFrameRendering();

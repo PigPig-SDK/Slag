@@ -17,7 +17,6 @@ public class GLModelComponent : ModelComponent
     private int? _VertexArrayObject;
 
     private int _IndiciesCount = 0;
-    
 
     public void OpenglRestart(GlInterface gl)
     {
@@ -102,14 +101,33 @@ public class GLModelComponent : ModelComponent
         Console.WriteLine($"{nameof(indicies)} Upload Error: {gl.GetError()}");
     }
 
-    public void RenderModel(GlInterface gl, ref Matrix4 objectTransformationMatrix)
+    public unsafe void RenderModel(GlInterface gl, int modelMatrixUniform)
     {
         if (_VertexBufferObject == null || _IndiciesBuffer == null)
         {
             Console.WriteLine($"Tried to render object while : {getInvalidBuffer()} is null! Discarded draw call.");
             return;
         }
-        
+
+        Matrix4 rotX = Matrix4.CreateRotationX(model.Rotation.X);
+        Matrix4 rotY = Matrix4.CreateRotationY(model.Rotation.Y);
+        Matrix4 rotZ = Matrix4.CreateRotationZ(model.Rotation.Z);
+        Matrix4 rotationMat = rotZ * rotY * rotX; // ZYX order of rotation...
+
+        Matrix4 modelTransformation = 
+            Matrix4.CreateTranslation(model.Position) 
+            * rotationMat 
+            * Matrix4.CreateScale(model.Scale);
+
+
+        model.Position.Y = (float)Math.Sin(DateTime.Now.Ticks * 0.0000005);
+        model.Position.Z = (float)Math.Cos(DateTime.Now.Ticks * 0.0000005);
+
+        model.Rotation.Z = (float)Math.Cos(DateTime.Now.Ticks * 0.0000005);
+
+
+        gl.UniformMatrix4fv(modelMatrixUniform, 1, false, &modelTransformation);
+
         gl.BindVertexArray(_VertexArrayObject!.Value);
         //Console.WriteLine($"{nameof(_VertexArrayObject)} Bind Error: {gl.GetError()}");
 
@@ -158,9 +176,9 @@ public class GLModelComponent : ModelComponent
 
     }
 
-    public static IEnumerable<GLModelComponent> AllComponents(Hierarchy hierarchy)
+    public static IEnumerable<GLModelComponent> AllComponents(List<Model> models)
     {
-        foreach (Model model in hierarchy.Models)
+        foreach (Model model in models)
         {
             if (!model.TryGetComponent<GLModelComponent>(out ModelComponent? component))//Add component it DNE!
             {
