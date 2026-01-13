@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -75,6 +76,19 @@ public static class ModelPrefabs
         triad.AddVertex(new Vertex(-arrowWidth, 0, arrowLength));
         triad.AddVertex(new Vertex(arrowWidth, 0, arrowLength));
         triad.AddFace(0, 5, 6);
+
+        return triad;
+    }
+    /// <returns>An XYZ axis triad shape for debugging</returns>
+    public static Model DebugTriangleLine(Vector3 start, Vector3 end)
+    {
+        Model triad = new Model();
+        triad.ObjectName = "Debugging model";
+
+        triad.AddVertex(new Vertex(start.X, start.Y, start.Z));
+        triad.AddVertex(new Vertex(end.X, end.Y, end.Z));
+        triad.AddVertex(new Vertex(end.X, end.Y + 0.1f, end.Z));
+        triad.AddFace(0, 1, 2);
 
         return triad;
     }

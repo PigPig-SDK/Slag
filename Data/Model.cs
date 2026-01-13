@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using OpenTK.Mathematics;
@@ -82,6 +83,7 @@ public class Model
 
     public void GenerateIndicies()
     {
+        TriangleToFaceMapping.Clear();
         List<uint> indicies = [];
         foreach (Face face in _Faces)
         {
@@ -116,5 +118,11 @@ public class Model
         foreach (var component in _Components.Values) component.OnModelUpdate(this, info, variable);
     }
 
-
+    public IEnumerable<(uint,uint,uint)> AllIndicies()
+    {
+        for(int i = 0; i < Indicies.Length; i+=3)
+        {
+            yield return (Indicies[i], Indicies[i + 1], Indicies[i + 2]);
+        }
+    }
 }

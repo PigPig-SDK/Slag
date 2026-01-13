@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Mathematics;
+using Models;
 
 
 public class Camera
@@ -64,7 +65,19 @@ public class Camera
         if(properties.IsRightButtonPressed)
         {
             Console.WriteLine("Detect ray in scene");
-            return;
+            Vector2 screenLocation = new Vector2((float)e.GetPosition(_glBase).X, (float)e.GetPosition(_glBase).Y);
+            float aspect = (float)(_glBase.Bounds.Width / (double)_glBase.Bounds.Height);
+            RaycastHit? hit = Raycast.GetObjectHitScreenLocation(SceneHierarchy.Instance.Models, Origin, Up, LookAt, aspect, FOV, screenLocation);
+            if (hit != null)
+            {
+                Console.WriteLine($"Hit was not null! {hit}");
+            }
+            else
+            {
+                Console.WriteLine("Hit was null");
+            }
+
+                return;
         }
 
         _lastDragLocation = e.GetPosition(_glBase);
@@ -86,8 +99,6 @@ public class Camera
     }
 
     public Matrix4 CreateLookAt() => Matrix4.LookAt(Origin, LookAt, Up);
-
-    
 
     public Matrix4 CreatePrespective(float aspect) => Matrix4.CreatePerspectiveFieldOfView(FOV, aspect, 0.01f, 100000f);
 
