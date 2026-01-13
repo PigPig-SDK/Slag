@@ -56,7 +56,18 @@ public class Face
             list.Add(Indicies[i + 1]);
             if(ParentModel is not null)
             {
-                ParentModel.TriangleToFaceMapping.Add((fanSource, Indicies[i], Indicies[i + 1]), this);
+                var tuple = (fanSource, Indicies[i], Indicies[i + 1]);
+
+                if (ParentModel.TriangleToFaceMapping.ContainsKey(tuple))
+                {
+                    if (ParentModel.TriangleToFaceMapping[tuple] == this)
+                        Console.WriteLine("Triangle already exists, face is the same. Interesting.");
+                    else
+                        Console.WriteLine($"Triangle already exists, face is not the same. { ParentModel.ObjectName }");
+
+                        continue;
+                }
+                ParentModel.TriangleToFaceMapping.Add(tuple, this);
             }
         }
         
