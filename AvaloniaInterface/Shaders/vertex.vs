@@ -5,7 +5,11 @@ layout (location = 2) in vec3 aUV;
 uniform mat4 model_matrix;
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
+
+out vec3 normal;
+
 void main()
 {
+    normal = aNormal;
     gl_Position = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
 }

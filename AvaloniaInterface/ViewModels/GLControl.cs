@@ -29,9 +29,9 @@ public class GLControl : OpenGlControlBase
 
     private Camera _camera;
 
-    private const string VertexShaderDirectory = "vertex.vs";
+    private const string VertexShaderDirectory = "Shaders/vertex.vs";
 
-    private const string FragmentShaderDirectory = "fragment.fs";
+    private const string FragmentShaderDirectory = "Shaders/fragment.fs";
 
     public GLControl()
     {
@@ -90,7 +90,8 @@ public class GLControl : OpenGlControlBase
     protected override unsafe void OnOpenGlRender(GlInterface gl, int fb)
     {
         gl.BindFramebuffer(GlConsts.GL_FRAMEBUFFER, fb);
-        gl.Viewport(0, 0, (int)Bounds.Width, (int)Bounds.Height);
+        var scaling = (this.VisualRoot != null) ? this.VisualRoot!.RenderScaling : 1.0;
+        gl.Viewport(0, 0, (int)(Bounds.Width * scaling), (int)(Bounds.Height * scaling));
 
         gl.ClearColor(0.1f, 0.1f, 0.1f, 1f);
         gl.Clear(GlConsts.GL_COLOR_BUFFER_BIT | GlConsts.GL_DEPTH_BUFFER_BIT);
@@ -108,7 +109,7 @@ public class GLControl : OpenGlControlBase
         //Draw all models
         foreach (GLModelComponent c in GLModelComponent.AllComponents(Hierarchy.Instance))
         {
-            c.RenderModel(gl);
+            c.RenderModel(gl, ref model);
         }
 
         RequestNextFrameRendering();

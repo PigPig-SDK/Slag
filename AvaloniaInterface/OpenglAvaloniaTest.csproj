@@ -33,11 +33,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="fragment.fs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Update="Shaders\fragment.fs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="vertex.vs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Update="Shaders\vertex.vs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 </Project>

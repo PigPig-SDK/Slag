@@ -1,7 +1,9 @@
 ﻿using Avalonia.OpenGL;
 using Models;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using static Avalonia.OpenGL.GlConsts;
 using static OpenglAvaloniaTest.ViewModels.GlConstantsExtended;
@@ -14,8 +16,7 @@ public class GLModelComponent : ModelComponent
     private int? _IndiciesBuffer = null;
     private int? _VertexArrayObject;
 
-    private Vertex[] _Verts = [];
-    private uint[] _Indicies = [];
+    private int _IndiciesCount = 0;
     
 
     public void OpenglRestart(GlInterface gl)
@@ -74,25 +75,34 @@ public class GLModelComponent : ModelComponent
 
     public unsafe void UpdateBuffers(GlInterface gl)
     {
+        //Temp buffers, to be sent to GPU.
+        Vertex[] verts = [];
+        uint[] indicies = [];
+
+        //Compute model data.
+        PopulateTriangulatedIndicies(ref indicies);
+        verts = model.Verticies.ToArray();
+        ComputeNormals(verts, indicies);
+        _IndiciesCount = indicies.Length;
+
         //Inform of vert data
-        _Verts = model.Verticies.ToArray();
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
-        fixed (Vertex* ptr = _Verts)
+        fixed (Vertex* ptr = verts)
         {
-            gl.BufferData(GL_ARRAY_BUFFER, Vertex.GetSize() * _Verts.Length, (nint)ptr, GL_STATIC_DRAW);
+            gl.BufferData(GL_ARRAY_BUFFER, Vertex.GetSize() * verts.Length, (nint)ptr, GL_STATIC_DRAW);
         }
-        Console.WriteLine($"{nameof(_Verts)} Upload Error: {gl.GetError()}");
+        Console.WriteLine($"{nameof(verts)} Upload Error: {gl.GetError()}");
+
         //Inform of indicies
-        PopulateTriangulatedIndicies();
         gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _IndiciesBuffer!.Value);
-        fixed (uint* ptr = _Indicies)
+        fixed (uint* ptr = indicies)
         {
-            gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * _Indicies.Length, (nint)ptr, GL_STATIC_DRAW);
+            gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * indicies.Length, (nint)ptr, GL_STATIC_DRAW);
         }
-        Console.WriteLine($"{nameof(_Indicies)} Upload Error: {gl.GetError()}");
+        Console.WriteLine($"{nameof(indicies)} Upload Error: {gl.GetError()}");
     }
 
-    public void RenderModel(GlInterface gl)
+    public void RenderModel(GlInterface gl, ref Matrix4 objectTransformationMatrix)
     {
         if (_VertexBufferObject == null || _IndiciesBuffer == null)
         {
@@ -104,16 +114,44 @@ public class GLModelComponent : ModelComponent
         //Console.WriteLine($"{nameof(_VertexArrayObject)} Bind Error: {gl.GetError()}");
 
         //Render triangles
-        gl.DrawElements(GL_TRIANGLES, _Indicies.Length, GL_UNSIGNED_INT, 0);
+        gl.DrawElements(GL_TRIANGLES, _IndiciesCount, GL_UNSIGNED_INT, 0);
         //Console.WriteLine($"{nameof(_Indicies)} Draw error: {gl.GetError()}");
         gl.BindVertexArray(0);
     }
 
-    public void PopulateTriangulatedIndicies()
+    public void ComputeNormals(Vertex[] verts, uint[] indicies)
     {
-        //Generate indicies.
-        _Indicies = model.GetTriangulatedModel().ToArray();
+        if (indicies.Length % 3 != 0) throw new ArgumentException($"{nameof(indicies)} must be a multiple of 3.");
+
+        //Reset normals
+        for (int i = 0; i < verts.Length; i++)
+        {
+            verts[i].Normal = new Vector3(0, 0, 0);
+        }
+
+        //Compute sum of normals
+        for(int i = 0; i < indicies.Length; i+=3)
+        {
+            //Get locations
+            Vector3 p1 = verts[indicies[i]].Position;
+            Vector3 p2 = verts[indicies[i + 1]].Position;
+            Vector3 p3 = verts[indicies[i + 2]].Position;
+
+            Vector3 normal = Vector3.Cross(p2 - p1, p3 - p1);
+
+            verts[indicies[i]].Normal += normal;
+            verts[indicies[i + 1]].Normal += normal;
+            verts[indicies[i + 2]].Normal += normal;
+        }
+
+        //Normalize
+        for (int i = 0; i < verts.Length; i++)
+        {
+            verts[i].Normal = Vector3.Normalize(verts[i].Normal);
+        }
     }
+
+    public void PopulateTriangulatedIndicies(ref uint[] indicies) => indicies = model.GetTriangulatedModel().ToArray();
 
     public override void OnModelUpdate(Model model, ModelUpdateType info, object data)
     {
