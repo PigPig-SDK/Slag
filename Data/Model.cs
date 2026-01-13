@@ -10,12 +10,15 @@ public class Model
     public List<Vertex> Verticies { get; private set; } = [];
     private List<Face> _Faces = [];
     private HashSet<Edge> _Edges = [];
+    public uint[] Indicies = [];
 
     private Dictionary<Type, ModelComponent> _Components = [];
 
     public Vector3 Position = Vector3.Zero;
     public Vector3 Rotation = Vector3.Zero;
     public Vector3 Scale = Vector3.One;
+
+    public Dictionary<(uint,uint,uint), Face> TriangleToFaceMapping = [];
 
 
     public Vertex GetVertex(int index) => Verticies[index];
@@ -76,14 +79,14 @@ public class Model
         UpdateAllComponents(ModelUpdateType.Edge | ModelUpdateType.Membership, edge);
     }
 
-    public List<uint> GetTriangulatedModel()
+    public void GenerateIndicies()
     {
         List<uint> indicies = [];
         foreach (Face face in _Faces)
         {
             face.Triangulate(ref indicies);
         }
-        return indicies;
+        Indicies = indicies.ToArray();
     }
 
     public ModelComponent AddComponent<T>(ModelComponent component)

@@ -76,13 +76,12 @@ public class GLModelComponent : ModelComponent
     {
         //Temp buffers, to be sent to GPU.
         Vertex[] verts = [];
-        uint[] indicies = [];
 
         //Compute model data.
-        PopulateTriangulatedIndicies(ref indicies);
+        model.GenerateIndicies();
         verts = model.Verticies.ToArray();
-        ComputeNormals(verts, indicies);
-        _IndiciesCount = indicies.Length;
+        ComputeNormals(verts, model.Indicies);
+        _IndiciesCount = model.Indicies.Length;
 
         //Inform of vert data
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
@@ -94,11 +93,11 @@ public class GLModelComponent : ModelComponent
 
         //Inform of indicies
         gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _IndiciesBuffer!.Value);
-        fixed (uint* ptr = indicies)
+        fixed (uint* ptr = model.Indicies)
         {
-            gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * indicies.Length, (nint)ptr, GL_STATIC_DRAW);
+            gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * _IndiciesCount, (nint)ptr, GL_STATIC_DRAW);
         }
-        Console.WriteLine($"{nameof(indicies)} Upload Error: {gl.GetError()}");
+        Console.WriteLine($"{nameof(model.Indicies)} Upload Error: {gl.GetError()}");
     }
 
     public unsafe void RenderModel(GlInterface gl, int modelMatrixUniform)
@@ -161,8 +160,6 @@ public class GLModelComponent : ModelComponent
             verts[i].Normal = Vector3.Normalize(verts[i].Normal);
         }
     }
-
-    public void PopulateTriangulatedIndicies(ref uint[] indicies) => indicies = model.GetTriangulatedModel().ToArray();
 
     public override void OnModelUpdate(Model model, ModelUpdateType info, object data)
     {

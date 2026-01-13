@@ -60,6 +60,13 @@ public class Camera
 
     public void OnMouseDown(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
+        var properties = e.GetCurrentPoint(_glBase).Properties;
+        if(properties.IsRightButtonPressed)
+        {
+            Console.WriteLine("Detect ray in scene");
+            return;
+        }
+
         _lastDragLocation = e.GetPosition(_glBase);
         _isDragging = true;
     }

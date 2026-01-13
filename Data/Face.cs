@@ -47,12 +47,19 @@ public class Face
 
     private void FanTriangulate(ref List<uint> list)
     {
+
         uint fanSource = Indicies.First();
         for(int i = 1; i < Indicies.Count - 1; i++)
         {
             list.Add(fanSource);
             list.Add(Indicies[i]);
             list.Add(Indicies[i + 1]);
+            if(ParentModel is not null)
+            {
+                ParentModel.TriangleToFaceMapping.Add((fanSource, Indicies[i], Indicies[i + 1]), this);
+            }
         }
+        
+
     }
 }
