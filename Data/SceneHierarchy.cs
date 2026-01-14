@@ -10,8 +10,28 @@ public class SceneHierarchy
 {
     public static SceneHierarchy Instance = new();
 
-    public List<Model> Models = [ModelPrefabs.InstanceBasicCube()];
+    public List<Model> Models { get; private set; } = [ModelPrefabs.InstanceBasicCube()];
 
-    public List<Model> ToolModels = [ModelPrefabs.InstanceAxisTriad()];
+    public List<Model> ToolModels { get; private set; } = [ModelPrefabs.InstanceAxisTriad()];
+
+    public event Action<Model> OnModelAdded;
+
+    public void AddModel(Model model)
+    {
+        Models.Add(model);
+        OnModelAdded?.Invoke(model);
+    }
+
+    public IEnumerable<Model> AllModels()
+    {
+        foreach (var model in Models)
+        {
+            yield return model;
+        }
+        foreach (var model in ToolModels)
+        { 
+            yield return model;
+        }
+    }
 
 }

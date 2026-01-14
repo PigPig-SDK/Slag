@@ -18,6 +18,8 @@ public class GLModelComponent : ModelComponent
 
     private int _IndiciesCount = 0;
 
+    GlInterface glInterface = null;
+
     public void OpenglRestart(GlInterface gl)
     {
         //Clear buffers
@@ -37,6 +39,7 @@ public class GLModelComponent : ModelComponent
         {
             throw new InvalidOperationException($"Accidentally tried to assign {getInvalidBuffer()} before setting null!");
         }
+        glInterface = gl;
 
         //Setup VAO
         _VertexArrayObject = gl.GenVertexArray();
@@ -172,9 +175,19 @@ public class GLModelComponent : ModelComponent
         {
             if (!model.TryGetComponent<GLModelComponent>(out ModelComponent? component))//Add component it DNE!
             {
-                component = model.AddComponent<GLModelComponent>(new GLModelComponent());
+                //component = model.AddComponent<GLModelComponent>(new GLModelComponent());
+                continue;
             }
             yield return (GLModelComponent)component!;
         }
+    }
+
+    public override void Dispose()
+    {
+        if (glInterface == null) return;
+
+        glInterface.DeleteBuffer(_VertexBufferObject!.Value);
+        glInterface.DeleteBuffer(_IndiciesBuffer!.Value);
+        glInterface.DeleteVertexArray(_VertexArrayObject!.Value);
     }
 }

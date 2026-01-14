@@ -113,6 +113,8 @@ public class Model
         return false;
     }
 
+    public bool HasComponent(Type type) => _Components.ContainsKey(type);
+
     void UpdateAllComponents(ModelUpdateType info, object variable)
     {
         foreach (var component in _Components.Values) component.OnModelUpdate(this, info, variable);

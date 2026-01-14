@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Mathematics;
 
 namespace Models;
 
@@ -86,9 +86,10 @@ public static class ModelPrefabs
         triad.ObjectName = "Debugging model";
 
         triad.AddVertex(new Vertex(start.X, start.Y, start.Z));
+        triad.AddVertex(new Vertex(start.X, start.Y + 0.1f, start.Z));
         triad.AddVertex(new Vertex(end.X, end.Y, end.Z));
         triad.AddVertex(new Vertex(end.X, end.Y + 0.1f, end.Z));
-        triad.AddFace(0, 1, 2);
+        triad.AddFace(0, 1, 2, 3);
 
         return triad;
     }

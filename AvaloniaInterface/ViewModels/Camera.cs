@@ -54,6 +54,7 @@ public class Camera
             _yaw += (float)dragDelta.X * 0.01f;
         }
     }
+
     public void OnMouseUp(object? sender, Avalonia.Input.PointerReleasedEventArgs e)
     {
         _isDragging = false;
@@ -66,8 +67,14 @@ public class Camera
         {
             Console.WriteLine("Detect ray in scene");
             Vector2 screenLocation = new Vector2((float)e.GetPosition(_glBase).X, (float)e.GetPosition(_glBase).Y);
-            float aspect = (float)(_glBase.Bounds.Width / (double)_glBase.Bounds.Height);
-            RaycastHit? hit = Raycast.GetObjectHitScreenLocation(SceneHierarchy.Instance.Models, Origin, Up, LookAt, aspect, FOV, screenLocation);
+            
+            double width = _glBase.Bounds.Width;
+            double height = _glBase.Bounds.Height;
+            float aspect = (float)(width / height);
+            Vector2 screenSize = new Vector2((float)width, (float)height);
+
+            RaycastHit? hit = Raycast.GetObjectHitScreenLocation(SceneHierarchy.Instance.Models, Origin, Up, LookAt, aspect, FOV, screenLocation, screenSize);
+
             if (hit != null)
             {
                 Console.WriteLine($"Hit was not null! {hit}");

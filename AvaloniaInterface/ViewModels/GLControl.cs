@@ -33,6 +33,8 @@ public class GLControl : OpenGlControlBase
 
     private const string FragmentShaderDirectory = "Shaders/fragment.fs";
 
+    private List<Model> _LateModelAddition = [];
+
     public GLControl()
     {
         //Link camera
@@ -40,8 +42,10 @@ public class GLControl : OpenGlControlBase
         this.PointerPressed += _camera.OnMouseDown;
         this.PointerReleased += _camera.OnMouseUp;
         this.PointerMoved += _camera.OnPointerMove;
-        this.AddHandler(InputElement.PointerWheelChangedEvent, _camera.OnWheel, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
+        this.AddHandler(PointerWheelChangedEvent, _camera.OnWheel, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
     }
+
+    public void OnModelAdded(Model model) => _LateModelAddition.Add(model);
 
     public static void CheckError(GlInterface gl)
     {
@@ -79,19 +83,41 @@ public class GLControl : OpenGlControlBase
         gl.UseProgram(_shaderProgram);
         gl.Enable(GL_DEPTH_TEST);
 
-        //Push models to Opengl
-        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.Models))
+        //Add components and buffer data to opengl.
+        foreach (Model model in SceneHierarchy.Instance.AllModels())
         {
-            c.GenerateBuffers(gl);
+            BindOpenglComponent(model, gl);
         }
-        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.ToolModels))
+
+        SceneHierarchy.Instance.OnModelAdded += OnModelAdded;
+    }
+
+    public bool BindOpenglComponent(Model model, GlInterface gl)
+    {
+        if (model.HasComponent(typeof(GLModelComponent))) return false;
+        GLModelComponent? glComponent = model.AddComponent<GLModelComponent>(new GLModelComponent()) as GLModelComponent;
+        
+        if(glComponent == null) return false;
+        glComponent.GenerateBuffers(gl);
+
+        return true;
+    }
+
+    void CheckLateObjects(GlInterface gl)
+    {
+        if (_LateModelAddition.Count == 0) return;
+
+        foreach (Model model in _LateModelAddition)
         {
-            c.GenerateBuffers(gl);
+            BindOpenglComponent(model, gl);
         }
+        _LateModelAddition.Clear();
     }
 
     protected override unsafe void OnOpenGlRender(GlInterface gl, int fb)
     {
+        CheckLateObjects(gl);
+
         gl.BindFramebuffer(GlConsts.GL_FRAMEBUFFER, fb);
         var scaling = (this.VisualRoot != null) ? this.VisualRoot!.RenderScaling : 1.0;
         gl.Viewport(0, 0, (int)(Bounds.Width * scaling), (int)(Bounds.Height * scaling));
@@ -113,6 +139,7 @@ public class GLControl : OpenGlControlBase
         {
             c.RenderModel(gl, _modelMatrixLoc);
         }
+
         //Draw tools models
         gl.Disable(GL_DEPTH_TEST);
         foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.ToolModels))
@@ -122,7 +149,10 @@ public class GLControl : OpenGlControlBase
         RequestNextFrameRendering();
     }
 
-    protected override void OnOpenGlDeinit(GlInterface gl){}
+    protected override void OnOpenGlDeinit(GlInterface gl)
+    {
+        SceneHierarchy.Instance.OnModelAdded -= OnModelAdded;
+    }
 
     public override void Render(DrawingContext context)
     {

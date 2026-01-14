@@ -54,24 +54,28 @@ public class Raycast
             return null;
     }
 
-    public static RaycastHit? GetObjectHitScreenLocation(List<Model> models, Vector3 origin, Vector3 cameraUp, Vector3 lookLocation, float aspect, float fov, Vector2 screenPos)
+    public static RaycastHit? GetObjectHitScreenLocation(List<Model> models, Vector3 origin, Vector3 cameraUp, Vector3 lookLocation, float aspect, float fov, Vector2 screenPos, Vector2 screenSize)
     {
         //Step account
-        float rayStrideHorizontal = MathF.Tan(fov / 2);
-        float rayStrideVertical = rayStrideHorizontal * aspect;
+        float strideVertical = MathF.Tan(fov / 2);
+        float strayHorizontal = strideVertical * aspect;
 
         Vector3 lookDirection = Vector3.Normalize(lookLocation - origin);
         //Compute realitive vectors
         Vector3 realitiveRight = Vector3.Normalize(Vector3.Cross(cameraUp, lookDirection));
         Vector3 realitiveUp = Vector3.Normalize(Vector3.Cross(lookDirection, realitiveRight));
 
-        Vector3 direction = Vector3.Normalize(lookDirection + ((realitiveRight * screenPos.X) - (realitiveUp * screenPos.Y)));
+        float stepX = strayHorizontal * 2.0f / (float)screenSize.X;
+        float stepY = strideVertical * 2.0f / (float)screenSize.Y;
+        Vector3 direction = Vector3.Normalize(lookDirection - (realitiveRight * (stepX * (screenPos.X - screenSize.X / 2)) + (realitiveUp * (stepY * (screenPos.Y - screenSize.Y/ 2)))));
 
         return GetObjectHit(models, origin, direction);
     }
 
     public static RaycastHit? GetObjectHit(List<Model> models, Vector3 origin, Vector3 direction)
     {
+        SceneHierarchy.Instance.AddModel(ModelPrefabs.DebugTriangleLine(origin, origin + (direction* 1000)));
+
         foreach (Model model in models)
         {
             if (!HasHitBoundingBox(model, origin, direction)) continue;
