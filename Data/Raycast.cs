@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Models;
 
-public class Raycast
+public static class Raycast
 {
     public static bool HasHitBoundingBox(Model model, Vector3 origin, Vector3 direction)
     {
@@ -56,9 +56,15 @@ public class Raycast
 
     public static RaycastHit? GetObjectHitScreenLocation(List<Model> models, Vector3 origin, Vector3 cameraUp, Vector3 lookLocation, float aspect, float fov, Vector2 screenPos, Vector2 screenSize)
     {
+        /*
+         * The following code is based on my raytracers screen to world calculations.
+         * 
+         * Converts a screen coordinate to valid raycast.
+         */
+
         //Step account
-        float strideVertical = MathF.Tan(fov / 2);
-        float strayHorizontal = strideVertical * aspect;
+        float strideVertical = MathF.Tan(fov / 2);//vertical FOV...
+        float strayHorizontal = strideVertical * aspect;//Horizontal FOV depending on aspect ratio.
 
         Vector3 lookDirection = Vector3.Normalize(lookLocation - origin);
         //Compute realitive vectors
