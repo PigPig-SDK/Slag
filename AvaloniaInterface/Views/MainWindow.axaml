@@ -8,7 +8,7 @@
         x:Class="OpenglAvaloniaTest.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="OpenGLTest">
+        Title="Slag">
 
 
     <Design.DataContext>
@@ -36,10 +36,9 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Side area -->
-            <Border Grid.Column="0" Background="#2B2B2B">
-                <!-- side UI -->
-            </Border>
+            <!-- Side area as a UserControl -->
+            <local:HierarchyPanel Grid.Column="0"/>
+
             <!-- OpenGL view -->
             <local:GLControl Grid.Column="1"/>
         </Grid>
