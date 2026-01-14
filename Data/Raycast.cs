@@ -80,25 +80,39 @@ public static class Raycast
 
     public static RaycastHit? GetObjectHit(List<Model> models, Vector3 origin, Vector3 direction)
     {
-        SceneHierarchy.Instance.AddModel(ModelPrefabs.DebugTriangleLine(origin, origin + (direction* 1000)));
+        Vector3 orignPure = origin;
+        Vector3 directionPure = direction;
 
+        RaycastHit? hit = null;
+        float closestDistance = float.PositiveInfinity;
         foreach (Model model in models)
         {
+            origin = orignPure - model.Position;
+
+
             if (!HasHitBoundingBox(model, origin, direction)) continue;
 
             foreach (var value in model.AllIndicies())
             {
-                RaycastHit? hit = CheckForHit(model, value, origin, direction);
-                if(hit != null)
+                //TODO: translate the origin/ray direction based on model transformations.
+                RaycastHit? hitTemp = CheckForHit(model, value, origin, direction);
+                if(hitTemp != null)
                 {
-                    //TODO: translate the origin/ray direction based on model transformations.
+                    float distanceCheck = Vector3.Distance(origin, hitTemp.HitPoint!.Value);
+                    if (distanceCheck > closestDistance) continue;
+                    closestDistance = distanceCheck;
 
-                    hit.Model = model;
-                    hit.Face = model.TriangleToFaceMapping[value];
-                    return hit;//For now, report any hit triangle.
+                    hitTemp.Model = model;
+                    hitTemp.Face = model.TriangleToFaceMapping[value];
+                    hit = hitTemp;
                 }
             }
         }
-        return null;
+        //Debug
+        if(hit != null)
+        {
+            SceneHierarchy.Instance.AddModel(ModelPrefabs.DebugTriangleLine(origin, hit.HitPoint!.Value));
+        }
+        return hit;
     }
 }
