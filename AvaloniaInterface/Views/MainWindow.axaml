@@ -18,21 +18,30 @@
     </Design.DataContext>
     <Grid>
         <Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel  Orientation="Horizontal" Spacing="8">
-            <!-- Place the menu at the top -->
-            <DockPanel>
-                <Menu DockPanel.Dock="Top">
-                    <MenuItem Header="_File">
-                        <MenuItem Header="_Open" Command="{Binding OpenCommand}"/>
-                    </MenuItem>
-                </Menu>
-            </DockPanel>
-        </StackPanel>
-        <!-- BODY -->
-        <local:GLControl Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <!-- Top menu -->
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open" Command="{Binding OpenCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- Body -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Side area -->
+            <Border Grid.Column="0" Background="#2B2B2B">
+                <!-- side UI -->
+            </Border>
+            <!-- OpenGL view -->
+            <local:GLControl Grid.Column="1"/>
+        </Grid>
     </Grid>
 </Window>

@@ -110,7 +110,7 @@ public class Camera
 
     public Matrix4 CreateLookAt() => Matrix4.LookAt(Origin, LookAt, Up);
 
-    public Matrix4 CreatePrespective(float aspect) => Matrix4.CreatePerspectiveFieldOfView(FOV, aspect, 0.01f, 100000f);
+    public Matrix4 CreatePrespective(float aspect) => Matrix4.CreatePerspectiveFieldOfView(FOV, (aspect == 0)? 1.0f : aspect, 0.01f, 100000f);
 
     /// <summary>
     /// Gets FOV in Radians
