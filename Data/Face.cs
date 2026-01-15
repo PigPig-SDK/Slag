@@ -29,6 +29,8 @@ public class Face
     {
         return HashCode.Combine(Indicies);
     }
+    
+    public void Flip() => Indicies.Reverse();
 
     public bool Contains(uint index) => Indicies.Contains(index);
 
@@ -47,7 +49,6 @@ public class Face
 
     private void FanTriangulate(ref List<uint> list)
     {
-
         uint fanSource = Indicies.First();
         for(int i = 1; i < Indicies.Count - 1; i++)
         {
