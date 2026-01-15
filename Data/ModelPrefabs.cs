@@ -30,12 +30,12 @@ public static class ModelPrefabs
         cube.AddVertex(new Vertex(1, 1, 1)); // 7
 
         //AddFace
-        cube.AddFace(0, 1, 2, 3);//Left
-        cube.AddFace(5, 4, 7, 6);//Right
-        cube.AddFace(2, 7, 6, 3);//Front
-        cube.AddFace(1, 4, 5, 0);//Back
-        cube.AddFace(1, 4, 7, 2);//Top
-        cube.AddFace(0, 5, 6, 3);//Bottom
+        cube.AddFace(0,1,2,3);//Left
+        cube.AddFace(6,7,4,5);//Right
+        cube.AddFace(2,7,6,3);//Front
+        cube.AddFace(0,5,4,1);//Back
+        cube.AddFace(1,4,7,2);//Top
+        cube.AddFace(3,6,5,0);//Bottom
 
         return cube;
     }
