@@ -41,6 +41,14 @@ public class Model
     public void AddFace(List<uint> indicies) => AddFace(new Face(indicies));
     public void AddFace(Face face)
     {
+        foreach(uint i in face.Indicies)
+        {
+            if( i < 0 || i > Verticies.Count -1)
+            {
+                throw new ArgumentException($"{nameof(face)} has an index out of range");
+            }
+        }
+
         face.ParentModel = this;
         _Faces.Add(face);
 

@@ -17,7 +17,7 @@ public static class ModelPrefabs
     public static Model InstanceBasicCube()
     {
         Model cube = new();
-        cube.ObjectName = "Generated Cube";
+        cube.ObjectName = "Basic Smooth Cube";
 
         //Add verts
         cube.AddVertex(new Vertex(-1, -1, -1)); // 0
@@ -38,6 +38,38 @@ public static class ModelPrefabs
         cube.AddFace(3,6,5,0);//Bottom
 
         return cube;
+    }
+
+    /// <returns>A basic cone</returns>
+    public static Model InstanceCone(int segments, float height, float radius)
+    {
+        Model cone = new();
+        cone.ObjectName = "Basic Cone";
+
+        //Add verts
+        cone.AddVertex(new Vertex(0, height, 0));//Top of cone
+
+        float step = 2 * float.Pi / segments;
+        for(int i = 0; i < segments; i++)
+        {
+            cone.AddVertex(new Vertex(MathF.Sin(step * i) * radius, 0, MathF.Cos(step * i) * radius));
+        }
+
+        for (uint i = 1; i <= segments; i++)
+        {
+            uint next = (uint)(i % segments) + 1;//Wrap around.
+            cone.AddFace(0, i, next);
+        }
+
+        //Bottom
+        uint[] bottomIndicies = new uint [segments];
+        for(uint i = 0; i < segments; i++)
+        {
+            bottomIndicies[i] = i + 1;
+        }
+        cone.AddFace(bottomIndicies);
+
+        return cone;
     }
     /// <returns>A basic triangle for debugging</returns>
     public static Model InstanceBasicTriangle()
@@ -61,8 +93,8 @@ public static class ModelPrefabs
         Model triad = new Model();
         triad.ObjectName = "Axis Triad model";
 
-        float arrowLength = 2.0f;
-        float arrowWidth = 0.05f;
+        float arrowLength = 0.5f;
+        float arrowWidth = 0.025f;
 
         triad.AddVertex(new Vertex(0, 0, 0));
         triad.AddVertex(new Vertex(arrowLength, arrowWidth, 0));
