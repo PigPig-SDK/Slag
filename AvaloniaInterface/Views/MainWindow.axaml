@@ -32,15 +32,18 @@
         <!-- Body -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Side area as a UserControl -->
-            <local:HierarchyPanel Grid.Column="0"/>
+            <local:HierarchyView Grid.Column="0"/>
+
+            <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="#808080"/>
 
             <!-- OpenGL view -->
-            <local:GLControl Grid.Column="1"/>
+            <local:GLControl Grid.Column="2"/>
         </Grid>
     </Grid>
 </Window>

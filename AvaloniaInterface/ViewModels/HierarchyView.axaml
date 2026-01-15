@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="OpenglAvaloniaTest.ViewModels.HierarchyView">
+
+    <StackPanel Spacing="8">
+        <Grid ColumnDefinitions="*,*">
+            <Button Grid.Column="0" Content="+" HorizontalAlignment="Stretch"/>
+            <Button Grid.Column="1" Content="-" HorizontalAlignment="Stretch"/>
+        </Grid>
+        <Separator/>
+        <ScrollViewer>
+			<StackPanel x:Name="HierarchyStack">
+				<!--Items go here...-->
+            </StackPanel>
+        </ScrollViewer>
+    </StackPanel>
+
+</UserControl>

@@ -10,12 +10,13 @@ using System.Threading.Tasks;
 using OpenTK.Mathematics;
 using Models;
 
-
 public class Camera
 {
     //camera controls
-    private float _pitch, _yaw;
-    private float _zoom = 1.0f;
+    //Pitch and YAW are in radians
+    private float _pitch = float.Pi / 4;
+    private float _yaw = float.Pi/4;
+    private float _zoom = 5.0f;
 
     private bool _isDragging = false;
     private Point _lastDragLocation;

@@ -18,7 +18,7 @@ public class GLModelComponent : ModelComponent
 
     private int _IndiciesCount = 0;
 
-    GlInterface glInterface = null;
+    GlInterface? glInterface = null;
 
     public void OpenglRestart(GlInterface gl)
     {
@@ -85,6 +85,8 @@ public class GLModelComponent : ModelComponent
         verts = model.Verticies.ToArray();
         ComputeNormals(verts, model.Indicies);
         _IndiciesCount = model.Indicies.Length;
+
+
 
         //Inform of vert data
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);

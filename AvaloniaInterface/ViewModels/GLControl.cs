@@ -25,7 +25,7 @@ public class GLControl : OpenGlControlBase
     private int _fragmentShader;
     private int _shaderProgram;
 
-    private int _modelMatrixLoc, _projectionMatrixLoc, _viewMatrixLoc;
+    private int _modelMatrixLoc, _projectionMatrixLoc, _viewMatrixLoc, _cameraLocationLoc;
 
     private Camera _camera;
 
@@ -79,6 +79,7 @@ public class GLControl : OpenGlControlBase
         _modelMatrixLoc = gl.GetUniformLocationString(_shaderProgram, "model_matrix");
         _projectionMatrixLoc = gl.GetUniformLocationString(_shaderProgram, "projection_matrix");
         _viewMatrixLoc = gl.GetUniformLocationString(_shaderProgram, "view_matrix");
+        _cameraLocationLoc = gl.GetUniformLocationString(_shaderProgram, "camera_location");
 
         gl.UseProgram(_shaderProgram);
         gl.Enable(GL_DEPTH_TEST);
@@ -132,6 +133,8 @@ public class GLControl : OpenGlControlBase
         
         gl.UniformMatrix4fv(_viewMatrixLoc, 1, false, &view);
         gl.UniformMatrix4fv(_projectionMatrixLoc, 1, false, &proj);
+        Vector3 cameraLocation = _camera.Origin;
+        gl.Uniform3f(_cameraLocationLoc, cameraLocation.X, cameraLocation.Y, cameraLocation.Z);
 
         //Draw all models
         gl.Enable(GL_DEPTH_TEST);
