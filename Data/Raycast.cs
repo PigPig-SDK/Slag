@@ -75,13 +75,12 @@ public static class Raycast
         float stepY = strideVertical * 2.0f / (float)screenSize.Y;
         Vector3 direction = Vector3.Normalize(lookDirection - (realitiveRight * (stepX * (screenPos.X - screenSize.X / 2)) + (realitiveUp * (stepY * (screenPos.Y - screenSize.Y/ 2)))));
 
-        return GetObjectHit(models, origin, direction);
+        return ComputeRaycastHit(models, origin, direction);
     }
 
-    public static RaycastHit? GetObjectHit(List<Model> models, Vector3 origin, Vector3 direction)
+    public static RaycastHit? ComputeRaycastHit(List<Model> models, Vector3 origin, Vector3 direction)
     {
         Vector3 orignPure = origin;
-        Vector3 directionPure = direction;
 
         RaycastHit? hit = null;
         float closestDistance = float.PositiveInfinity;

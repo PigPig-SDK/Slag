@@ -11,6 +11,6 @@ public partial class HierarchyView : UserControl
     public HierarchyView()
     {
         InitializeComponent();
-        HierarchyStack.Children.Add(new Button{Content = "Code given"});
+        HierarchyStack.Children.Add(new HierarchyModel { });
     }
 }

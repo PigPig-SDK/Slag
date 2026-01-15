@@ -40,7 +40,7 @@
             <!-- Side area as a UserControl -->
             <local:HierarchyView Grid.Column="0"/>
 
-            <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="#808080"/>
+            <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="#0D324D"/>
 
             <!-- OpenGL view -->
             <local:GLControl Grid.Column="2"/>

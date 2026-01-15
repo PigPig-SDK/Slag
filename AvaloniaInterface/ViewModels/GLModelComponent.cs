@@ -28,7 +28,7 @@ public class GLModelComponent : ModelComponent
         GenerateBuffers(gl);
     }
 
-    private string getInvalidBuffer()
+    private string GetInvalidBuffer()
     {
         return $"{(_VertexBufferObject == null ? $"{nameof(_VertexBufferObject)}, " : null)}{(_IndiciesBuffer == null ? $"{nameof(_IndiciesBuffer)}" : null)}";
     }
@@ -37,7 +37,7 @@ public class GLModelComponent : ModelComponent
     {
         if(_IndiciesBuffer != null && _VertexBufferObject != null)
         {
-            throw new InvalidOperationException($"Accidentally tried to assign {getInvalidBuffer()} before setting null!");
+            throw new InvalidOperationException($"Accidentally tried to assign {GetInvalidBuffer()} before setting null!");
         }
         glInterface = gl;
 
@@ -109,7 +109,7 @@ public class GLModelComponent : ModelComponent
     {
         if (_VertexBufferObject == null || _IndiciesBuffer == null)
         {
-            Console.WriteLine($"Tried to render object while : {getInvalidBuffer()} is null! Discarded draw call.");
+            Console.WriteLine($"Tried to render object while : {GetInvalidBuffer()} is null! Discarded draw call.");
             return;
         }
 
