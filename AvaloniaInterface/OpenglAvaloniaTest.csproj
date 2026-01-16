@@ -33,6 +33,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AvaloniaResource Update="Assets\hiddenIcon.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </AvaloniaResource>
+    <AvaloniaResource Update="Assets\visibleIcon.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </AvaloniaResource>
+  </ItemGroup>
+  
+  <ItemGroup>
     <None Update="Shaders\fragment.fs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

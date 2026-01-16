@@ -7,7 +7,9 @@
         <Expander HorizontalAlignment="Stretch" Focusable="False">
             <Expander.Header>
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="5">
-                    <Button Grid.Column="0" Content="Hide" CornerRadius="0"/>
+                    <Button Grid.Column="0" x:Name="HideButton" Click="OnHideButtonClick" CornerRadius="40">
+                        <Image Width="25" x:Name="HiddenImage" Source="../Assets/hiddenIcon.png"/>
+                    </Button>
                     <TextBox Grid.Column="1"
                              x:Name="NameTextbox"
                              Text="SuperLongFuckingName"

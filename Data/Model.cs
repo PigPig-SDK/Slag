@@ -14,6 +14,8 @@ public class Model
     private HashSet<Edge> _Edges = [];
     public uint[] Indicies = [];
 
+    public bool Hidden = false;
+
     private Dictionary<Type, ModelComponent> _Components = [];
 
     public Vector3 Position = Vector3.Zero;

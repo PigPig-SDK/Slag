@@ -8,6 +8,8 @@
         x:Class="OpenglAvaloniaTest.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/slagIcon.ico"
+        TransparencyLevelHint="AcrylicBlur" 
+        Background="Transparent" 
         Title="Slag">
 
 

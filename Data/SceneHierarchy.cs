@@ -14,7 +14,9 @@ public class SceneHierarchy
 
     public List<Model> ToolModels { get; private set; } = [ModelPrefabs.InstanceAxisTriad()];
 
-    public event Action<Model> OnModelAdded;
+    public event Action<Model>? OnModelAdded;
+
+    public event Action<Model>? OnModelRemoved;
 
     public void AddModel(Model model)
     {

@@ -123,7 +123,7 @@ public class GLControl : OpenGlControlBase
         var scaling = (this.VisualRoot != null) ? this.VisualRoot!.RenderScaling : 1.0;
         gl.Viewport(0, 0, (int)(Bounds.Width * scaling), (int)(Bounds.Height * scaling));
 
-        gl.ClearColor(0.1f, 0.1f, 0.1f, 1f);
+        gl.ClearColor(0.1f, 0.1f, 0.1f, 0.85f);
         gl.Clear(GlConsts.GL_COLOR_BUFFER_BIT | GlConsts.GL_DEPTH_BUFFER_BIT);
 
         //Camera controls

@@ -107,6 +107,8 @@ public class GLModelComponent : ModelComponent
 
     public unsafe void RenderModel(GlInterface gl, int modelMatrixUniform)
     {
+        if (model.Hidden) return;//Do not render.
+
         if (_VertexBufferObject == null || _IndiciesBuffer == null)
         {
             Console.WriteLine($"Tried to render object while : {GetInvalidBuffer()} is null! Discarded draw call.");
