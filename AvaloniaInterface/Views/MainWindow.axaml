@@ -25,7 +25,7 @@
         </Grid.RowDefinitions>
 
         <!-- Top menu -->
-        <Menu Grid.Row="0">
+        <Menu Grid.Row="0" Background="#1a1a1a">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="{Binding OpenCommand}"/>
             </MenuItem>
@@ -40,7 +40,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Side area as a UserControl -->
-            <local:HierarchyView Grid.Column="0"/>
+            <local:HierarchyView Grid.Column="0" Background="#1a1a1a"/>
 
             <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="#0D324D"/>
 
