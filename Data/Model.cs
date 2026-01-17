@@ -12,7 +12,10 @@ public class Model
     public List<Vertex> Verticies { get; private set; } = [];
     private List<Face> _Faces = [];
     private HashSet<Edge> _Edges = [];
+
+    //Important to note: Indicies are constantly changing.
     public uint[] Indicies = [];
+    public List<bool> SelectedVerticies = [];
 
     public bool Hidden = false;
 
@@ -91,7 +94,7 @@ public class Model
         UpdateAllComponents(ModelUpdateType.Edge | ModelUpdateType.Membership, edge);
     }
 
-    public void GenerateIndicies()
+    private void GenerateIndicies()
     {
         TriangleToFaceMapping.Clear();
         List<uint> indicies = [];
@@ -136,5 +139,12 @@ public class Model
         {
             yield return (Indicies[i], Indicies[i + 1], Indicies[i + 2]);
         }
+    }
+
+    public void GenerateTriangulatedModel(ref Vertex[] verts, ref List<uint> indicies)
+    {
+        verts = Verticies.ToArray();
+        GenerateIndicies();
+        indicies = new (Indicies);
     }
 }

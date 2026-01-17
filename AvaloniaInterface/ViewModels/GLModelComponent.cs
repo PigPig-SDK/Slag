@@ -18,7 +18,10 @@ public class GLModelComponent : ModelComponent
 
     private int _IndiciesCount = 0;
 
-    GlInterface? glInterface = null;
+    private GlInterface? glInterface = null;
+
+    private Dictionary<uint, List<uint>> _SharpIndicies = [];
+
 
     public void OpenglRestart(GlInterface gl)
     {
@@ -77,16 +80,36 @@ public class GLModelComponent : ModelComponent
 
     public unsafe void UpdateBuffers(GlInterface gl)
     {
-        //Temp buffers, to be sent to GPU.
         Vertex[] verts = [];
+        List<uint> indiciesList = []; //List that will encounter lots of modification
+        _SharpIndicies.Clear();
 
-        //Compute model data.
-        model.GenerateIndicies();
-        verts = model.Verticies.ToArray();
-        ComputeNormals(verts, model.Indicies);
-        _IndiciesCount = model.Indicies.Length;
+        model.GenerateTriangulatedModel(ref verts, ref indiciesList);
+
+        //Account for sharps.
+        for (int triangleStart = 0; triangleStart < indiciesList.Count; triangleStart += 3)
+        {
+            //Check each edge and account for triangulation, O(1).?
+            //When triangulation occurs, store index mapping in _SharpIndicies
+        }
+
+        /*
+         foreach triangle
+            for each edge
+                if sharp
+                indicies.remove(old triangle)
+                indicies.add, new triangle accounting for sharps
+         */
 
 
+        uint[] indicies = indiciesList.ToArray();
+        
+        //Manage edges
+        ComputeNormals(verts, indicies);
+        _IndiciesCount = indicies.Length;
+        ///
+        //Populate OPENGL buffers
+        ///
 
         //Inform of vert data
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
@@ -98,11 +121,11 @@ public class GLModelComponent : ModelComponent
 
         //Inform of indicies
         gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _IndiciesBuffer!.Value);
-        fixed (uint* ptr = model.Indicies)
+        fixed (uint* ptr = indicies)
         {
             gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * _IndiciesCount, (nint)ptr, GL_STATIC_DRAW);
         }
-        Console.WriteLine($"{nameof(model.Indicies)} Upload Error: {gl.GetError()}");
+        Console.WriteLine($"{nameof(indicies)} Upload Error: {gl.GetError()}");
     }
 
     public unsafe void RenderModel(GlInterface gl, int modelMatrixUniform)

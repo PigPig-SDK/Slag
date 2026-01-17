@@ -15,6 +15,7 @@ public record class Edge
 {
     public uint Vertex1 { get; internal set; }
     public uint Vertex2 { get; internal set; }
+    public bool IsSharp = false;
 
     public Edge(uint vertex1, uint vertex2)
     {
