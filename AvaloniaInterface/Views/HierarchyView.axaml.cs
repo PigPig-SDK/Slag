@@ -18,7 +18,7 @@ public partial class HierarchyView : UserControl
     public HierarchyView()
     {
         InitializeComponent();
-        foreach (Model model in SceneHierarchy.Instance.Models)
+        foreach (Model model in SceneHierarchy.Instance.SceneModels())
         {
             OnModelAdded(model);
         }

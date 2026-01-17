@@ -54,7 +54,7 @@ public static class Raycast
             return null;
     }
 
-    public static RaycastHit? GetObjectHitScreenLocation(List<Model> models, Vector3 origin, Vector3 cameraUp, Vector3 lookLocation, float aspect, float fov, Vector2 screenPos, Vector2 screenSize)
+    public static RaycastHit? GetObjectHitScreenLocation(IEnumerable<Model> models, Vector3 origin, Vector3 cameraUp, Vector3 lookLocation, float aspect, float fov, Vector2 screenPos, Vector2 screenSize)
     {
         /*
          * The following code is based on my raytracers screen to world calculations.
@@ -78,7 +78,7 @@ public static class Raycast
         return ComputeRaycastHit(models, origin, direction);
     }
 
-    public static RaycastHit? ComputeRaycastHit(List<Model> models, Vector3 origin, Vector3 direction)
+    public static RaycastHit? ComputeRaycastHit(IEnumerable<Model> models, Vector3 origin, Vector3 direction)
     {
         Vector3 orignPure = origin;
 

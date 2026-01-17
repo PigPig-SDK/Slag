@@ -11,5 +11,21 @@
   
     <Application.Styles>
         <FluentTheme/>
+
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="Roboto"/>
+        </Style>
+
+        <Style Selector="TextBox">
+            <Setter Property="FontFamily" Value="Roboto"/>
+        </Style>
+
+        <Style Selector="Button">
+            <Setter Property="FontFamily" Value="Roboto"/>
+        </Style>
+
+        <Style Selector="Label">
+            <Setter Property="FontFamily" Value="Roboto"/>
+        </Style>
     </Application.Styles>
 </Application>

@@ -8,19 +8,38 @@
             <Expander.Header>
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="5">
                     <Button Grid.Column="0" x:Name="HideButton" Click="OnHideButtonClick" CornerRadius="40">
-                        <Image Width="25" x:Name="HiddenImage" Source="../Assets/hiddenIcon.png"/>
+                        <Image Width="25" x:Name="HiddenImage" Source="../Assets/visibleIcon.png"/>
                     </Button>
                     <TextBox Grid.Column="1"
                              x:Name="NameTextbox"
-                             Text="SuperLongFuckingName"
+                             Text="Test"
                              VerticalAlignment="Center"
                              Watermark="ObjectName" KeyDown="OnNameKeyDown"/>
                 </Grid>
             </Expander.Header>
-            <!-- Expanded content -->
-            <StackPanel>
-                <!-- properties here -->
-            </StackPanel>
+            <Grid RowDefinitions="Auto,*" RowSpacing="10">
+            <!-- Top: Delete button -->
+            <Button Grid.Row="0"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Content="Delete"
+                    Click="DeleteModelClick"/>
+
+            <!-- Bottom: position stuff -->
+            <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,Auto"
+                  ColumnDefinitions="Auto,*">
+                <Label Grid.Row="0" Grid.Column="0" Content="Posistion"/>
+                <!-- X -->
+                <Label Grid.Row="1" Grid.Column="0" Content="X"/>
+                <TextBox Grid.Row="1" Grid.Column="1" x:Name="XBox" TextChanged="OnPositionTextChanged" KeyDown="HandleNonNumericInput"/>
+                <!-- Y -->
+                <Label Grid.Row="2" Grid.Column="0" Content="Y" />
+                <TextBox Grid.Row="2" Grid.Column="1" x:Name="YBox" TextChanged="OnPositionTextChanged" KeyDown="HandleNonNumericInput"/>
+                <!-- Z -->
+                <Label Grid.Row="3" Grid.Column="0" Content="Z"/>
+                <TextBox Grid.Row="3" Grid.Column="1" x:Name="ZBox" TextChanged="OnPositionTextChanged" KeyDown="HandleNonNumericInput"/>
+            </Grid>
+        </Grid>
         </Expander>
     </Grid>
 </UserControl>

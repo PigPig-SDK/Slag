@@ -196,7 +196,7 @@ public class GLModelComponent : ModelComponent
 
     }
 
-    public static IEnumerable<GLModelComponent> AllComponents(List<Model> models)
+    public static IEnumerable<GLModelComponent> AllComponents(IEnumerable<Model> models)
     {
         foreach (Model model in models)
         {
@@ -211,10 +211,13 @@ public class GLModelComponent : ModelComponent
 
     public override void Dispose()
     {
+        //Clean up the opengl resources.
         if (glInterface == null) return;
 
-        glInterface.DeleteBuffer(_VertexBufferObject!.Value);
-        glInterface.DeleteBuffer(_IndiciesBuffer!.Value);
-        glInterface.DeleteVertexArray(_VertexArrayObject!.Value);
+        if(_VertexBufferObject != null) glInterface.DeleteBuffer(_VertexBufferObject!.Value);
+        if(_IndiciesBuffer != null) glInterface.DeleteBuffer(_IndiciesBuffer!.Value);
+        if (_VertexArrayObject != null)  glInterface.DeleteVertexArray(_VertexArrayObject!.Value);
+
+        glInterface = null;
     }
 }

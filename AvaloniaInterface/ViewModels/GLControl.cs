@@ -138,14 +138,14 @@ public class GLControl : OpenGlControlBase
 
         //Draw all models
         gl.Enable(GL_DEPTH_TEST);
-        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.Models))
+        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneModels()))
         {
             c.RenderModel(gl, _modelMatrixLoc);
         }
 
         //Draw tools models
         gl.Disable(GL_DEPTH_TEST);
-        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.ToolModels))
+        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneTools()))
         {
             c.RenderModel(gl, _modelMatrixLoc);
         }

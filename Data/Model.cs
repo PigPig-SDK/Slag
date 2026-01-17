@@ -6,7 +6,7 @@ using OpenTK.Mathematics;
 
 namespace Models;
 
-public class Model
+public class Model : IDisposable
 {
     public string ObjectName = "Object";
     public List<Vertex> Verticies { get; private set; } = [];
@@ -146,5 +146,15 @@ public class Model
         verts = Verticies.ToArray();
         GenerateIndicies();
         indicies = new (Indicies);
+    }
+
+    ~Model() => Dispose();
+
+    public void Dispose()
+    {
+        foreach(var component in _Components.Values)
+        {
+            component.Dispose();
+        }
     }
 }

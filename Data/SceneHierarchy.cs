@@ -10,9 +10,9 @@ public class SceneHierarchy
 {
     public static SceneHierarchy Instance = new();
 
-    public List<Model> Models { get; private set; } = [ModelPrefabs.InstanceCone(100,3,1)];
+    private List<Model> Models { get; set; } = [ModelPrefabs.InstanceCone(100,3,1)];
 
-    public List<Model> ToolModels { get; private set; } = [ModelPrefabs.InstanceAxisTriad()];
+    private List<Model> Tools { get; set; } = [ModelPrefabs.InstanceAxisTriad()];
 
     public event Action<Model>? OnModelAdded;
 
@@ -24,13 +24,36 @@ public class SceneHierarchy
         OnModelAdded?.Invoke(model);
     }
 
+    public void RemoveModel(Model model)
+    {
+        model.Dispose();
+        Models.Remove(model);
+        OnModelRemoved?.Invoke(model);
+    }
+
+    public IEnumerable<Model> SceneModels()
+    {
+        foreach (var model in Models)
+        {
+            yield return model;
+        }
+    }
+
+    public IEnumerable<Model> SceneTools()
+    {
+        foreach (var model in Tools)
+        {
+            yield return model;
+        }
+    }
+
     public IEnumerable<Model> AllModels()
     {
         foreach (var model in Models)
         {
             yield return model;
         }
-        foreach (var model in ToolModels)
+        foreach (var model in Tools)
         { 
             yield return model;
         }
