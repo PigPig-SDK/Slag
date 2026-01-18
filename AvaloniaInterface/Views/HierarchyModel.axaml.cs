@@ -36,6 +36,7 @@ public partial class HierarchyModel : UserControl
 
         UpdatePositionText();
         UpdateRotationText();
+        UpdateScaleText();
     }
     void UpdatePositionText()
     {
@@ -50,6 +51,14 @@ public partial class HierarchyModel : UserControl
         YRotationBox.Text = (Model!.Rotation.Y * _RadiansToDegrees).ToString();
         ZRotationBox.Text = (Model!.Rotation.Z * _RadiansToDegrees).ToString();
     }
+
+    private void UpdateScaleText()
+    {
+        XScaleBox.Text = Model!.Scale.X.ToString();
+        YScaleBox.Text = Model!.Scale.Y.ToString();
+        ZScaleBox.Text = Model!.Scale.Z.ToString();
+    }
+
 
     private void OnNameKeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
     {
@@ -108,9 +117,20 @@ public partial class HierarchyModel : UserControl
         if (float.TryParse(ZRotationBox.Text, out float z)) Model!.Rotation.Z = z * _DegreesToRadians;
     }
 
+    private void OnScaleTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        if (Model == null) return;
+
+        if (float.TryParse(XScaleBox.Text, out float x)) Model!.Scale.X = x;
+
+        if (float.TryParse(YScaleBox.Text, out float y)) Model!.Scale.Y = y;
+
+        if (float.TryParse(ZScaleBox.Text, out float z)) Model!.Scale.Z = z;
+    }
+
     private void HandleNonNumericInput(object? sender, KeyEventArgs e)
     {
-        if(e == null) return;
+        if (e == null) return;
         if (sender == null) return;
 
         var tb = sender as TextBox;
@@ -119,6 +139,7 @@ public partial class HierarchyModel : UserControl
         {
             UpdatePositionText();
             UpdateRotationText();
+            UpdateScaleText();
             TopLevel.GetTopLevel(tb)?.Focus();
             e.Handled = true;
         }
@@ -128,7 +149,7 @@ public partial class HierarchyModel : UserControl
             e.Handled = true;
             return;
         }
-        if(tb.Text == null) return;
+        if (tb.Text == null) return;
 
         bool rejectKey = true;
 

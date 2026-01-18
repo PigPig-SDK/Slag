@@ -17,16 +17,18 @@
                              Watermark="ObjectName" KeyDown="OnNameKeyDown"/>
                 </Grid>
             </Expander.Header>
-            <Grid RowDefinitions="Auto,*,*" RowSpacing="10">
+            
+            <Grid RowDefinitions="Auto,*,*,*,*,*" RowSpacing="10">
+            
             <!-- Top: Delete button -->
             <Button Grid.Row="0"
                     HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Center"
                     Content="Delete"
                     Click="DeleteModelClick"/>
-
+            <Separator Grid.Row="1"/>
             <!-- Bottom: position stuff -->
-            <Grid Grid.Row="1" RowDefinitions="Auto,Auto"
+            <Grid Grid.Row="2" RowDefinitions="Auto,Auto"
                   ColumnDefinitions="1*,2*,1*,2*,1*,2*">
                 <Label Grid.Row="0" Grid.Column="0" Content="Posistion" VerticalAlignment="Center" Grid.ColumnSpan="6" HorizontalAlignment="Center"/>
                 <!-- X -->
@@ -40,7 +42,7 @@
                 <TextBox Grid.Row="1" Grid.Column="5" MinWidth="0" x:Name="ZBox" TextChanged="OnPositionTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
             </Grid>
             <!-- Bottom: Rotation stuff -->
-            <Grid Grid.Row="2" RowDefinitions="Auto,Auto"
+            <Grid Grid.Row="3" RowDefinitions="Auto,Auto"
                   ColumnDefinitions="1*,2*,1*,2*,1*,2*">
                 <Label Grid.Row="0" Grid.Column="0" Content="Rotation" VerticalAlignment="Center" Grid.ColumnSpan="6" HorizontalAlignment="Center"/>
                 <!-- X -->
@@ -53,6 +55,20 @@
                 <Label Grid.Row="1" Grid.Column="4" MaxWidth="20" MinWidth="0"  Content="Z" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <TextBox Grid.Row="1" Grid.Column="5" MinWidth="0" x:Name="ZRotationBox" TextChanged="OnRotationTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
             </Grid>
+            <Grid Grid.Row="4" RowDefinitions="Auto,Auto"
+                  ColumnDefinitions="1*,2*,1*,2*,1*,2*">
+                <Label Grid.Row="0" Grid.Column="0" Content="Scale" VerticalAlignment="Center" Grid.ColumnSpan="6" HorizontalAlignment="Center"/>
+                <!-- X -->
+                <Label Grid.Row="1" Grid.Column="0" MaxWidth="20" MinWidth="0" Content="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="1" MinWidth="0" x:Name="XScaleBox" TextChanged="OnScaleTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
+                <!-- Y -->
+                <Label Grid.Row="1" Grid.Column="2" MaxWidth="20" MinWidth="0" Content="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="3" MinWidth="0" x:Name="YScaleBox" TextChanged="OnScaleTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
+                <!-- Z -->
+                <Label Grid.Row="1" Grid.Column="4" MaxWidth="20" MinWidth="0"  Content="Z" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="5" MinWidth="0" x:Name="ZScaleBox" TextChanged="OnScaleTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
+            </Grid>
+            <Separator Grid.Row="5"/>
         </Grid>
         </Expander>
     </Grid>
