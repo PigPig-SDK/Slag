@@ -18,6 +18,9 @@ public partial class HierarchyModel : UserControl
     private static readonly string HiddenImageDirectory = "avares://AvaloniaInterface/Assets/hiddenIcon.png";
     private static readonly string VisibleImageDirectory = "avares://AvaloniaInterface/Assets/visibleIcon.png";
 
+    private const float _DegreesToRadians = (float)(Math.PI / 180.0);
+    private const float _RadiansToDegrees = (float)(180.0 / Math.PI);
+
     public Model? Model;
 
     public HierarchyModel()
@@ -32,13 +35,20 @@ public partial class HierarchyModel : UserControl
         NameTextbox.Text = Model.ObjectName;
 
         UpdatePositionText();
+        UpdateRotationText();
     }
     void UpdatePositionText()
     {
         XBox.Text = Model!.Position.X.ToString();
         YBox.Text = Model!.Position.Y.ToString();
         ZBox.Text = Model!.Position.Z.ToString();
+    }
 
+    private void UpdateRotationText()
+    {
+        XRotationBox.Text = (Model!.Rotation.X * _RadiansToDegrees).ToString();
+        YRotationBox.Text = (Model!.Rotation.Y * _RadiansToDegrees).ToString();
+        ZRotationBox.Text = (Model!.Rotation.Z * _RadiansToDegrees).ToString();
     }
 
     private void OnNameKeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
@@ -49,6 +59,8 @@ public partial class HierarchyModel : UserControl
             e.Handled = true;
         }
     }
+
+
 
     private void OnHideButtonClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
@@ -85,13 +97,28 @@ public partial class HierarchyModel : UserControl
 
     }
 
+    private void OnRotationTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        if (Model == null) return;
+
+        if (float.TryParse(XRotationBox.Text, out float x)) Model!.Rotation.X = x * _DegreesToRadians;
+
+        if (float.TryParse(YRotationBox.Text, out float y)) Model!.Rotation.Y = y * _DegreesToRadians;
+
+        if (float.TryParse(ZRotationBox.Text, out float z)) Model!.Rotation.Z = z * _DegreesToRadians;
+    }
+
     private void HandleNonNumericInput(object? sender, KeyEventArgs e)
     {
+        if(e == null) return;
+        if (sender == null) return;
+
         var tb = sender as TextBox;
 
         if (e.Key == Key.Enter || e.Key == Key.Return)
         {
             UpdatePositionText();
+            UpdateRotationText();
             TopLevel.GetTopLevel(tb)?.Focus();
             e.Handled = true;
         }
@@ -101,6 +128,7 @@ public partial class HierarchyModel : UserControl
             e.Handled = true;
             return;
         }
+        if(tb.Text == null) return;
 
         bool rejectKey = true;
 
@@ -108,10 +136,10 @@ public partial class HierarchyModel : UserControl
         if ((e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9))
             rejectKey = false;
         // Period: only allow if not already in text
-        else if ((e.Key == Key.OemPeriod || e.Key == Key.Decimal) && !tb.Text.Contains("."))
+        else if ((e.Key == Key.OemPeriod || e.Key == Key.Decimal) && !tb.Text!.Contains("."))
             rejectKey = false;
         // Minus: only at start and not already present
-        else if ((e.Key == Key.OemMinus || e.Key == Key.Subtract) && !tb.Text.Contains("-"))
+        else if ((e.Key == Key.OemMinus || e.Key == Key.Subtract) && !tb.Text!.Contains("-"))
             rejectKey = false;
 
         e.Handled = rejectKey;

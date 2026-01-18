@@ -38,7 +38,7 @@ public class GLModelComponent : ModelComponent
 
     public void GenerateBuffers(GlInterface gl)
     {
-        if(_IndiciesBuffer != null && _VertexBufferObject != null)
+        if (_IndiciesBuffer != null && _VertexBufferObject != null)
         {
             throw new InvalidOperationException($"Accidentally tried to assign {GetInvalidBuffer()} before setting null!");
         }
@@ -103,7 +103,7 @@ public class GLModelComponent : ModelComponent
 
 
         uint[] indicies = indiciesList.ToArray();
-        
+
         //Manage edges
         ComputeNormals(verts, indicies);
         _IndiciesCount = indicies.Length;
@@ -143,9 +143,9 @@ public class GLModelComponent : ModelComponent
         Matrix4 rotZ = Matrix4.CreateRotationZ(model.Rotation.Z);
         Matrix4 rotationMat = rotZ * rotY * rotX; // ZYX order of rotation...
 
-        Matrix4 modelTransformation = 
-            Matrix4.CreateTranslation(model.Position) 
-            * rotationMat 
+        Matrix4 modelTransformation =
+             rotationMat 
+            * Matrix4.CreateTranslation(model.Position)
             * Matrix4.CreateScale(model.Scale);
 
         gl.UniformMatrix4fv(modelMatrixUniform, 1, false, &modelTransformation);
@@ -170,7 +170,7 @@ public class GLModelComponent : ModelComponent
         }
 
         //Compute sum of normals
-        for(int i = 0; i < indicies.Length; i+=3)
+        for (int i = 0; i < indicies.Length; i += 3)
         {
             //Get locations
             Vector3 p1 = verts[indicies[i]].Position;
@@ -214,9 +214,9 @@ public class GLModelComponent : ModelComponent
         //Clean up the opengl resources.
         if (glInterface == null) return;
 
-        if(_VertexBufferObject != null) glInterface.DeleteBuffer(_VertexBufferObject!.Value);
-        if(_IndiciesBuffer != null) glInterface.DeleteBuffer(_IndiciesBuffer!.Value);
-        if (_VertexArrayObject != null)  glInterface.DeleteVertexArray(_VertexArrayObject!.Value);
+        if (_VertexBufferObject != null) glInterface.DeleteBuffer(_VertexBufferObject!.Value);
+        if (_IndiciesBuffer != null) glInterface.DeleteBuffer(_IndiciesBuffer!.Value);
+        if (_VertexArrayObject != null) glInterface.DeleteVertexArray(_VertexArrayObject!.Value);
 
         glInterface = null;
     }

@@ -17,7 +17,7 @@
                              Watermark="ObjectName" KeyDown="OnNameKeyDown"/>
                 </Grid>
             </Expander.Header>
-            <Grid RowDefinitions="Auto,*" RowSpacing="10">
+            <Grid RowDefinitions="Auto,*,*" RowSpacing="10">
             <!-- Top: Delete button -->
             <Button Grid.Row="0"
                     HorizontalAlignment="Stretch"
@@ -26,18 +26,32 @@
                     Click="DeleteModelClick"/>
 
             <!-- Bottom: position stuff -->
-            <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,Auto"
-                  ColumnDefinitions="Auto,*">
-                <Label Grid.Row="0" Grid.Column="0" Content="Posistion"/>
+            <Grid Grid.Row="1" RowDefinitions="Auto,Auto"
+                  ColumnDefinitions="1*,2*,1*,2*,1*,2*">
+                <Label Grid.Row="0" Grid.Column="0" Content="Posistion" VerticalAlignment="Center" Grid.ColumnSpan="6" HorizontalAlignment="Center"/>
                 <!-- X -->
-                <Label Grid.Row="1" Grid.Column="0" Content="X"/>
-                <TextBox Grid.Row="1" Grid.Column="1" x:Name="XBox" TextChanged="OnPositionTextChanged" KeyDown="HandleNonNumericInput"/>
+                <Label Grid.Row="1" Grid.Column="0" MaxWidth="20" MinWidth="0" Content="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="1" MinWidth="0" x:Name="XBox" TextChanged="OnPositionTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
                 <!-- Y -->
-                <Label Grid.Row="2" Grid.Column="0" Content="Y" />
-                <TextBox Grid.Row="2" Grid.Column="1" x:Name="YBox" TextChanged="OnPositionTextChanged" KeyDown="HandleNonNumericInput"/>
+                <Label Grid.Row="1" Grid.Column="2" MaxWidth="20" MinWidth="0" Content="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="3" MinWidth="0" x:Name="YBox" TextChanged="OnPositionTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
                 <!-- Z -->
-                <Label Grid.Row="3" Grid.Column="0" Content="Z"/>
-                <TextBox Grid.Row="3" Grid.Column="1" x:Name="ZBox" TextChanged="OnPositionTextChanged" KeyDown="HandleNonNumericInput"/>
+                <Label Grid.Row="1" Grid.Column="4" MaxWidth="20" MinWidth="0"  Content="Z" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="5" MinWidth="0" x:Name="ZBox" TextChanged="OnPositionTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
+            </Grid>
+            <!-- Bottom: Rotation stuff -->
+            <Grid Grid.Row="2" RowDefinitions="Auto,Auto"
+                  ColumnDefinitions="1*,2*,1*,2*,1*,2*">
+                <Label Grid.Row="0" Grid.Column="0" Content="Rotation" VerticalAlignment="Center" Grid.ColumnSpan="6" HorizontalAlignment="Center"/>
+                <!-- X -->
+                <Label Grid.Row="1" Grid.Column="0" MaxWidth="20" MinWidth="0" Content="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="1" MinWidth="0" x:Name="XRotationBox" TextChanged="OnRotationTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
+                <!-- Y -->
+                <Label Grid.Row="1" Grid.Column="2" MaxWidth="20" MinWidth="0" Content="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="3" MinWidth="0" x:Name="YRotationBox" TextChanged="OnRotationTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
+                <!-- Z -->
+                <Label Grid.Row="1" Grid.Column="4" MaxWidth="20" MinWidth="0"  Content="Z" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="5" MinWidth="0" x:Name="ZRotationBox" TextChanged="OnRotationTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
             </Grid>
         </Grid>
         </Expander>
