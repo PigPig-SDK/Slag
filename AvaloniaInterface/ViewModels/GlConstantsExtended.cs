@@ -24,4 +24,6 @@ public static class GlConstantsExtended
 
     public const int GL_TRIANGLE_FAN = 0x0006;
 
+    public const int GL_LEQUAL = 0x0203;
+
 }

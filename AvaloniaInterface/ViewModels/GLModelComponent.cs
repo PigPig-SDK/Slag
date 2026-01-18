@@ -146,37 +146,28 @@ public class GLModelComponent : ModelComponent
         //Not implemented yet.
     }
 
-    public unsafe void RenderModel(GlInterface gl, int modelMatrixUniform)
+    public unsafe void RenderModel(GlInterface gl)
     {
-        if (model.Hidden) return;//Do not render.
-
         if (_VertexBufferObject == null || _IndiciesBuffer == null)
         {
             Console.WriteLine($"Tried to render object while : {GetInvalidBuffer()} is null! Discarded draw call.");
             return;
         }
 
-        Matrix4 rotX = Matrix4.CreateRotationX(model.Rotation.X);
-        Matrix4 rotY = Matrix4.CreateRotationY(model.Rotation.Y);
-        Matrix4 rotZ = Matrix4.CreateRotationZ(model.Rotation.Z);
-        Matrix4 rotationMat = rotZ * rotY * rotX; // ZYX order of rotation...
+        gl.BindVertexArray(_TriangleArrayObject!.Value);
+        gl.DrawElements(GL_TRIANGLES, _IndiciesCount, GL_UNSIGNED_INT, 0);
+    }
 
-        Matrix4 modelTransformation =
-             rotationMat 
-            * Matrix4.CreateTranslation(model.Position)
-            * Matrix4.CreateScale(model.Scale);
-
-        gl.UniformMatrix4fv(modelMatrixUniform, 1, false, &modelTransformation);
-
-        //gl.BindVertexArray(_TriangleArrayObject!.Value);
-        ////Console.WriteLine($"{nameof(_VertexArrayObject)} Bind Error: {gl.GetError()}");
-        //gl.DrawElements(GL_TRIANGLES, _IndiciesCount, GL_UNSIGNED_INT, 0);
-        ////Console.WriteLine($"{nameof(_Indicies)} Draw error: {gl.GetError()}");
-        //gl.BindVertexArray(0);
-
+    internal void RenderEdges(GlInterface gl)
+    {
         gl.BindVertexArray(_EdgeArrayObject!.Value);
         gl.DrawElements(GL_LINES, _EdgeIndiciesCount, GL_UNSIGNED_INT, 0);
         gl.BindVertexArray(0);
+    }
+
+    internal void RenderVerts(GlInterface gl)
+    {
+
     }
 
     public void ComputeNormals(Vertex[] verts, uint[] indicies)
@@ -239,5 +230,17 @@ public class GLModelComponent : ModelComponent
         if (_TriangleArrayObject != null) glInterface.DeleteVertexArray(_TriangleArrayObject!.Value);
 
         glInterface = null;
+    }
+
+    internal Matrix4 GetModelTranslationMatrix()
+    {
+        Matrix4 rotX = Matrix4.CreateRotationX(model.Rotation.X);
+        Matrix4 rotY = Matrix4.CreateRotationY(model.Rotation.Y);
+        Matrix4 rotZ = Matrix4.CreateRotationZ(model.Rotation.Z);
+        Matrix4 rotationMat = rotZ * rotY * rotX; // ZYX order of rotation...
+
+        return rotationMat
+            * Matrix4.CreateTranslation(model.Position)
+            * Matrix4.CreateScale(model.Scale);
     }
 }

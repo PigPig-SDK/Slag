@@ -13,17 +13,18 @@ using Avalonia.Media;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using Models;
+using OpenTK.Mathematics;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using static Avalonia.OpenGL.GlConsts;
-using OpenTK.Mathematics;
 
 public class GLControl : OpenGlControlBase
 {
-    private int _shaderProgram;
-
-    private int _modelMatrixLoc, _projectionMatrixLoc, _viewMatrixLoc, _cameraLocationLoc;
+    private ShaderProgram _triangleShaderProgram = new();
+    private ShaderProgram _edgeShaderProgram = new();
+    private ShaderProgram _vertexShaderProgram = new();
 
     private Camera _camera;
 
@@ -57,40 +58,23 @@ public class GLControl : OpenGlControlBase
             Console.WriteLine("OPENGL ERROR:" + err);
     }
 
-    void GenerateShaders(GlInterface gl)
-    {
-        //Compile/link shaders
-        int vertexShader = gl.CreateShader(GL_VERTEX_SHADER);
-        Console.WriteLine("Vertex shader error : " + gl.CompileShaderAndGetError(vertexShader, LoadShaderFile(TriangleVertexShader)));
-
-        int fragmentShader = gl.CreateShader(GL_FRAGMENT_SHADER);
-        Console.WriteLine("Fragment shader error : " + gl.CompileShaderAndGetError(fragmentShader, LoadShaderFile(TriangleFragmentShader)));
-
-        //Create shaderprogram
-        _shaderProgram = gl.CreateProgram();
-        gl.AttachShader(_shaderProgram, vertexShader);
-        gl.AttachShader(_shaderProgram, fragmentShader);
-    }
-
     protected override unsafe void OnOpenGlInit(GlInterface gl)
     {
         CheckError(gl);
         Console.WriteLine($"Renderer: {gl.GetString(GL_RENDERER)} Version: {gl.GetString(GL_VERSION)}");
 
-        GenerateShaders(gl);
+        Console.WriteLine("Generating triangle shader program...");
+        _triangleShaderProgram.GenerateShaderProgram(gl, TriangleVertexShader, TriangleFragmentShader);
 
-        //Bind to string location with attribute
-        Console.WriteLine("Link shader program: " + gl.LinkProgramAndGetError(_shaderProgram));
+        Console.WriteLine("Generating edge shader program...");
+        _edgeShaderProgram.GenerateShaderProgram(gl, EdgeVertexShader, EdgeFragmentShader);
+
+        Console.WriteLine("Generating vertex shader program...");
+        _vertexShaderProgram.GenerateShaderProgram(gl, VertexVertexShader, VertexFragmentShader);
 
         CheckError(gl);
-        //Bind uniforms
-        _modelMatrixLoc = gl.GetUniformLocationString(_shaderProgram, "model_matrix");
-        _projectionMatrixLoc = gl.GetUniformLocationString(_shaderProgram, "projection_matrix");
-        _viewMatrixLoc = gl.GetUniformLocationString(_shaderProgram, "view_matrix");
-        _cameraLocationLoc = gl.GetUniformLocationString(_shaderProgram, "camera_location");
 
-        gl.UseProgram(_shaderProgram);
-        gl.Enable(GL_DEPTH_TEST);
+        gl.UseProgram(_triangleShaderProgram.ProgramID);
 
         //Add components and buffer data to opengl.
         foreach (Model model in SceneHierarchy.Instance.AllModels())
@@ -139,23 +123,41 @@ public class GLControl : OpenGlControlBase
         float aspect = (float)(Bounds.Width / (double)Bounds.Height);
         Matrix4 proj = _camera.CreatePrespective(aspect);
         
-        gl.UniformMatrix4fv(_viewMatrixLoc, 1, false, &view);
-        gl.UniformMatrix4fv(_projectionMatrixLoc, 1, false, &proj);
-        Vector3 cameraLocation = _camera.Origin;
-        gl.Uniform3f(_cameraLocationLoc, cameraLocation.X, cameraLocation.Y, cameraLocation.Z);
+
 
         //Draw all models
         gl.Enable(GL_DEPTH_TEST);
-        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneModels()))
+        foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneModels()))
         {
-            c.RenderModel(gl, _modelMatrixLoc);
+            if(component.model.Hidden) continue;
+
+            Matrix4 modelTransformation = component.GetModelTranslationMatrix();
+
+            //Triangles
+            _triangleShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
+            gl.DepthMask(1);//true
+            gl.DepthFunc(GL_LESS);
+            component.RenderModel(gl);
+
+            _edgeShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
+            gl.DepthMask(0);//false
+            gl.DepthFunc(GlConstantsExtended.GL_LEQUAL);
+            component.RenderEdges(gl);
+
+            gl.DepthMask(1);//true
+
+            component.RenderVerts(gl);
         }
 
         //Draw tools models
         gl.Disable(GL_DEPTH_TEST);
-        foreach (GLModelComponent c in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneTools()))
+        foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneTools()))
         {
-            c.RenderModel(gl, _modelMatrixLoc);
+            if (component.model.Hidden) continue;
+
+            Matrix4 modelTransformation = component.GetModelTranslationMatrix();
+            _triangleShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
+            component.RenderModel(gl);
         }
         RequestNextFrameRendering();
     }
@@ -172,10 +174,4 @@ public class GLControl : OpenGlControlBase
         context.FillRectangle(Brushes.Transparent, new Avalonia.Rect(Bounds.Size));
     }
 
-    public static string LoadShaderFile(string shaderFile)
-    {
-        ArgumentNullException.ThrowIfNull(shaderFile);
-
-        return File.ReadAllText(shaderFile);
-    }
 }
