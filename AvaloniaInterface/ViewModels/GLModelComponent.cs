@@ -14,9 +14,12 @@ public class GLModelComponent : ModelComponent
 {
     private int? _VertexBufferObject = null;
     private int? _IndiciesBuffer = null;
-    private int? _VertexArrayObject;
+    private int? _EdgeIndiciesBuffer = null;
+    private int? _TriangleArrayObject;
+    private int? _EdgeArrayObject;
 
     private int _IndiciesCount = 0;
+    private int _EdgeIndiciesCount = 0;
 
     private GlInterface? glInterface = null;
 
@@ -45,40 +48,60 @@ public class GLModelComponent : ModelComponent
         glInterface = gl;
 
         //Setup VAO
-        _VertexArrayObject = gl.GenVertexArray();
-        gl.BindVertexArray(_VertexArrayObject!.Value);
-        Console.WriteLine($"{nameof(_VertexArrayObject)} Error: {gl.GetError()}");
+        _TriangleArrayObject = gl.GenVertexArray();
+        gl.BindVertexArray(_TriangleArrayObject!.Value);
 
-        //Setup VBO
+        //Setup buffers
         _VertexBufferObject = gl.GenBuffer();
-        Console.WriteLine($"{nameof(_VertexBufferObject)} Error: {gl.GetError()}");
-
-        //Setup EBO
         _IndiciesBuffer = gl.GenBuffer();
-        Console.WriteLine($"{nameof(_IndiciesBuffer)} Error: {gl.GetError()}");
 
         //Upload vertex information to the VBO and EBO
-        UpdateBuffers(gl);
+        UpdateTrangleBuffers(gl);
 
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
-        Console.WriteLine($"{nameof(_VertexBufferObject)} Bind Error: {gl.GetError()}");
 
-        //Setup location info inside VAO
+        //Setup data location info inside VAO
+        SetLocationsInsideVAO(gl);
+
+        //Setup edge VAO
+        _EdgeArrayObject = gl.GenVertexArray();
+        _EdgeIndiciesBuffer = gl.GenBuffer();
+
+        gl.BindVertexArray(_EdgeArrayObject!.Value);
+        gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
+        gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _EdgeIndiciesBuffer!.Value);
+
+        //Setup data location info inside VAO
+        SetLocationsInsideVAO(gl);
+        UpdateEdgeBuffers(gl);
+    }
+
+    private void SetLocationsInsideVAO(GlInterface gl)
+    {
         gl.VertexAttribPointer(0, 3, GL_FLOAT, 0, Vertex.GetSize(), 0);
         gl.EnableVertexAttribArray(0);
-        Console.WriteLine($"Attrib0 Error: {gl.GetError()}");
-
 
         gl.VertexAttribPointer(1, 3, GL_FLOAT, 0, Vertex.GetSize(), Marshal.OffsetOf<Vertex>("Normal"));
         gl.EnableVertexAttribArray(1);
-        Console.WriteLine($"Attrib1 Error: {gl.GetError()}");
 
         gl.VertexAttribPointer(2, 2, GL_FLOAT, 0, Vertex.GetSize(), Marshal.OffsetOf<Vertex>("UV"));
         gl.EnableVertexAttribArray(2);
-        Console.WriteLine($"Attrib2 Error: {gl.GetError()}");
     }
 
-    public unsafe void UpdateBuffers(GlInterface gl)
+    public unsafe void UpdateEdgeBuffers(GlInterface gl)
+    {
+        uint[] edgeIndicies = model.GetEdgeIndicies();
+
+        gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _EdgeIndiciesBuffer!.Value);
+        fixed (uint* ptr = edgeIndicies)
+        {
+            gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * edgeIndicies.Length, (nint)ptr, GL_STATIC_DRAW);
+        }
+        Console.WriteLine($"{nameof(edgeIndicies)} Upload Error: {gl.GetError()}");
+        _EdgeIndiciesCount = edgeIndicies.Length;
+    }
+
+    public unsafe void UpdateTrangleBuffers(GlInterface gl)
     {
         Vertex[] verts = [];
         List<uint> indiciesList = []; //List that will encounter lots of modification
@@ -86,21 +109,8 @@ public class GLModelComponent : ModelComponent
 
         model.GenerateTriangulatedModel(ref verts, ref indiciesList);
 
-        //Account for sharps.
-        for (int triangleStart = 0; triangleStart < indiciesList.Count; triangleStart += 3)
-        {
-            //Check each edge and account for triangulation, O(1).?
-            //When triangulation occurs, store index mapping in _SharpIndicies
-        }
-
-        /*
-         foreach triangle
-            for each edge
-                if sharp
-                indicies.remove(old triangle)
-                indicies.add, new triangle accounting for sharps
-         */
-
+        //Recalculates the model to account for 'sharp' edges
+        ComputeSmoothing(ref indiciesList);
 
         uint[] indicies = indiciesList.ToArray();
 
@@ -110,7 +120,7 @@ public class GLModelComponent : ModelComponent
         ///
         //Populate OPENGL buffers
         ///
-
+        
         //Inform of vert data
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
         fixed (Vertex* ptr = verts)
@@ -123,9 +133,17 @@ public class GLModelComponent : ModelComponent
         gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _IndiciesBuffer!.Value);
         fixed (uint* ptr = indicies)
         {
-            gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * _IndiciesCount, (nint)ptr, GL_STATIC_DRAW);
+            gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * indicies.Length, (nint)ptr, GL_STATIC_DRAW);
         }
         Console.WriteLine($"{nameof(indicies)} Upload Error: {gl.GetError()}");
+    }
+
+    /// <summary>
+    /// Accounts for sharp edges in the model, creating duplicate verticies for each smoothing group.
+    /// </summary>
+    private void ComputeSmoothing(ref List<uint> indiciesList)
+    {
+        //Not implemented yet.
     }
 
     public unsafe void RenderModel(GlInterface gl, int modelMatrixUniform)
@@ -150,12 +168,14 @@ public class GLModelComponent : ModelComponent
 
         gl.UniformMatrix4fv(modelMatrixUniform, 1, false, &modelTransformation);
 
-        gl.BindVertexArray(_VertexArrayObject!.Value);
-        //Console.WriteLine($"{nameof(_VertexArrayObject)} Bind Error: {gl.GetError()}");
+        //gl.BindVertexArray(_TriangleArrayObject!.Value);
+        ////Console.WriteLine($"{nameof(_VertexArrayObject)} Bind Error: {gl.GetError()}");
+        //gl.DrawElements(GL_TRIANGLES, _IndiciesCount, GL_UNSIGNED_INT, 0);
+        ////Console.WriteLine($"{nameof(_Indicies)} Draw error: {gl.GetError()}");
+        //gl.BindVertexArray(0);
 
-        //Render triangles
-        gl.DrawElements(GL_TRIANGLES, _IndiciesCount, GL_UNSIGNED_INT, 0);
-        //Console.WriteLine($"{nameof(_Indicies)} Draw error: {gl.GetError()}");
+        gl.BindVertexArray(_EdgeArrayObject!.Value);
+        gl.DrawElements(GL_LINES, _EdgeIndiciesCount, GL_UNSIGNED_INT, 0);
         gl.BindVertexArray(0);
     }
 
@@ -216,7 +236,7 @@ public class GLModelComponent : ModelComponent
 
         if (_VertexBufferObject != null) glInterface.DeleteBuffer(_VertexBufferObject!.Value);
         if (_IndiciesBuffer != null) glInterface.DeleteBuffer(_IndiciesBuffer!.Value);
-        if (_VertexArrayObject != null) glInterface.DeleteVertexArray(_VertexArrayObject!.Value);
+        if (_TriangleArrayObject != null) glInterface.DeleteVertexArray(_TriangleArrayObject!.Value);
 
         glInterface = null;
     }

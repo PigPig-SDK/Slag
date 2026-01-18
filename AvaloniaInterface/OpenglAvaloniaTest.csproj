@@ -42,10 +42,10 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Update="Shaders\fragment.fs">
+    <None Update="Shaders\triangle.fs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Shaders\vertex.vs">
+    <None Update="Shaders\triangle.vs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

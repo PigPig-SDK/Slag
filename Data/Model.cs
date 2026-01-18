@@ -105,6 +105,18 @@ public class Model : IDisposable
         Indicies = indicies.ToArray();
     }
 
+    public uint[] GetEdgeIndicies()
+    {
+        uint[] indicies = new uint[_Edges.Count * 2];
+        int index = 0;
+        foreach (Edge edge in _Edges)
+        {
+            indicies[index++] = edge.Vertex1;
+            indicies[index++] = edge.Vertex2;
+        }
+        return indicies;
+    }
+
     public ModelComponent AddComponent<T>(ModelComponent component)
     {
         if(component is null) throw new ArgumentNullException($"Invalid component: {nameof(T)} | {nameof(component)}");

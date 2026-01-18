@@ -115,13 +115,31 @@ public static class ModelPrefabs
     public static Model DebugTriangleLine(Vector3 start, Vector3 end)
     {
         Model triad = new Model();
-        triad.ObjectName = "Debugging model";
+        triad.ObjectName = "Debugging Raycast";
 
         triad.AddVertex(new Vertex(start.X, start.Y, start.Z));
         triad.AddVertex(new Vertex(start.X, start.Y + 0.1f, start.Z));
         triad.AddVertex(new Vertex(end.X, end.Y + 0.1f, end.Z));
         triad.AddVertex(new Vertex(end.X, end.Y, end.Z));
         triad.AddFace(0, 1, 2, 3);
+
+        return triad;
+    }
+    /// <returns>Returns a edge only object</returns>
+    public static Model DebugEdges()
+    {
+        Model triad = new Model();
+        triad.ObjectName = "DebugEdges";
+
+        triad.AddVertex(new Vertex(0,1,0));//0
+        triad.AddVertex(new Vertex(0, 0, 0));//1
+        triad.AddVertex(new Vertex(0, 0, 1));//2
+        triad.AddVertex(new Vertex(1, 0, 0));//3
+        triad.AddVertex(new Vertex(0, 1, 0));//4
+
+        triad.AddEdge(new Edge(0, 1));
+        triad.AddEdge(new Edge(1, 2));
+        triad.AddEdge(new Edge(2, 0));
 
         return triad;
     }

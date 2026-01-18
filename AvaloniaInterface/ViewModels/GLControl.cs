@@ -21,17 +21,20 @@ using OpenTK.Mathematics;
 
 public class GLControl : OpenGlControlBase
 {
-    private int _vertexShader;
-    private int _fragmentShader;
     private int _shaderProgram;
 
     private int _modelMatrixLoc, _projectionMatrixLoc, _viewMatrixLoc, _cameraLocationLoc;
 
     private Camera _camera;
 
-    private const string VertexShaderDirectory = "Shaders/vertex.vs";
+    private const string TriangleVertexShader = "Shaders/triangle.vs";
+    private const string TriangleFragmentShader = "Shaders/triangle.fs";
 
-    private const string FragmentShaderDirectory = "Shaders/fragment.fs";
+    private const string EdgeVertexShader = "Shaders/edge.vs";
+    private const string EdgeFragmentShader = "Shaders/edge.fs";
+
+    private const string VertexVertexShader = "Shaders/vertex.vs";
+    private const string VertexFragmentShader = "Shaders/vertex.fs";
 
     private List<Model> _LateModelAddition = [];
 
@@ -54,22 +57,27 @@ public class GLControl : OpenGlControlBase
             Console.WriteLine("OPENGL ERROR:" + err);
     }
 
+    void GenerateShaders(GlInterface gl)
+    {
+        //Compile/link shaders
+        int vertexShader = gl.CreateShader(GL_VERTEX_SHADER);
+        Console.WriteLine("Vertex shader error : " + gl.CompileShaderAndGetError(vertexShader, LoadShaderFile(TriangleVertexShader)));
+
+        int fragmentShader = gl.CreateShader(GL_FRAGMENT_SHADER);
+        Console.WriteLine("Fragment shader error : " + gl.CompileShaderAndGetError(fragmentShader, LoadShaderFile(TriangleFragmentShader)));
+
+        //Create shaderprogram
+        _shaderProgram = gl.CreateProgram();
+        gl.AttachShader(_shaderProgram, vertexShader);
+        gl.AttachShader(_shaderProgram, fragmentShader);
+    }
+
     protected override unsafe void OnOpenGlInit(GlInterface gl)
     {
         CheckError(gl);
         Console.WriteLine($"Renderer: {gl.GetString(GL_RENDERER)} Version: {gl.GetString(GL_VERSION)}");
 
-        //Compile/link shaders
-        _vertexShader = gl.CreateShader(GL_VERTEX_SHADER);
-        Console.WriteLine("Vertex shader error : " + gl.CompileShaderAndGetError(_vertexShader, LoadShaderFile(VertexShaderDirectory)));
-
-        _fragmentShader = gl.CreateShader(GL_FRAGMENT_SHADER);
-        Console.WriteLine("Fragment shader error : " + gl.CompileShaderAndGetError(_fragmentShader, LoadShaderFile(FragmentShaderDirectory)));
-
-        //Create shaderprogram
-        _shaderProgram = gl.CreateProgram();
-        gl.AttachShader(_shaderProgram, _vertexShader);
-        gl.AttachShader(_shaderProgram, _fragmentShader);
+        GenerateShaders(gl);
 
         //Bind to string location with attribute
         Console.WriteLine("Link shader program: " + gl.LinkProgramAndGetError(_shaderProgram));
