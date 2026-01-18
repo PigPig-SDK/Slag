@@ -1,36 +1,16 @@
 #version 300 es
 precision highp float;
 
-uniform vec3 camera_location;
-uniform mat4 model_matrix;
-uniform mat4 view_matrix;
-uniform mat4 projection_matrix;
-
-in vec3 normal;
-in vec3 posistion;
-in vec4 desiredColor;
-
 out vec4 FragColor;
 
 void main()
 {
-    float shininess = 4.0;
+    // gl_PointCoord ranges from 0.0 to 1.0 across the point
+    vec2 uv = gl_PointCoord * 2.0 - 1.0; // center at (0,0)
+    float dist2 = dot(uv, uv);
 
-    vec3 N = normalize(normal);
+    if (dist2 > 1.0)
+        discard; // outside the circle, discard fragment
 
-    vec3 L = normalize(camera_location - posistion);
-
-    vec3 V = normalize(camera_location - posistion);
-
-    float diff = max(dot(N, L), 0.0);
-    vec4 ambient = vec4(0.7, 0.7, 0.7, 1.0);
-    vec4 lightColor = vec4(1.0, 1.0, 1.0, 1.0);
-    vec4 diffuse = diff * lightColor;
-
-    
-    vec3 R = reflect(-L, N);
-    float spec = pow(max(dot(R, V), 0.0), shininess);
-    vec4 specular = spec * lightColor;
-
-    FragColor = (desiredColor * 0.5 + 0.5) * (ambient + diffuse + specular);
+    FragColor = vec4(1.0,1.0,1.0,1.0);
 }

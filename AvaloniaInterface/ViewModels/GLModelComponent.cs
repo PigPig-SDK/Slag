@@ -15,10 +15,12 @@ public class GLModelComponent : ModelComponent
     private int? _VertexBufferObject = null;
     private int? _IndiciesBuffer = null;
     private int? _EdgeIndiciesBuffer = null;
+
     private int? _TriangleArrayObject;
     private int? _EdgeArrayObject;
 
     private int _IndiciesCount = 0;
+    private int _VertexCount = 0;
     private int _EdgeIndiciesCount = 0;
 
     private GlInterface? glInterface = null;
@@ -50,30 +52,25 @@ public class GLModelComponent : ModelComponent
         //Setup VAO
         _TriangleArrayObject = gl.GenVertexArray();
         gl.BindVertexArray(_TriangleArrayObject!.Value);
-
         //Setup buffers
         _VertexBufferObject = gl.GenBuffer();
         _IndiciesBuffer = gl.GenBuffer();
-
-        //Upload vertex information to the VBO and EBO
         UpdateTrangleBuffers(gl);
-
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
-
         //Setup data location info inside VAO
         SetLocationsInsideVAO(gl);
 
         //Setup edge VAO
         _EdgeArrayObject = gl.GenVertexArray();
         _EdgeIndiciesBuffer = gl.GenBuffer();
-
         gl.BindVertexArray(_EdgeArrayObject!.Value);
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
         gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _EdgeIndiciesBuffer!.Value);
-
         //Setup data location info inside VAO
         SetLocationsInsideVAO(gl);
         UpdateEdgeBuffers(gl);
+
+        //Setup vertex VAO
     }
 
     private void SetLocationsInsideVAO(GlInterface gl)
@@ -117,10 +114,12 @@ public class GLModelComponent : ModelComponent
         //Manage edges
         ComputeNormals(verts, indicies);
         _IndiciesCount = indicies.Length;
+        _VertexCount = verts.Length;
+
         ///
         //Populate OPENGL buffers
         ///
-        
+
         //Inform of vert data
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
         fixed (Vertex* ptr = verts)
@@ -153,13 +152,16 @@ public class GLModelComponent : ModelComponent
             Console.WriteLine($"Tried to render object while : {GetInvalidBuffer()} is null! Discarded draw call.");
             return;
         }
-
+        gl.DepthMask(1);//true
+        gl.DepthFunc(GL_LESS);
         gl.BindVertexArray(_TriangleArrayObject!.Value);
         gl.DrawElements(GL_TRIANGLES, _IndiciesCount, GL_UNSIGNED_INT, 0);
     }
 
     internal void RenderEdges(GlInterface gl)
     {
+        gl.DepthFunc(GL_LEQUAL);
+        gl.DepthMask(0);//false
         gl.BindVertexArray(_EdgeArrayObject!.Value);
         gl.DrawElements(GL_LINES, _EdgeIndiciesCount, GL_UNSIGNED_INT, 0);
         gl.BindVertexArray(0);
@@ -167,7 +169,9 @@ public class GLModelComponent : ModelComponent
 
     internal void RenderVerts(GlInterface gl)
     {
-
+        gl.BindVertexArray(_TriangleArrayObject!.Value);
+        gl.DrawArrays(GL_POINTS, 0, _VertexCount);
+        gl.BindVertexArray(0);
     }
 
     public void ComputeNormals(Vertex[] verts, uint[] indicies)

@@ -122,9 +122,10 @@ public class GLControl : OpenGlControlBase
         Matrix4 view = _camera.CreateLookAt();
         float aspect = (float)(Bounds.Width / (double)Bounds.Height);
         Matrix4 proj = _camera.CreatePrespective(aspect);
-        
 
+        //gl.LineWidth(10);
 
+        CheckError(gl);
         //Draw all models
         gl.Enable(GL_DEPTH_TEST);
         foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneModels()))
@@ -135,18 +136,16 @@ public class GLControl : OpenGlControlBase
 
             //Triangles
             _triangleShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
-            gl.DepthMask(1);//true
-            gl.DepthFunc(GL_LESS);
             component.RenderModel(gl);
 
             _edgeShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
-            gl.DepthMask(0);//false
-            gl.DepthFunc(GlConstantsExtended.GL_LEQUAL);
+            
             component.RenderEdges(gl);
 
-            gl.DepthMask(1);//true
-
+            _vertexShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
             component.RenderVerts(gl);
+
+            gl.DepthMask(1);//true
         }
 
         //Draw tools models

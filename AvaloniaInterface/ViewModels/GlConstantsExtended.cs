@@ -26,4 +26,10 @@ public static class GlConstantsExtended
 
     public const int GL_LEQUAL = 0x0203;
 
+    public const int GL_ALWAYS = 0x207;
+
+    public const int GL_PROGRAM_POINT_SIZE = 0x8642;
+
+    public const int GL_POLYGON_OFFSET_LINE = 0x2a02;
+
 }

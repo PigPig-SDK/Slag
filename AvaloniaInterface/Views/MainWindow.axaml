@@ -46,6 +46,7 @@
 
             <!-- OpenGL view -->
             <local:GLControl Grid.Column="2"/>
+            <DropDownButton Grid.Column="2" Content="Options" HorizontalAlignment="Left" VerticalAlignment="Top"></DropDownButton>
         </Grid>
     </Grid>
 </Window>

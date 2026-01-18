@@ -10,6 +10,7 @@ uniform mat4 projection_matrix;
 
 void main()
 {
-    gl_Position = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
-    
+    vec4 pos = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
+    pos.z -= 0.0001;//Improper fix for making edges appear ontop of models (lol)
+    gl_Position = pos;
 }
