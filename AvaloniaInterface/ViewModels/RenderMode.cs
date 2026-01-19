@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenglAvaloniaTest.ViewModels;
 
+[Flags]
 public enum RenderMode
 {
     Triangles = 1 << 0,
