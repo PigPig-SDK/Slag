@@ -22,6 +22,8 @@ using static Avalonia.OpenGL.GlConsts;
 
 public class GLControl : OpenGlControlBase
 {
+    public static RenderMode RenderMode = RenderMode.Solid;
+
     private ShaderProgram _triangleShaderProgram = new();
     private ShaderProgram _edgeShaderProgram = new();
     private ShaderProgram _vertexShaderProgram = new();
@@ -135,15 +137,23 @@ public class GLControl : OpenGlControlBase
             Matrix4 modelTransformation = component.GetModelTranslationMatrix();
 
             //Triangles
-            _triangleShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
-            component.RenderModel(gl);
+            if (RenderMode.HasFlag(RenderMode.Triangles))
+            {
+                _triangleShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
+                component.RenderModel(gl);
+            }
 
-            _edgeShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
-            
-            component.RenderEdges(gl);
+            if (RenderMode.HasFlag(RenderMode.Edges))
+            {
+                _edgeShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
+                component.RenderEdges(gl);
+            }
 
-            _vertexShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
-            component.RenderVerts(gl);
+            if (RenderMode.HasFlag(RenderMode.Verts))
+            {
+                _vertexShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
+                component.RenderVerts(gl);
+            }
 
             gl.DepthMask(1);//true
         }

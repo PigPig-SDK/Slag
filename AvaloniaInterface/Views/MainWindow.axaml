@@ -46,7 +46,15 @@
 
             <!-- OpenGL view -->
             <local:GLControl Grid.Column="2"/>
-            <DropDownButton Grid.Column="2" Content="Options" HorizontalAlignment="Left" VerticalAlignment="Top"></DropDownButton>
+            <ComboBox Grid.Column="2"
+                      Width="120"
+                      SelectedIndex="0"
+                      CornerRadius="0"
+                      SelectionChanged="OnRendermodeChanged">
+                <ComboBoxItem Content="Solid"/>
+                <ComboBoxItem Content="Wireframe"/>
+                <ComboBoxItem Content="Points"/>
+            </ComboBox>
         </Grid>
     </Grid>
 </Window>
