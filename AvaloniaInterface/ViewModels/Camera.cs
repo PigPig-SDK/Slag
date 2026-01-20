@@ -52,6 +52,7 @@ public class Camera
         else
         {
             _pitch -= (float)dragDelta.Y * 0.01f;
+            _pitch = Math.Clamp(_pitch, -MathF.PI / 2 + 0.01f, MathF.PI / 2 - 0.01f);
             _yaw += (float)dragDelta.X * 0.01f;
         }
     }
@@ -79,15 +80,6 @@ public class Camera
             Console.WriteLine("Detect ray in scene");
             Vector2 screenLocation = new Vector2((float)e.GetPosition(_glBase).X, (float)e.GetPosition(_glBase).Y);
             RaycastHit? hit = FindRaycastHit(screenLocation);
-
-            if (hit != null)
-            {
-                Console.WriteLine($"Hit was not null! {hit}");
-            }
-            else
-            {
-                Console.WriteLine("Hit was null");
-            }
             return;
         }
 
