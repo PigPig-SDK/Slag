@@ -1,8 +1,9 @@
-﻿using System;
+﻿using OpenTK.Mathematics;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
-using OpenTK.Mathematics;
 
 namespace Models;
 
@@ -117,6 +118,19 @@ public class Model : IDisposable
         return indicies;
     }
 
+    public Matrix4 GetModelMatrix()
+    {
+        Matrix4 rotX = Matrix4.CreateRotationX(Rotation.X);
+        Matrix4 rotY = Matrix4.CreateRotationY(Rotation.Y);
+        Matrix4 rotZ = Matrix4.CreateRotationZ(Rotation.Z);
+        Matrix4 rotationMat = rotZ * rotY * rotX; // ZYX order of rotation...
+
+
+        return Matrix4.CreateScale(Scale)
+            * rotationMat
+            * Matrix4.CreateTranslation(Position);
+    }
+
     public ModelComponent AddComponent<T>(ModelComponent component)
     {
         if(component is null) throw new ArgumentNullException($"Invalid component: {nameof(T)} | {nameof(component)}");
@@ -145,7 +159,7 @@ public class Model : IDisposable
         foreach (var component in _Components.Values) component.OnModelUpdate(this, info, variable);
     }
 
-    public IEnumerable<(uint,uint,uint)> AllIndicies()
+    public IEnumerable<(uint v1,uint v2,uint v3)> AllTrianglesAsIndicies()
     {
         for(int i = 0; i < Indicies.Length; i+=3)
         {

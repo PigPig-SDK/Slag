@@ -27,7 +27,6 @@ public class GLModelComponent : ModelComponent
 
     private Dictionary<uint, List<uint>> _SharpIndicies = [];
 
-
     public void OpenglRestart(GlInterface gl)
     {
         //Clear buffers
@@ -234,17 +233,5 @@ public class GLModelComponent : ModelComponent
         if (_TriangleArrayObject != null) glInterface.DeleteVertexArray(_TriangleArrayObject!.Value);
 
         glInterface = null;
-    }
-
-    internal Matrix4 GetModelTranslationMatrix()
-    {
-        Matrix4 rotX = Matrix4.CreateRotationX(model.Rotation.X);
-        Matrix4 rotY = Matrix4.CreateRotationY(model.Rotation.Y);
-        Matrix4 rotZ = Matrix4.CreateRotationZ(model.Rotation.Z);
-        Matrix4 rotationMat = rotZ * rotY * rotX; // ZYX order of rotation...
-
-        return rotationMat
-            * Matrix4.CreateTranslation(model.Position)
-            * Matrix4.CreateScale(model.Scale);
     }
 }

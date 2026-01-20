@@ -134,7 +134,7 @@ public class GLControl : OpenGlControlBase
         {
             if(component.model.Hidden) continue;
 
-            Matrix4 modelTransformation = component.GetModelTranslationMatrix();
+            Matrix4 modelTransformation = component.model.GetModelMatrix();
 
             //Triangles
             if (RenderMode.HasFlag(RenderMode.Triangles))
@@ -164,7 +164,7 @@ public class GLControl : OpenGlControlBase
         {
             if (component.model.Hidden) continue;
 
-            Matrix4 modelTransformation = component.GetModelTranslationMatrix();
+            Matrix4 modelTransformation = component.model.GetModelMatrix();
             _triangleShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
             component.RenderModel(gl);
         }

@@ -43,7 +43,7 @@ public static class Raycast
 
         if(t > float.Epsilon)
         {
-            RaycastHit hit = new()
+            RaycastHit hit = new() 
             {
                 HitPoint = (origin + direction * t),
                 BarycentricPoint = new Vector3(u, v, 1 - (u + v))
@@ -80,21 +80,22 @@ public static class Raycast
 
     public static RaycastHit? ComputeRaycastHit(IEnumerable<Model> models, Vector3 origin, Vector3 direction)
     {
-        Vector3 orignPure = origin;
-
         RaycastHit? hit = null;
         float closestDistance = float.PositiveInfinity;
         foreach (Model model in models)
         {
-            origin = orignPure - model.Position;
+            //Translate ray by model transformations.
 
+            Matrix4 modelInv = model.GetModelMatrix().Inverted();
 
-            if (!HasHitBoundingBox(model, origin, direction)) continue;
+            Vector3 originHomo = (modelInv * (new Vector4(origin, 1.0f))).Xyz;
+            Vector3 directionHomo =  Vector4.Normalize(modelInv * (new Vector4(direction, 0.0f))).Xyz;
 
-            foreach (var value in model.AllIndicies())
+            if (!HasHitBoundingBox(model, originHomo, directionHomo)) continue;
+
+            foreach (var triangleIndicies in model.AllTrianglesAsIndicies())
             {
-                //TODO: translate the origin/ray direction based on model transformations.
-                RaycastHit? hitTemp = CheckForHit(model, value, origin, direction);
+                RaycastHit? hitTemp = CheckForHit(model, triangleIndicies, originHomo, directionHomo);
                 if(hitTemp != null)
                 {
                     float distanceCheck = Vector3.Distance(origin, hitTemp.HitPoint!.Value);
@@ -102,7 +103,7 @@ public static class Raycast
                     closestDistance = distanceCheck;
 
                     hitTemp.Model = model;
-                    hitTemp.Face = model.TriangleToFaceMapping[value];
+                    hitTemp.Face = model.TriangleToFaceMapping[triangleIndicies];
                     hit = hitTemp;
                 }
             }
