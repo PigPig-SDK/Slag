@@ -84,8 +84,6 @@ public static class Raycast
         float closestDistance = float.PositiveInfinity;
         foreach (Model model in models)
         {
-            //Translate ray by model transformations.
-
             Matrix4 modelInv = model.GetModelMatrix().Inverted();
 
             Vector3 originHomo = (modelInv * (new Vector4(origin, 1.0f))).Xyz;
@@ -98,21 +96,22 @@ public static class Raycast
                 RaycastHit? hitTemp = CheckForHit(model, triangleIndicies, originHomo, directionHomo);
                 if(hitTemp != null)
                 {
-                    float distanceCheck = Vector3.Distance(origin, hitTemp.HitPoint!.Value);
+                    //Translate hitpoint by model transformation
+                    hitTemp.HitPoint = (model.GetModelMatrix() * new Vector4(hitTemp.HitPoint!.Value, 1.0f)).Xyz;
+
+                    float distanceCheck = Vector3.Distance(originHomo, hitTemp.HitPoint!.Value);
                     if (distanceCheck > closestDistance) continue;
                     closestDistance = distanceCheck;
 
                     hitTemp.Model = model;
+                    hitTemp.triangleIndicies = triangleIndicies;
                     hitTemp.Face = model.TriangleToFaceMapping[triangleIndicies];
                     hit = hitTemp;
                 }
             }
         }
-        //Debug
-        if(hit != null)
-        {
-            SceneHierarchy.Instance.AddModel(ModelPrefabs.DebugTriangleLine(origin, hit.HitPoint!.Value));
-        }
+        
+        
         return hit;
     }
 }

@@ -13,6 +13,7 @@ public class RaycastHit
     public Face? Face = null;
     public Vector3? HitPoint;
     public Vector3? BarycentricPoint;
+    public (uint v1, uint v2, uint v3) triangleIndicies;
 
     public override string ToString()
     {
