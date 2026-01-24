@@ -118,17 +118,24 @@ public class Model : IDisposable
         return indicies;
     }
 
-    public Matrix4 GetModelMatrix()
+    public Matrix4 GetRotationMatrix()
     {
         Matrix4 rotX = Matrix4.CreateRotationX(Rotation.X);
         Matrix4 rotY = Matrix4.CreateRotationY(Rotation.Y);
         Matrix4 rotZ = Matrix4.CreateRotationZ(Rotation.Z);
-        Matrix4 rotationMat = rotZ * rotY * rotX; // ZYX order of rotation...
+        return rotZ * rotY * rotX; // ZYX order of rotation...
+        
+    }
 
+    public Matrix4 GetScaleMatrix() => Matrix4.CreateScale(Scale);
 
-        return Matrix4.CreateScale(Scale)
-            * rotationMat
-            * Matrix4.CreateTranslation(Position);
+    public Matrix4 GetTranslationMatrix() => Matrix4.CreateTranslation(Position);
+
+    public Matrix4 GetModelMatrix()
+    {
+        return GetScaleMatrix()
+            * GetRotationMatrix()
+            * GetTranslationMatrix();
     }
 
     public ModelComponent AddComponent<T>(ModelComponent component)

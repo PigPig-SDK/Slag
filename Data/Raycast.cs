@@ -80,24 +80,23 @@ public static class Raycast
 
     public static RaycastHit? ComputeRaycastHit(IEnumerable<Model> models, Vector3 origin, Vector3 direction)
     {
-        RaycastHit? hit = null;
+        RaycastHit? hit = null; 
         float closestDistance = float.PositiveInfinity;
         foreach (Model model in models)
         {
             Matrix4 modelInv = model.GetModelMatrix().Inverted();
-
-            Vector3 originHomo = (modelInv * (new Vector4(origin, 1.0f))).Xyz;
-            Vector3 directionHomo =  Vector4.Normalize(modelInv * (new Vector4(direction, 0.0f))).Xyz;
+            Vector3 originHomo = ((new Vector4(origin, 1.0f) * modelInv)).Xyz;
+            Vector3 directionHomo =  ((new Vector4(direction, 0.0f) * modelInv)).Xyz.Normalized();
 
             if (!HasHitBoundingBox(model, originHomo, directionHomo)) continue;
 
             foreach (var triangleIndicies in model.AllTrianglesAsIndicies())
             {
-                RaycastHit? hitTemp = CheckForHit(model, triangleIndicies, originHomo, directionHomo);
+                RaycastHit? hitTemp = CheckForHit( model, triangleIndicies, originHomo, directionHomo);
                 if(hitTemp != null)
                 {
                     //Translate hitpoint by model transformation
-                    hitTemp.HitPoint = (model.GetModelMatrix() * new Vector4(hitTemp.HitPoint!.Value, 1.0f)).Xyz;
+                    hitTemp.HitPoint = (new Vector4(hitTemp.HitPoint!.Value, 1.0f) * model.GetModelMatrix()).Xyz;
 
                     float distanceCheck = Vector3.Distance(originHomo, hitTemp.HitPoint!.Value);
                     if (distanceCheck > closestDistance) continue;
