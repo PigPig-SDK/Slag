@@ -10,7 +10,7 @@ public class SceneHierarchy
 {
     public static SceneHierarchy Instance = new();
 
-    private List<Model> Models { get; set; } = [ModelPrefabs.InstanceCone(100,3,1), ModelPrefabs.DebugEdges()];
+    private List<Model> Models { get; set; } = [ModelPrefabs.InstanceCone(100,3,1)];
 
     private List<Model> Tools { get; set; } = [ModelPrefabs.InstanceAxisTriad()];
 
@@ -22,6 +22,11 @@ public class SceneHierarchy
     {
         Models.Add(model);
         OnModelAdded?.Invoke(model);
+    }
+
+    public void AddToolModel(Model model)
+    {
+        Tools.Add(model);
     }
 
     public void RemoveModel(Model model)
