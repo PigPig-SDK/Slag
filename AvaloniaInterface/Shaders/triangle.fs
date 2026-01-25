@@ -14,7 +14,7 @@ out vec4 FragColor;
 
 void main()
 {
-    float shininess = 4.0;
+    float shininess = 1000.0;
 
     vec3 N = normalize(normal);
 

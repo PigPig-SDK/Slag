@@ -15,6 +15,7 @@ public class GLModelComponent : ModelComponent
     private int? _VertexBufferObject = null;
     private int? _IndiciesBuffer = null;
     private int? _EdgeIndiciesBuffer = null;
+    private int? _SelectionBuffer = null;
 
     private int? _TriangleArrayObject;
     private int? _EdgeArrayObject;
@@ -59,32 +60,33 @@ public class GLModelComponent : ModelComponent
         }
         glInterface = gl;
 
-        //Setup VAO
+        //Setup Buffers
         _TriangleArrayObject = gl.GenVertexArray();
-        gl.BindVertexArray(_TriangleArrayObject!.Value);
-        //Setup buffers
         _VertexBufferObject = gl.GenBuffer();
         _IndiciesBuffer = gl.GenBuffer();
-        UpdateTrangleBuffers(gl);
-        gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
-        //Setup data location info inside VAO
-        SetLocationsInsideVAO(gl);
-
-        //Setup edge VAO
+        _SelectionBuffer = gl.GenBuffer();
         _EdgeArrayObject = gl.GenVertexArray();
         _EdgeIndiciesBuffer = gl.GenBuffer();
+
+        
+
+        //TRIANGLE
+        gl.BindVertexArray(_TriangleArrayObject!.Value);
+        UpdateTrangleBuffers(gl);
+        SetLocationsInsideVAO(gl);
+
+        //EDGE
         gl.BindVertexArray(_EdgeArrayObject!.Value);
-        gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
         gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _EdgeIndiciesBuffer!.Value);
-        //Setup data location info inside VAO
         SetLocationsInsideVAO(gl);
         UpdateEdgeBuffers(gl);
-
-        //Setup vertex VAO
     }
 
     private void SetLocationsInsideVAO(GlInterface gl)
     {
+        //Vertex Data
+        gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
+
         gl.VertexAttribPointer(0, 3, GL_FLOAT, 0, Vertex.GetSize(), 0);
         gl.EnableVertexAttribArray(0);
 
@@ -93,6 +95,11 @@ public class GLModelComponent : ModelComponent
 
         gl.VertexAttribPointer(2, 2, GL_FLOAT, 0, Vertex.GetSize(), Marshal.OffsetOf<Vertex>("UV"));
         gl.EnableVertexAttribArray(2);
+
+        //Selection Related data
+        gl.BindBuffer(GL_ARRAY_BUFFER, _SelectionBuffer!.Value);
+        gl.VertexAttribPointer(3, 1, GL_UNSIGNED_BYTE, 0, sizeof(byte), 0);
+        gl.EnableVertexAttribArray(3);
     }
 
     public unsafe void UpdateEdgeBuffers(GlInterface gl)
@@ -145,6 +152,20 @@ public class GLModelComponent : ModelComponent
             gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * indicies.Length, (nint)ptr, GL_STATIC_DRAW);
         }
         Console.WriteLine($"{nameof(indicies)} Upload Error: {gl.GetError()}");
+
+        //Buffer selection
+        byte[] selectionData = new byte[verts.Length];
+        for (int i = 0; i < selectionData.Length; i++)
+        {
+            selectionData[i] = i % 2 == 0 ? (byte)1 : (byte)0;//Temporary selection data
+        }
+
+        gl.BindBuffer(GL_ARRAY_BUFFER, _SelectionBuffer!.Value);
+        fixed (byte* ptr = selectionData)
+        {
+            gl.BufferData(GL_ARRAY_BUFFER, sizeof(byte) * verts.Length, (nint)ptr, GL_STATIC_DRAW);
+        }
+        Console.WriteLine($"{nameof(selectionData)} Upload Error: {gl.GetError()}");
     }
 
     /// <summary>
@@ -242,6 +263,12 @@ public class GLModelComponent : ModelComponent
         if (_VertexBufferObject != null) glInterface.DeleteBuffer(_VertexBufferObject!.Value);
         if (_IndiciesBuffer != null) glInterface.DeleteBuffer(_IndiciesBuffer!.Value);
         if (_TriangleArrayObject != null) glInterface.DeleteVertexArray(_TriangleArrayObject!.Value);
+        if(_SelectionBuffer != null) glInterface.DeleteBuffer(_SelectionBuffer!.Value);
+
+        _SelectionBuffer = null;
+        _TriangleArrayObject = null;
+        _IndiciesBuffer = null;
+        _VertexBufferObject = null;
 
         glInterface = null;
     }

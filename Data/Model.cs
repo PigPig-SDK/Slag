@@ -10,7 +10,7 @@ namespace Models;
 
 public class Model : IDisposable
 {
-    public string ObjectName = "Object";
+    public string ObjectName = "Undefined Model";
     public List<Vertex> Verticies { get; private set; } = [];
     private List<Face> _Faces = [];
     private HashSet<Edge> _Edges = [];
@@ -26,9 +26,9 @@ public class Model : IDisposable
 
     public Dictionary<(uint,uint,uint), Face> TriangleToFaceMapping = [];
 
-
     public Model()
     {
+        //Default components
         _Components.Add(typeof(ModelSelection), new ModelSelection(this));
     }
 
@@ -47,7 +47,9 @@ public class Model : IDisposable
     }
 
     public void AddFace(params uint[] indicies) => AddFace(new List<uint>(indicies));
+
     public void AddFace(List<uint> indicies) => AddFace(new Face(indicies));
+
     public void AddFace(Face face)
     {
         foreach(uint i in face.Indicies)

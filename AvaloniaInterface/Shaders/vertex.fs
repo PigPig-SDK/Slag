@@ -2,6 +2,7 @@
 precision highp float;
 
 out vec4 FragColor;
+in vec4 color;
 
 void main()
 {
@@ -12,5 +13,5 @@ void main()
     if (dist2 > 1.0)
         discard; // outside the circle, discard fragment
 
-    FragColor = vec4(1.0,1.0,1.0,1.0);
+    FragColor = color;
 }
