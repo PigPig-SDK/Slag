@@ -4,17 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              x:Class="OpenglAvaloniaTest.HierarchyModel">
     <Grid Background="Gray">
-        <Expander HorizontalAlignment="Stretch" Focusable="False">
+        <Expander HorizontalAlignment="Stretch" Focusable="False" ExpandDirection="Down" IsExpanded="False" x:Name="BodyExpander">
             <Expander.Header>
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="5">
-                    <Button Grid.Column="0" x:Name="HideButton" Click="OnHideButtonClick" CornerRadius="40">
-                        <Image Width="25" x:Name="HiddenImage" Source="../Assets/visibleIcon.png"/>
+                    <Button Grid.Column="0" MinWidth="0" Focusable="False" x:Name="HideButton" Click="OnHideButtonClick" CornerRadius="40">
+                        <Image Width="25" MinWidth="0" x:Name="HiddenImage" Source="../Assets/visibleIcon.png"/>
                     </Button>
                     <TextBox Grid.Column="1"
                              x:Name="NameTextbox"
                              Text="Test"
                              VerticalAlignment="Center"
-                             Watermark="ObjectName" KeyDown="OnNameKeyDown"/>
+                             Watermark="ObjectName" MinWidth="0" KeyDown="OnNameKeyDown"/>
                 </Grid>
             </Expander.Header>
             
@@ -36,7 +36,7 @@
                 <TextBox Grid.Row="1" Grid.Column="1" MinWidth="0" x:Name="XBox" TextChanged="OnPositionTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
                 <!-- Y -->
                 <Label Grid.Row="1" Grid.Column="2" MaxWidth="20" MinWidth="0" Content="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                <TextBox Grid.Row="1" Grid.Column="3" MinWidth="0" x:Name="YBox" TextChanged="OnPositionTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="1"  Grid.Column="3" MinWidth="0" x:Name="YBox" TextChanged="OnPositionTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
                 <!-- Z -->
                 <Label Grid.Row="1" Grid.Column="4" MaxWidth="20" MinWidth="0"  Content="Z" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <TextBox Grid.Row="1" Grid.Column="5" MinWidth="0" x:Name="ZBox" TextChanged="OnPositionTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
@@ -44,7 +44,7 @@
             <!-- Bottom: Rotation stuff -->
             <Grid Grid.Row="3" RowDefinitions="Auto,Auto"
                   ColumnDefinitions="1*,2*,1*,2*,1*,2*">
-                <Label Grid.Row="0" Grid.Column="0" Content="Rotation" VerticalAlignment="Center" Grid.ColumnSpan="6" HorizontalAlignment="Center"/>
+                <Label Grid.Row="0"  Grid.Column="0" Content="Rotation" VerticalAlignment="Center" Grid.ColumnSpan="6" HorizontalAlignment="Center"/>
                 <!-- X -->
                 <Label Grid.Row="1" Grid.Column="0" MaxWidth="20" MinWidth="0" Content="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <TextBox Grid.Row="1" Grid.Column="1" MinWidth="0" x:Name="XRotationBox" TextChanged="OnRotationTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>

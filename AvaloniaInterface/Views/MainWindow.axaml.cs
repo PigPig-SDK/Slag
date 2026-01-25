@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using OpenglAvaloniaTest.ViewModels;
 using System;
 using System.Diagnostics;
@@ -15,15 +16,15 @@ namespace OpenglAvaloniaTest.Views
         private void OnRendermodeChanged(object? sender, SelectionChangedEventArgs e)
         {
             var cb = (ComboBox)sender!;
-             if(cb == null) return;
+            if (cb == null) return;
 
             var item = (ComboBoxItem)cb.SelectedItem!;
-            if(item == null) return;
+            if (item == null) return;
 
             var mode = item.Content?.ToString();
             if (mode == null) return;
 
-            switch(mode)
+            switch (mode)
             {
                 case "Solid":
                     GLControl.RenderMode = RenderMode.Solid;
@@ -33,7 +34,7 @@ namespace OpenglAvaloniaTest.Views
                     break;
                 case "Points":
                     GLControl.RenderMode = RenderMode.Verts;
-                break;
+                    break;
             }
         }
     }
