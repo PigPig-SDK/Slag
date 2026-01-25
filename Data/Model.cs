@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using OpenglAvaloniaTest.ViewModels;
+using OpenTK.Mathematics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,6 +26,11 @@ public class Model : IDisposable
 
     public Dictionary<(uint,uint,uint), Face> TriangleToFaceMapping = [];
 
+
+    public Model()
+    {
+        _Components.Add(typeof(ModelSelection), new ModelSelection(this));
+    }
 
     public Vertex GetVertex(int index) => Verticies[index];
 

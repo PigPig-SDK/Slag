@@ -11,6 +11,11 @@ public class ModelSelection : ModelComponent
 {
     private HashSet<uint> SelectedIndicies = [];
 
+    public ModelSelection(Model model)
+    {
+        this.model = model;
+    }
+
     /// <summary>
     /// First parameter is the index, second parameter is true if selected, false if deselected
     /// </summary>
