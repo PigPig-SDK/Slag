@@ -27,6 +27,17 @@ public class GLModelComponent : ModelComponent
 
     private Dictionary<uint, List<uint>> _SharpIndicies = [];
 
+    public override void OnAddedToModel(Model model)
+    {
+        ModelSelection? modelSelection = model.GetComponent<ModelSelection>();
+        modelSelection!.OnSelectionChanged += OnSelectionChanged;
+    }
+
+    private void OnSelectionChanged(uint index, bool isSelected)
+    {
+
+    }
+
     public void OpenglRestart(GlInterface gl)
     {
         //Clear buffers

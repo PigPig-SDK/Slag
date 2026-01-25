@@ -2,7 +2,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="OpenglAvaloniaTest.ViewModels.HierarchyView">
         <Grid RowDefinitions="Auto,Auto,*">
-            <Button Grid.Row="0" Content="AddObject" CornerRadius="0" HorizontalAlignment="Stretch" Focusable="False"/>
+            <Button Grid.Row="0" Content="AddObject" CornerRadius="0" HorizontalAlignment="Stretch" Focusable="False" Click="OnAddObjectButtonClick">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Cube"/>
+                        <MenuItem Header="Sphere"/>
+                        <MenuItem Header="Cylinder"/>
+                        <MenuItem Header="Cone"/>
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
             <Separator Grid.Row="1"/>
             <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel x:Name="HierarchyStack"/>

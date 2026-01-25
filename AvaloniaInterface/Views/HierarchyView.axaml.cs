@@ -28,7 +28,7 @@ public partial class HierarchyView : UserControl
 
     private void OnAttach(object? sender, VisualTreeAttachmentEventArgs e)
     {
-        if(_attached) return;
+        if (_attached) return;
         SceneHierarchy.Instance.OnModelAdded += OnModelAdded;
         SceneHierarchy.Instance.OnModelRemoved += OnModelRemoved;
         _attached = true;
@@ -36,7 +36,7 @@ public partial class HierarchyView : UserControl
 
     private void OnDetach(object? sender, VisualTreeAttachmentEventArgs e)
     {
-        if(!_attached) return;
+        if (!_attached) return;
         SceneHierarchy.Instance.OnModelAdded -= OnModelAdded;
         SceneHierarchy.Instance.OnModelRemoved -= OnModelRemoved;
         _attached = false;
@@ -58,5 +58,11 @@ public partial class HierarchyView : UserControl
         _Mapping.Add(model, modelView);
     }
 
-
+    private void OnAddObjectButtonClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (sender is Button button && button.ContextMenu != null)
+        {
+            button.ContextMenu.Open(button);
+        }
+    }
 }

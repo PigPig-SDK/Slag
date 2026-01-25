@@ -15,4 +15,6 @@ public abstract class ModelComponent : IDisposable
     public abstract void OnModelUpdate(Model model, ModelUpdateType info, object data);
 
     public abstract void Dispose();
+
+    public abstract void OnAddedToModel(Model model);
 }

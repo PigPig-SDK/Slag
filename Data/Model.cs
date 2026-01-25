@@ -14,10 +14,7 @@ public class Model : IDisposable
     private List<Face> _Faces = [];
     private HashSet<Edge> _Edges = [];
 
-    //Important to note: Indicies are constantly changing.
     public uint[] Indicies = [];
-    public List<bool> SelectedVerticies = [];
-
     public bool Hidden = false;
 
     private Dictionary<Type, ModelComponent> _Components = [];
@@ -143,10 +140,29 @@ public class Model : IDisposable
         if(component is null) throw new ArgumentNullException($"Invalid component: {nameof(T)} | {nameof(component)}");
         _Components[typeof(T)] = component;
         component.model = this;
+        component.OnAddedToModel(this);
         return component;
     }
 
-    public void RemoveComponent(Type component) => _Components.Remove(component);
+    public bool RemoveComponent(Type component) => _Components.Remove(component);
+
+    public T? GetComponent<T>() where T : ModelComponent
+    {
+        Type type = typeof(T);
+
+        if (_Components.TryGetValue(type, out var component))
+        {
+            return (T)component;
+        }
+
+        return null;
+    }
+
+    public bool TryGetComponent<T>(out T? component) where T : ModelComponent
+    {
+        component = GetComponent<T>();
+        return component != null;
+    }
 
     public bool TryGetComponent<T>(out ModelComponent? component)
     {
