@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Mathematics;
 using Models;
+using OpenglAvaloniaTest.ViewModels;
 
 public class Camera
 {
@@ -80,6 +81,10 @@ public class Camera
             Console.WriteLine("Detect ray in scene");
             Vector2 screenLocation = new Vector2((float)e.GetPosition(_glBase).X, (float)e.GetPosition(_glBase).Y);
             RaycastHit? hit = FindRaycastHit(screenLocation);
+            if (hit != null)
+            {
+                hit!.Model.GetComponent<ModelSelection>()?.SelectIndex(hit!.Face.Indicies[0]);
+            }
             return;
         }
 
