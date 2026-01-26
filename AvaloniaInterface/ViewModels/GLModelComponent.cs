@@ -200,21 +200,14 @@ public class GLModelComponent : ModelComponent
 
     public unsafe void RenderModel(GlInterface gl)
     {
-        if (_VertexBufferObject == null || _IndiciesBuffer == null)
-        {
-            Console.WriteLine($"Tried to render object while : {GetInvalidBuffer()} is null! Discarded draw call.");
-            return;
-        }
-        gl.DepthMask(1);//true
-        gl.DepthFunc(GL_LESS);
+        if (_TriangleArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_TriangleArrayObject)} while its null");
         gl.BindVertexArray(_TriangleArrayObject!.Value);
         gl.DrawElements(GL_TRIANGLES, _IndiciesCount, GL_UNSIGNED_INT, 0);
     }
 
     internal void RenderEdges(GlInterface gl)
     {
-        gl.DepthFunc(GL_LEQUAL);
-        gl.DepthMask(0);//false
+        if (_EdgeArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_EdgeArrayObject)} while its null");
         gl.BindVertexArray(_EdgeArrayObject!.Value);
         gl.DrawElements(GL_LINES, _EdgeIndiciesCount, GL_UNSIGNED_INT, 0);
         gl.BindVertexArray(0);
@@ -222,6 +215,7 @@ public class GLModelComponent : ModelComponent
 
     internal void RenderVerts(GlInterface gl)
     {
+        if (_TriangleArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_TriangleArrayObject)} while its null");
         gl.BindVertexArray(_TriangleArrayObject!.Value);
         gl.DrawArrays(GL_POINTS, 0, _VertexCount);
         gl.BindVertexArray(0);

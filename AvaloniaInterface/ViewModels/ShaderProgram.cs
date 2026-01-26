@@ -14,7 +14,9 @@ public class ShaderProgram
 {
     public int ProgramID;
 
-    private int _modelMatrixLoc, _projectionMatrixLoc, _viewMatrixLoc, _cameraLocationLoc;
+    public int ModelMatrixLocation;
+
+    private int _projectionMatrixLoc, _viewMatrixLoc, _cameraLocationLoc;
 
     public void GenerateShaderProgram(GlInterface gl, string vertexShader, string fragmentShader)
     {
@@ -33,16 +35,15 @@ public class ShaderProgram
         error = gl.LinkProgramAndGetError(ProgramID);
         if (error != null) Console.WriteLine("Link shader program: " + error);
 
-        _modelMatrixLoc = gl.GetUniformLocationString(ProgramID, "model_matrix");
+        ModelMatrixLocation = gl.GetUniformLocationString(ProgramID, "model_matrix");
         _projectionMatrixLoc = gl.GetUniformLocationString(ProgramID, "projection_matrix");
         _viewMatrixLoc = gl.GetUniformLocationString(ProgramID, "view_matrix");
         _cameraLocationLoc = gl.GetUniformLocationString(ProgramID, "camera_location");
     }
 
-    public unsafe void UseProgram(GlInterface gl, Matrix4 model, Matrix4 view, Matrix4 projection, Vector3 cameraLocation)
+    public unsafe void UseProgram(GlInterface gl, Matrix4 view, Matrix4 projection, Vector3 cameraLocation)
     {
         gl.UseProgram(ProgramID);
-        gl.UniformMatrix4fv(_modelMatrixLoc, 1, false, (float*)&model);
         gl.UniformMatrix4fv(_viewMatrixLoc, 1, false, (float*)&view);
         gl.UniformMatrix4fv(_projectionMatrixLoc, 1, false, (float*)&projection);
         gl.Uniform3f(_cameraLocationLoc, cameraLocation.X, cameraLocation.Y, cameraLocation.Z);

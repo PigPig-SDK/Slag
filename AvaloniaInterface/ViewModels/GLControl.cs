@@ -46,6 +46,8 @@ public class GLControl : OpenGlControlBase
 
     private List<Model> _LateModelAddition = [];
 
+    Dictionary<RenderMode, ShaderProgram> renderModeToShaderProgram;
+
     public GLControl()
     {
         Instance = this;
@@ -55,6 +57,11 @@ public class GLControl : OpenGlControlBase
         this.PointerReleased += _camera.OnMouseUp;
         this.PointerMoved += _camera.OnPointerMove;
         this.AddHandler(PointerWheelChangedEvent, _camera.OnWheel, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
+        
+        renderModeToShaderProgram = new() {
+            { RenderMode.Triangles, _triangleShaderProgram },
+            { RenderMode.Edges, _edgeShaderProgram },
+            { RenderMode.Verts, _vertexShaderProgram} };
     }
 
     public void OnModelAdded(Model model) => _LateModelAddition.Add(model);
@@ -152,7 +159,7 @@ public class GLControl : OpenGlControlBase
         }
     }
 
-    private void RenderTools(GlInterface gl, ref Matrix4 view, ref Matrix4 proj)
+    private unsafe void RenderTools(GlInterface gl, ref Matrix4 view, ref Matrix4 proj)
     {
         gl.Disable(GL_DEPTH_TEST);
         foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneTools()))
@@ -160,44 +167,50 @@ public class GLControl : OpenGlControlBase
             if (component.model.Hidden) continue;
 
             Matrix4 modelTransformation = component.model.GetModelMatrix();
-            _triangleShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
+            _triangleShaderProgram.UseProgram(gl, view, proj, _camera.Origin);
+            gl.UniformMatrix4fv(_triangleShaderProgram.ModelMatrixLocation, 1, false, (float*)&modelTransformation);
+            
             component.RenderModel(gl);
         }
     }
 
-    private void RenderModels(GlInterface gl, ref Matrix4 view, ref Matrix4 proj)
+
+    private unsafe void RenderModels(GlInterface gl, ref Matrix4 view, ref Matrix4 proj)
     {
         gl.Enable(GL_DEPTH_TEST);
-        //Update models that are not 'fresh'
-
-        foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneModels()))
+        
+        foreach (RenderMode renderMode in renderModeToShaderProgram.Keys)
         {
-            if (component.model.Hidden) continue;
-
-            Matrix4 modelTransformation = component.model.GetModelMatrix();
-
-            component.SelectonMassUpdate(gl);
-
-            //Triangles
-            if (RenderMode.HasFlag(RenderMode.Triangles))
+            if(RenderMode.HasFlag(renderMode))
             {
-                _triangleShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
-                component.RenderModel(gl);
-            }
+                ShaderProgram activeShader = renderModeToShaderProgram[renderMode];
+                activeShader.UseProgram(gl, view, proj, _camera.Origin);
+                foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneModels()))
+                {
+                    if (component.model.Hidden) continue;
+                    Matrix4 modelTransformation = component.model.GetModelMatrix();
+                    gl.UniformMatrix4fv(activeShader.ModelMatrixLocation, 1, false, (float*)&modelTransformation);
 
-            if (RenderMode.HasFlag(RenderMode.Edges))
-            {
-                _edgeShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
-                component.RenderEdges(gl);
+                    switch(renderMode)
+                    {
+                        case RenderMode.Triangles:
+                            {
+                                component.RenderModel(gl);
+                                break;
+                            }
+                        case RenderMode.Edges:
+                            {
+                                component.RenderEdges(gl);
+                                break;
+                            }
+                        case RenderMode.Verts:
+                            {
+                                component.RenderVerts(gl);
+                                break;
+                            }
+                    }
+                }
             }
-
-            if (RenderMode.HasFlag(RenderMode.Verts))
-            {
-                _vertexShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
-                component.RenderVerts(gl);
-            }
-
-            gl.DepthMask(1);//true
         }
     }
 
