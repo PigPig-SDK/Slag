@@ -12,9 +12,23 @@ public static unsafe class GlInterfaceExtensions
 {
     private delegate void Uniform3fDelegate(int location, float x, float y, float z);
     private delegate void LineWidthDelegate(float width);
+    private delegate void BufferSubDataDelegate(int target, IntPtr offset, IntPtr size, IntPtr data);
 
     private static Uniform3fDelegate? _uniform3f;
     private static LineWidthDelegate? _lineWidth;
+    private static BufferSubDataDelegate? _bufferSubData;
+
+    public static void BufferSubData(this GlInterface gl, int target, IntPtr offset, IntPtr size, IntPtr data)
+    {
+        if (_bufferSubData == null)
+        {
+            nint ptr = gl.GetProcAddress("glBufferSubData");
+            if (ptr == IntPtr.Zero) throw new InvalidOperationException("glBufferSubData not available");
+            _bufferSubData = Marshal.GetDelegateForFunctionPointer<BufferSubDataDelegate>(ptr);
+        }
+
+        _bufferSubData(target, offset, size, data);
+    }
 
     public static void Uniform3f(this GlInterface gl, int location, float x, float y, float z)
     {
