@@ -14,7 +14,7 @@ public static class Raycast
         return true;
     }
 
-    public static RaycastHit? CheckForHit(Model m, (uint e1, uint e2, uint e3) incidies, Vector3 origin, Vector3 direction)
+    public static (Vector3 hitPoint, Vector3 barryCoords)? CheckForHit(Model m, (uint e1, uint e2, uint e3) incidies, Vector3 origin, Vector3 direction)
     {
         Vector3 p1 = m.Verticies[(int)incidies.e1].Position;
         Vector3 p2 = m.Verticies[(int)incidies.e2].Position;
@@ -43,12 +43,7 @@ public static class Raycast
 
         if(t > float.Epsilon)
         {
-            RaycastHit hit = new() 
-            {
-                HitPoint = (origin + direction * t),
-                BarycentricPoint = new Vector3(u, v, 1 - (u + v))
-            };
-            return hit;
+            return (origin + direction * t, new Vector3(u, v, 1 - (u + v)));
         }
         else
             return null;
@@ -92,27 +87,23 @@ public static class Raycast
 
             foreach (var triangleIndicies in model.AllTrianglesAsIndicies())
             {
-                RaycastHit? hitTemp = CheckForHit( model, triangleIndicies, originHomo, directionHomo);
-                if(hitTemp != null)
+                (Vector3 hitPoint, Vector3 barryCoords)? hitPoints = CheckForHit(model, triangleIndicies, originHomo, directionHomo);
+                if(hitPoints != null)
                 {
                     //Translate hitpoint by model transformation
-                    hitTemp.HitPoint = (new Vector4(hitTemp.HitPoint!.Value, 1.0f) * model.GetModelMatrix()).Xyz;
+                    Vector3 hitPoint = (new Vector4(hitPoints!.Value.hitPoint, 1.0f) * model.GetModelMatrix()).Xyz;
 
-                    float distanceCheck = Vector3.Distance(originHomo, hitTemp.HitPoint!.Value);
+                    float distanceCheck = Vector3.Distance(originHomo, hitPoint);
                     if (distanceCheck > closestDistance) continue;
                     closestDistance = distanceCheck;
-
-                    hitTemp.Model = model;
-                    hitTemp.triangleIndicies = triangleIndicies;
-                    hitTemp.Face = model.TriangleToFaceMapping[triangleIndicies];
-                    hit = hitTemp;
+                    hit = new (model, model.TriangleToFaceMapping[triangleIndicies], hitPoint, hitPoints!.Value.barryCoords, triangleIndicies);
                 }
             }
         }
-        if (hit != null)
-        {
-            SceneHierarchy.Instance.AddModel(ModelPrefabs.DebugTriangleLine(origin, hit.HitPoint!.Value));
-        }
+        //if (hit != null)
+        //{
+        //    SceneHierarchy.Instance.AddModel(ModelPrefabs.DebugTriangleLine(origin, hit!.HitPoint));
+        //}
 
         return hit;
     }
