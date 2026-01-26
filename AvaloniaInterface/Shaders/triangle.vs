@@ -15,17 +15,13 @@ out vec3 posistion;
 
 void main()
 {
-    if(metadata == 1.0)
-        desiredColor = vec4(1.0, 0.647, 0.0, 1.0);
-    else
-    {
-        vec3 offset = aPos - camera_location;
-        float dotProduct = dot(normalize(offset), aNormal);
+    vec3 offset = aPos - camera_location;
+    float dotProduct = dot(normalize(offset), aNormal);
 
-        float normalDotContribution = 0.5;
-        float colorDiff = 0.5;
-        desiredColor = (normalize(vec4(dotProduct,dotProduct,dotProduct, 1.0)) * normalDotContribution) + vec4(normalize(offset) * colorDiff, 1.0);
-    }
+    float normalDotContribution = 0.5;
+    float colorDiff = 0.5;
+    desiredColor = (normalize(vec4(dotProduct,dotProduct,dotProduct, 1.0)) * normalDotContribution) + vec4(normalize(offset) * colorDiff, 1.0);
+    
     normal = aNormal;
     gl_Position = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
     posistion = vec3(gl_Position);
