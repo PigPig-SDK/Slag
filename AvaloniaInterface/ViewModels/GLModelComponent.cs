@@ -35,31 +35,36 @@ public class GLModelComponent : ModelComponent
         modelSelection!.OnSelectionMassUpdate += OnSelectionMassUpdate;
     }
 
-    private unsafe void OnSelectionMassUpdate()
+    public unsafe void SelectonMassUpdate(GlInterface? gl)
     {
-        if (glInterface == null)
+        if (gl == null)
         {
             Console.WriteLine("Tried to update selection buffer when opengl interface is null!");
             return;
         }
-        Console.WriteLine($"Mass update selection buffer {_VertexCount}");
+
         //Generate array.
         byte[] selectionData = new byte[_VertexCount];
-        for(int i = 0; i < selectionData.Length; i++)
+        for (int i = 0; i < selectionData.Length; i++)
         {
             selectionData[i] = model.GetComponent<ModelSelection>()!.IsVertexSelected((uint)i) ? (byte)1 : (byte)0;
         }
 
-        glInterface.BindBuffer(GL_ARRAY_BUFFER, _SelectionBuffer!.Value);
+        gl.BindBuffer(GL_ARRAY_BUFFER, _SelectionBuffer!.Value);
         fixed (byte* ptr = selectionData)
         {
-            glInterface!.BufferSubData(GL_ARRAY_BUFFER, (nint)0, (nint)(_VertexCount * sizeof(byte)), (IntPtr)ptr);
+            gl!.BufferSubData(GL_ARRAY_BUFFER, (nint)0, (nint)(_VertexCount * sizeof(byte)), (IntPtr)ptr);
         }
+    }
+
+    private unsafe void OnSelectionMassUpdate()
+    {
+
     }
 
     private void OnSelectionChanged(uint index, bool isSelected)
     {
-        OnSelectionMassUpdate();//For now...
+
     }
 
     public void OpenglRestart(GlInterface gl)

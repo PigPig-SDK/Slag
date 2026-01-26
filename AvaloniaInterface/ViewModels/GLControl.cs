@@ -136,6 +136,8 @@ public class GLControl : OpenGlControlBase
 
             Matrix4 modelTransformation = component.model.GetModelMatrix();
 
+            component.SelectonMassUpdate(gl);
+
             //Triangles
             if (RenderMode.HasFlag(RenderMode.Triangles))
             {

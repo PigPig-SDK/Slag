@@ -25,10 +25,13 @@ public class ModelSelection : ModelComponent
 
     public void SelectIndex(uint index)
     {
-        Console.WriteLine("Select index " + index);
-        SelectedIndicies.Clear();
         SelectedIndicies.Add(index);
         OnSelectionChanged?.Invoke(index, true);
+    }
+
+    public void DeselectAll()
+    {
+        SelectedIndicies.Clear();
     }
 
     public void DeselectIndex(uint index)

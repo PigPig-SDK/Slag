@@ -83,7 +83,13 @@ public class Camera
             RaycastHit? hit = FindRaycastHit(screenLocation);
             if (hit != null)
             {
-                hit!.Model.GetComponent<ModelSelection>()?.SelectIndex(hit!.Face.Indicies[0]);
+                //MS IS NEVER NULL! IF MS IS NULL A MUCH LARGER BUG HAS OCCURED!
+                ModelSelection? ms = hit!.Model.GetComponent<ModelSelection>();
+                ms!.DeselectAll();
+                foreach (uint index in hit!.Face.Indicies)
+                {
+                    ms!.SelectIndex(index);
+                }
             }
             return;
         }
