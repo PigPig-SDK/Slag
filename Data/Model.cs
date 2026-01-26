@@ -66,7 +66,7 @@ public class Model : IDisposable
         for(int i = 0; i < face.Indicies.Count - 1; i++) {
             uint start = (uint)face.Indicies[i];
             uint end = (uint)face.Indicies[i + 1];
-            AddEdge(new Edge(start, end), ModelUpdateType.MassOperation);
+            AddEdge(new Edge(start, end), ModelUpdateType.Ignore);
         }
         UpdateAllComponents(ModelUpdateType.Face | ModelUpdateType.Membership, face);
     }

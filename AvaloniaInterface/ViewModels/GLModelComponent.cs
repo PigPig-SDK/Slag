@@ -57,14 +57,21 @@ public class GLModelComponent : ModelComponent
         }
     }
 
-    private unsafe void OnSelectionMassUpdate()
+    private unsafe void OnSelectionMassUpdate(ModelUpdateType update)
     {
+        if (update.HasFlag(ModelUpdateType.Ignore)) return;
 
+        if(GLControl.Instance != null)
+        {
+            GLControl.Instance!.ModelActions.Push(SelectonMassUpdate);
+        }
     }
 
-    private void OnSelectionChanged(uint index, bool isSelected)
+    private void OnSelectionChanged(uint index, bool isSelected, ModelUpdateType update)
     {
+        if (update.HasFlag(ModelUpdateType.Ignore)) return;
 
+        OnSelectionMassUpdate(update);
     }
 
     public void OpenglRestart(GlInterface gl)

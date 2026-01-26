@@ -85,11 +85,12 @@ public class Camera
             {
                 //MS IS NEVER NULL! IF MS IS NULL A MUCH LARGER BUG HAS OCCURED!
                 ModelSelection? ms = hit!.Model.GetComponent<ModelSelection>();
-                ms!.DeselectAll();
+                ms!.DeselectAll(ModelUpdateType.Ignore);
                 foreach (uint index in hit!.Face.Indicies)
                 {
-                    ms!.SelectIndex(index);
+                    ms!.SelectIndex(index, ModelUpdateType.Ignore);
                 }
+                ms.BroadcastMassUpdate(ModelUpdateType.Face);
             }
             return;
         }

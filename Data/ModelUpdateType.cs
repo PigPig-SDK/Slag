@@ -14,6 +14,6 @@ public enum ModelUpdateType
     Face = 1 << 2,
     Locational = 1 << 2,
     Membership = 1 << 3,
-    MassOperation = 1 << 3,
+    Ignore = 1 << 3,
     ComponentAddition = 1 << 4,
 }
