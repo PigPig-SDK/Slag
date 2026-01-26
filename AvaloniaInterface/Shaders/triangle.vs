@@ -12,6 +12,7 @@ uniform mat4 projection_matrix;
 out vec3 normal;
 out vec4 desiredColor;
 out vec3 posistion;
+out float blendedMetaData;
 
 void main()
 {
@@ -25,4 +26,5 @@ void main()
     normal = aNormal;
     gl_Position = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
     posistion = vec3(gl_Position);
+    blendedMetaData = metadata;
 }

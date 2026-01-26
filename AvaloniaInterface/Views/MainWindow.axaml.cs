@@ -26,8 +26,11 @@ namespace OpenglAvaloniaTest.Views
 
             switch (mode)
             {
-                case "Solid":
+                case "All":
                     GLControl.RenderMode = RenderMode.Solid;
+                    break;
+                case "Solid":
+                    GLControl.RenderMode = RenderMode.Triangles;
                     break;
                 case "Wireframe":
                     GLControl.RenderMode = RenderMode.Wireframe;

@@ -10,7 +10,7 @@ public class SceneHierarchy
 {
     public static SceneHierarchy Instance = new();
 
-    private List<Model> Models { get; set; } = [ModelPrefabs.InstanceCone(100,3,1)];
+    private List<Model> Models { get; set; } = [ModelPrefabs.InstanceBasicCube()];
 
     private List<Model> Tools { get; set; } = [ModelPrefabs.InstanceAxisTriad()];
 

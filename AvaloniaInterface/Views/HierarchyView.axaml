@@ -5,10 +5,11 @@
             <Button Grid.Row="0" Content="AddObject" CornerRadius="0" HorizontalAlignment="Stretch" Focusable="False" Click="OnAddObjectButtonClick">
                 <Button.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Cube"/>
-                        <MenuItem Header="Sphere"/>
-                        <MenuItem Header="Cylinder"/>
-                        <MenuItem Header="Cone"/>
+                        <MenuItem Header="Cube" Click="OnAddCubePressed"/>
+                        <MenuItem Header="Sphere" Click="OnAddSpherePressed"/>
+                        <MenuItem Header="Cylinder" Click="OnAddCylinderPressed"/>
+                        <MenuItem Header="Cone" Click="OnAddConePressed"/>
+                        <MenuItem Header="Torus" Click="OnAddTorusPressed"/>
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>

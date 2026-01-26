@@ -9,6 +9,7 @@ uniform mat4 projection_matrix;
 in vec3 normal;
 in vec3 posistion;
 in vec4 desiredColor;
+in float blendedMetaData;
 
 out vec4 FragColor;
 
@@ -32,5 +33,10 @@ void main()
     float spec = pow(max(dot(R, V), 0.0), shininess);
     vec4 specular = spec * lightColor;
 
-    FragColor = (desiredColor * 0.5 + 0.5) * (ambient + diffuse + specular);
+    vec4 dColor = desiredColor;
+
+    if(blendedMetaData == 1.0)
+        dColor = vec4(1.0, 0.647, 0.0, 1.0);
+
+    FragColor = (dColor * 0.5 + 0.5) * (ambient + diffuse + specular);
 }

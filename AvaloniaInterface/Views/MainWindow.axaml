@@ -52,6 +52,7 @@
                       CornerRadius="0"
                       SelectionChanged="OnRendermodeChanged"
                       Focusable="False">
+                <ComboBoxItem Content="All"/>
                 <ComboBoxItem Content="Solid"/>
                 <ComboBoxItem Content="Wireframe"/>
                 <ComboBoxItem Content="Points"/>
