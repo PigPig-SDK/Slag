@@ -79,6 +79,8 @@ public static class Raycast
         float closestDistance = float.PositiveInfinity;
         foreach (Model model in models)
         {
+            if(model.Hidden) continue;//Do not scan against hidden models.
+
             Matrix4 modelInv = model.GetModelMatrix().Inverted();
             Vector3 originHomo = ((new Vector4(origin, 1.0f) * modelInv)).Xyz;
             Vector3 directionHomo =  ((new Vector4(direction, 0.0f) * modelInv)).Xyz.Normalized();
