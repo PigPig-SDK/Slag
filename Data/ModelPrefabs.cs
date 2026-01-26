@@ -9,7 +9,6 @@ namespace Models;
 
 public static class ModelPrefabs
 {
-
     /// <summary>
     /// Note: This objects edges will intentionally be smoothed when triangulated
     /// </summary>
@@ -17,7 +16,7 @@ public static class ModelPrefabs
     public static Model InstanceBasicCube()
     {
         Model cube = new();
-        cube.ObjectName = "Basic Smooth Cube";
+        cube.ObjectName = "Cube";
 
         //Add verts
         cube.AddVertex(new Vertex(-1, -1, -1)); // 0
@@ -40,11 +39,52 @@ public static class ModelPrefabs
         return cube;
     }
 
+    /// <returns>A basic cube for debugging</returns>
+    public static Model InstanceTorus(int torusIterations, int ringIterations, float torusRadius, float ringRadius)
+    {
+        Model torus = new();
+        torus.ObjectName = "Torus";
+
+        float pi = 3.1415f;
+
+        float torusStep = (2.0f * pi) / (float)torusIterations;
+        float ringStep = (2.0f * pi) / (float)ringIterations;
+
+        //The simplest way I could think of accomplishing a torus was using matrix translations.
+        for (int iTorus = 0; iTorus < torusIterations; iTorus++)
+        {
+            Matrix4.CreateRotationY(torusStep * iTorus, out Matrix4 rotationMatrix);
+            Matrix4 translation =  Matrix4.CreateTranslation(new Vector3(torusRadius, 0, 0)) * rotationMatrix;
+            for (int iRadial = 0; iRadial < ringIterations; iRadial++)
+            {
+                //build vert position based on local distance
+                Vector3 vertPos = new Vector3(MathF.Cos(ringStep * (float)iRadial) * ringRadius, MathF.Sin(ringStep * (float)iRadial) * ringRadius, 0);
+                Vector4 posVec4 = new Vector4(vertPos, 1.0f) * translation;
+                torus.AddVertex(new Vertex(posVec4.X, posVec4.Y, posVec4.Z));
+            }
+        }
+
+        //Populating faces...
+        for (int t = 0; t < torusIterations; t++)
+        {
+            for (int r = 0; r < ringIterations; r++)
+            {
+                int cur = (t * ringIterations) + r;
+                int next = (t * ringIterations) + ((r + 1) % ringIterations);
+                int curTop = ((t + 1) * ringIterations + r) % torus.Verticies.Count;
+                int curTopNext = ((t + 1) * ringIterations + (r + 1) % ringIterations) % torus.Verticies.Count;
+
+                torus.AddFace((uint)curTop, (uint)curTopNext, (uint)next, (uint)cur);
+            }
+        }
+        return torus;
+    }
+
     /// <returns>A basic cone</returns>
     public static Model InstanceCone(int segments, float height, float radius)
     {
         Model cone = new();
-        cone.ObjectName = "Basic Cone";
+        cone.ObjectName = "Cone";
 
         //Add verts
         cone.AddVertex(new Vertex(0, height, 0));//Top of cone
@@ -75,7 +115,7 @@ public static class ModelPrefabs
     public static Model InstanceBasicTriangle()
     {
         Model triangle = new();
-        triangle.ObjectName = "Basic Triangle";
+        triangle.ObjectName = "Triangle";
 
         //Add verts
         triangle.AddVertex(new Vertex(1, 1, -1));//0
@@ -91,7 +131,7 @@ public static class ModelPrefabs
     public static Model InstanceAxisTriad()
     {
         Model triad = new Model();
-        triad.ObjectName = "Axis Triad model";
+        triad.ObjectName = "Triad";
 
         float arrowLength = 0.5f;
         float arrowWidth = 0.025f;
@@ -115,7 +155,7 @@ public static class ModelPrefabs
     public static Model DebugTriangleLine(Vector3 start, Vector3 end)
     {
         Model triad = new Model();
-        triad.ObjectName = "Debugging Raycast";
+        triad.ObjectName = "DebugLine";
 
         triad.AddVertex(new Vertex(start.X, start.Y, start.Z));
         triad.AddVertex(new Vertex(start.X, start.Y + 0.1f, start.Z));
