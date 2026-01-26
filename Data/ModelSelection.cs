@@ -11,18 +11,22 @@ public class ModelSelection : ModelComponent
 {
     private HashSet<uint> SelectedIndicies = [];
 
-    public ModelSelection(Model model)
-    {
-        this.model = model;
-    }
-
     /// <summary>
     /// First parameter is the index, second parameter is true if selected, false if deselected
     /// </summary>
     public event Action<uint, bool>? OnSelectionChanged;
 
+    public event Action? OnSelectionMassUpdate;
+
+    public ModelSelection(Model model)
+    {
+        this.model = model;
+    }
+
     public void SelectIndex(uint index)
     {
+        Console.WriteLine("Select index " + index);
+        SelectedIndicies.Clear();
         SelectedIndicies.Add(index);
         OnSelectionChanged?.Invoke(index, true);
     }
@@ -42,4 +46,6 @@ public class ModelSelection : ModelComponent
     }
 
     public override void OnAddedToModel(Model model) { }
+
+    public bool IsVertexSelected(uint i) => SelectedIndicies.Contains(i);
 }

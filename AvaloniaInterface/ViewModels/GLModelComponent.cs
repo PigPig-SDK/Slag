@@ -32,11 +32,34 @@ public class GLModelComponent : ModelComponent
     {
         ModelSelection? modelSelection = model.GetComponent<ModelSelection>();
         modelSelection!.OnSelectionChanged += OnSelectionChanged;
+        modelSelection!.OnSelectionMassUpdate += OnSelectionMassUpdate;
+    }
+
+    private unsafe void OnSelectionMassUpdate()
+    {
+        if (glInterface == null)
+        {
+            Console.WriteLine("Tried to update selection buffer when opengl interface is null!");
+            return;
+        }
+        Console.WriteLine($"Mass update selection buffer {_VertexCount}");
+        //Generate array.
+        byte[] selectionData = new byte[_VertexCount];
+        for(int i = 0; i < selectionData.Length; i++)
+        {
+            selectionData[i] = model.GetComponent<ModelSelection>()!.IsVertexSelected((uint)i) ? (byte)1 : (byte)0;
+        }
+
+        glInterface.BindBuffer(GL_ARRAY_BUFFER, _SelectionBuffer!.Value);
+        fixed (byte* ptr = selectionData)
+        {
+            glInterface!.BufferSubData(GL_ARRAY_BUFFER, (nint)0, (nint)(_VertexCount * sizeof(byte)), (IntPtr)ptr);
+        }
     }
 
     private void OnSelectionChanged(uint index, bool isSelected)
     {
-
+        OnSelectionMassUpdate();//For now...
     }
 
     public void OpenglRestart(GlInterface gl)
@@ -68,11 +91,9 @@ public class GLModelComponent : ModelComponent
         _EdgeArrayObject = gl.GenVertexArray();
         _EdgeIndiciesBuffer = gl.GenBuffer();
 
-        
-
         //TRIANGLE
         gl.BindVertexArray(_TriangleArrayObject!.Value);
-        UpdateTrangleBuffers(gl);
+        InitializeTrangleBuffers(gl);
         SetLocationsInsideVAO(gl);
 
         //EDGE
@@ -115,7 +136,7 @@ public class GLModelComponent : ModelComponent
         _EdgeIndiciesCount = edgeIndicies.Length;
     }
 
-    public unsafe void UpdateTrangleBuffers(GlInterface gl)
+    public unsafe void InitializeTrangleBuffers(GlInterface gl)
     {
         Vertex[] verts = [];
         List<uint> indiciesList = []; //List that will encounter lots of modification
@@ -132,10 +153,6 @@ public class GLModelComponent : ModelComponent
         ComputeNormals(verts, indicies);
         _IndiciesCount = indicies.Length;
         _VertexCount = verts.Length;
-
-        ///
-        //Populate OPENGL buffers
-        ///
 
         //Inform of vert data
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
@@ -157,7 +174,7 @@ public class GLModelComponent : ModelComponent
         byte[] selectionData = new byte[verts.Length];
         for (int i = 0; i < selectionData.Length; i++)
         {
-            selectionData[i] = i % 2 == 0 ? (byte)1 : (byte)0;//Temporary selection data
+            selectionData[i] = i % 10 == 0 ? (byte)1 : (byte)0;//Temporary selection data
         }
 
         gl.BindBuffer(GL_ARRAY_BUFFER, _SelectionBuffer!.Value);
