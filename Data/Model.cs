@@ -68,6 +68,7 @@ public class Model : IDisposable
             uint end = (uint)face.Indicies[i + 1];
             AddEdge(new Edge(start, end), ModelUpdateType.Ignore);
         }
+        AddEdge(new Edge(face.Indicies[0], face.Indicies[^1]), ModelUpdateType.Ignore);
         UpdateAllComponents(ModelUpdateType.Face | ModelUpdateType.Membership, face);
     }
 
