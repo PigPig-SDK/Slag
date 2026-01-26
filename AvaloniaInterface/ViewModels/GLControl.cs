@@ -22,7 +22,12 @@ using static Avalonia.OpenGL.GlConsts;
 
 public class GLControl : OpenGlControlBase
 {
+    public static GLControl? Instance;
     public static RenderMode RenderMode = RenderMode.Solid;
+    /// <summary>
+    /// This stack exists so that OpenGL Actions are all executed on the main thread
+    /// </summary>
+    public Stack<Action<GlInterface>> ModelActions = new();
 
     private ShaderProgram _triangleShaderProgram = new();
     private ShaderProgram _edgeShaderProgram = new();
@@ -43,6 +48,7 @@ public class GLControl : OpenGlControlBase
 
     public GLControl()
     {
+        Instance = this;
         //Link camera
         _camera = new Camera(this);
         this.PointerPressed += _camera.OnMouseDown;
@@ -128,11 +134,45 @@ public class GLControl : OpenGlControlBase
         //gl.LineWidth(10);
 
         CheckError(gl);
-        //Draw all models
+
+        //PRIMARY RENDERING!
+        ExecuteGlStack(gl);
+        RenderModels(gl, ref view, ref proj);
+        RenderTools(gl, ref view, ref proj);
+
+        RequestNextFrameRendering();
+    }
+
+    private void ExecuteGlStack(GlInterface gl)
+    {
+        while (ModelActions.Count > 0)
+        {
+            var action = ModelActions.Pop();
+            action.Invoke(gl);
+        }
+    }
+
+    private void RenderTools(GlInterface gl, ref Matrix4 view, ref Matrix4 proj)
+    {
+        gl.Disable(GL_DEPTH_TEST);
+        foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneTools()))
+        {
+            if (component.model.Hidden) continue;
+
+            Matrix4 modelTransformation = component.model.GetModelMatrix();
+            _triangleShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
+            component.RenderModel(gl);
+        }
+    }
+
+    private void RenderModels(GlInterface gl, ref Matrix4 view, ref Matrix4 proj)
+    {
         gl.Enable(GL_DEPTH_TEST);
+        //Update models that are not 'fresh'
+
         foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneModels()))
         {
-            if(component.model.Hidden) continue;
+            if (component.model.Hidden) continue;
 
             Matrix4 modelTransformation = component.model.GetModelMatrix();
 
@@ -159,18 +199,6 @@ public class GLControl : OpenGlControlBase
 
             gl.DepthMask(1);//true
         }
-
-        //Draw tools models
-        gl.Disable(GL_DEPTH_TEST);
-        foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneTools()))
-        {
-            if (component.model.Hidden) continue;
-
-            Matrix4 modelTransformation = component.model.GetModelMatrix();
-            _triangleShaderProgram.UseProgram(gl, modelTransformation, view, proj, _camera.Origin);
-            component.RenderModel(gl);
-        }
-        RequestNextFrameRendering();
     }
 
     protected override void OnOpenGlDeinit(GlInterface gl)
