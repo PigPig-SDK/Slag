@@ -7,8 +7,11 @@
         <Expander HorizontalAlignment="Stretch" Focusable="False" ExpandDirection="Down" IsExpanded="False" x:Name="BodyExpander">
             <Expander.Header>
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="5">
-                    <Button Grid.Column="0" MinWidth="0" Focusable="False" x:Name="HideButton" Click="OnHideButtonClick" CornerRadius="40">
-                        <Image Width="25" MinWidth="0" x:Name="HiddenImage" Source="../Assets/visibleIcon.png"/>
+                    <Button Grid.Column="0" MinWidth="0" Focusable="False" x:Name="HideButton" Click="OnHideButtonClick" CornerRadius="40" Background ="Transparent">
+                        <Grid> 
+                            <Image Width="25" MinWidth="0" x:Name="ShownImage" Source="../Assets/visibleIcon.png"/>
+                            <Image Width="25" MinWidth="0" x:Name="HiddenImage" Source="../Assets/hiddenIcon.png" IsVisible="False"/>
+                        </Grid>
                     </Button>
                     <TextBox Grid.Column="1"
                              x:Name="NameTextbox"

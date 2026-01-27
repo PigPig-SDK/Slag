@@ -16,10 +16,6 @@ namespace OpenglAvaloniaTest;
 
 public partial class HierarchyModel : UserControl
 {
-
-    private static readonly string HiddenImageDirectory = "avares://AvaloniaInterface/Assets/hiddenIcon.png";
-    private static readonly string VisibleImageDirectory = "avares://AvaloniaInterface/Assets/visibleIcon.png";
-
     private const float _DegreesToRadians = (float)(Math.PI / 180.0);
     private const float _RadiansToDegrees = (float)(180.0 / Math.PI);
 
@@ -76,15 +72,8 @@ public partial class HierarchyModel : UserControl
         if (Model == null) return;
 
         Model.Hidden = !Model.Hidden;
-
-        //if (Model.Hidden)
-        //{
-        //    HiddenImage.Source = new Bitmap(HiddenImageDirectory);
-        //}
-        //else
-        //{
-        //    HiddenImage.Source = new Bitmap(VisibleImageDirectory);
-        //}
+        HiddenImage.IsVisible = Model.Hidden;
+        ShownImage.IsVisible = !Model.Hidden;
     }
 
     private void DeleteModelClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
