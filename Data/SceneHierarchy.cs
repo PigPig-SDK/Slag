@@ -10,9 +10,9 @@ public class SceneHierarchy
 {
     public static SceneHierarchy Instance = new();
 
-    private List<Model> Models { get; set; } = [ModelPrefabs.InstanceBasicCube()];
+    private List<Model> Models { get; set; } = [ModelPrefabs.Cube()];
 
-    private List<Model> Tools { get; set; } = [ModelPrefabs.InstanceAxisTriad()];
+    private List<Model> Tools { get; set; } = [ModelPrefabs.AxisTriad()];
 
     public event Action<Model>? OnModelAdded;
 

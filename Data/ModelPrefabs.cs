@@ -1,9 +1,10 @@
-﻿using System;
+﻿using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using OpenTK.Mathematics;
 
 namespace Models;
 
@@ -13,7 +14,7 @@ public static class ModelPrefabs
     /// Note: This objects edges will intentionally be smoothed when triangulated
     /// </summary>
     /// <returns>A basic cube for debugging</returns>
-    public static Model InstanceBasicCube()
+    public static Model Cube()
     {
         Model cube = new();
         cube.ObjectName = "Cube";
@@ -40,7 +41,7 @@ public static class ModelPrefabs
     }
 
     /// <returns>A basic cube for debugging</returns>
-    public static Model InstanceTorus(int torusIterations, int ringIterations, float torusRadius, float ringRadius)
+    public static Model Torus(int torusIterations, int ringIterations, float torusRadius, float ringRadius)
     {
         Model torus = new();
         torus.ObjectName = "Torus";
@@ -80,11 +81,87 @@ public static class ModelPrefabs
         return torus;
     }
 
-    /// <returns>A cylinder</returns>
-    public static Model InstanceBasicCylinder(float height, float radius, int triangulation)
+    public static Model Sphere(uint step, float radius)
     {
-        Model cylinder = new();
-        cylinder.ObjectName = "Cylinder";
+        Model circle = new()
+        {
+            ObjectName = "Circle"
+        };
+
+        //Probably better ways of accomplishing this.
+
+        for (float b = -step / 2.0f; b <= step / 2.0f; b++)
+        {
+            if (b == step / 2.0f)//Top
+            {
+                circle.AddVertex(new Vertex(0, radius, 0));
+            }
+            else if (b == -step / 2.0f)//Bottom
+            {
+                circle.AddVertex(new Vertex(0, -radius, 0));
+            }
+            else//Rings
+            {
+                for (int a = 0; a < step; a++)
+                {
+                    float phi = (((float)a / (float)step)) * 2 * MathF.PI;
+                    float theta = (((float)b / (float)step)) * MathF.PI;
+                    circle.AddVertex(new Vertex(
+                        MathF.Cos(theta) * MathF.Sin(phi) * radius,
+                        MathF.Sin(theta) * radius,
+                        MathF.Cos(theta) * MathF.Cos(phi) * radius));
+                }
+            }
+        }
+
+        for (uint longitude = 0; longitude < step; longitude++)
+        {
+            if (longitude == 0)//Bottom ring
+            {
+                //Scan the ring above us.
+                for (uint ringIndex = 0; ringIndex < step; ringIndex++)
+                {
+                    uint index = ringIndex + 1;
+                    uint indexNext = (index % step) + 1;
+                    circle.AddFace(indexNext, index , 0);
+
+                }
+            }
+            else if (longitude == step - 1)// Top ring
+            {
+                uint rootIndex = (uint)circle.Verticies.Count - 1;
+                for (uint ringIndex = 0; ringIndex < step; ringIndex++)
+                {
+                    uint index = ringIndex + 1;
+                    uint indexNext = (index % step) + 1;
+                    circle.AddFace(rootIndex - indexNext, rootIndex - index, rootIndex);
+
+                }
+            }
+            else//Body rings
+            {
+                for (uint latitude = 0; latitude < step; latitude++)
+                {
+                    uint cur = ((longitude - 1) * step) + latitude + 1;
+                    uint next = ((longitude - 1) * step) + ((latitude + 1) % step) + 1;
+                    uint curTop = ((longitude) * step) + latitude + 1;
+                    uint curTopNext = ((longitude) * step) + ((latitude + 1) % step) + 1;
+                    circle.AddFace(next, curTopNext, curTop, cur);
+                }
+            }
+        }
+
+        return circle;
+
+    }
+
+    /// <returns>A cylinder</returns>
+    public static Model Cylinder(float height, float radius, int triangulation)
+    {
+        Model cylinder = new()
+        {
+            ObjectName = "Cylinder"
+        };
 
         float step = (2.0f * MathF.PI) / triangulation;
 
@@ -121,7 +198,7 @@ public static class ModelPrefabs
     }
 
     /// <returns>A basic cone</returns>
-    public static Model InstanceCone(int segments, float height, float radius)
+    public static Model Cone(int segments, float height, float radius)
     {
         Model cone = new();
         cone.ObjectName = "Cone";
@@ -152,7 +229,7 @@ public static class ModelPrefabs
         return cone;
     }
     /// <returns>A basic triangle for debugging</returns>
-    public static Model InstanceBasicTriangle()
+    public static Model Triangle()
     {
         Model triangle = new();
         triangle.ObjectName = "Triangle";
@@ -168,7 +245,7 @@ public static class ModelPrefabs
         return triangle;
     }
     /// <returns>An XYZ axis triad shape for debugging</returns>
-    public static Model InstanceAxisTriad()
+    public static Model AxisTriad()
     {
         Model triad = new Model();
         triad.ObjectName = "Triad";
