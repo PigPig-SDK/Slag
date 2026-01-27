@@ -65,4 +65,29 @@ public partial class HierarchyView : UserControl
             button.ContextMenu.Open(button);
         }
     }
+
+    private void OnAddCubePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        SceneHierarchy.Instance.AddModel(ModelPrefabs.Cube());
+    }
+
+    private void OnAddSpherePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        SceneHierarchy.Instance.AddModel(ModelPrefabs.Sphere(10, 1));
+    }
+
+    private void OnAddCylinderPressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        SceneHierarchy.Instance.AddModel(ModelPrefabs.Cylinder(1,1,10));
+    }
+
+    private void OnAddConePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        SceneHierarchy.Instance.AddModel(ModelPrefabs.Cone(10, 1, 1));
+    }
+
+    private void OnAddTorusPressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        SceneHierarchy.Instance.AddModel(ModelPrefabs.Torus(20, 20, 2, 1));
+    }
 }
