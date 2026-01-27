@@ -138,10 +138,6 @@ public class GLControl : OpenGlControlBase
         float aspect = (float)(Bounds.Width / (double)Bounds.Height);
         Matrix4 proj = _camera.CreatePrespective(aspect);
 
-        //gl.LineWidth(10);
-
-        CheckError(gl);
-
         //PRIMARY RENDERING!
         ExecuteGlStack(gl);
         RenderModels(gl, ref view, ref proj);
@@ -200,6 +196,7 @@ public class GLControl : OpenGlControlBase
                             }
                         case RenderMode.Edges:
                             {
+
                                 component.RenderEdges(gl);
                                 break;
                             }

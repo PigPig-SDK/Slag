@@ -216,6 +216,8 @@ public class GLModelComponent : ModelComponent
     {
         if (_EdgeArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_EdgeArrayObject)} while its null");
         gl.BindVertexArray(_EdgeArrayObject!.Value);
+        //TODO: Find alternative to GL_LINES for better edge rendering.
+        //For now, this will do.
         gl.DrawElements(GL_LINES, _EdgeIndiciesCount, GL_UNSIGNED_INT, 0);
         gl.BindVertexArray(0);
     }
