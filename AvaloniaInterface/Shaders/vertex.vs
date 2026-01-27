@@ -13,7 +13,7 @@ out vec4 color;
 
 void main()
 {
-    gl_PointSize = 5.0;
+    gl_PointSize = 10.0;
     vec4 pos = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
     pos.z -= 0.0001;
     gl_Position = pos;

@@ -10,7 +10,7 @@ void main()
     vec2 uv = gl_PointCoord * 2.0 - 1.0; // center at (0,0)
     float dist2 = dot(uv, uv);
 
-    if (dist2 > 1.0)
+    if (dist2 > 1.0 || dist2 < 0.5)
         discard; // outside the circle, discard fragment
 
     FragColor = color;
