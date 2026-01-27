@@ -8,11 +8,6 @@ namespace OpenglAvaloniaTest.ViewModels
     {
         public string Greeting { get; } = "Welcome to Avalonia!";
 
-        public MainWindowViewModel()
-        {
-
-        }
-
         [RelayCommand]
         private void OnOpen()
         {

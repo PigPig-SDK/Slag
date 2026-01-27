@@ -57,9 +57,9 @@ public class GLModelComponent : ModelComponent
         }
     }
 
-    private unsafe void OnSelectionMassUpdate(ModelUpdateType update)
+    private unsafe void OnSelectionMassUpdate(UpdateType update)
     {
-        if (update.HasFlag(ModelUpdateType.Ignore)) return;
+        if (update.HasFlag(UpdateType.Ignore)) return;
 
         if(GLControl.Instance != null)
         {
@@ -67,9 +67,9 @@ public class GLModelComponent : ModelComponent
         }
     }
 
-    private void OnSelectionChanged(uint index, bool isSelected, ModelUpdateType update)
+    private void OnSelectionChanged(uint index, bool isSelected, UpdateType update)
     {
-        if (update.HasFlag(ModelUpdateType.Ignore)) return;
+        if (update.HasFlag(UpdateType.Ignore)) return;
 
         OnSelectionMassUpdate(update);
     }
@@ -260,7 +260,7 @@ public class GLModelComponent : ModelComponent
         }
     }
 
-    public override void OnModelUpdate(Model model, ModelUpdateType info, object data)
+    public override void OnModelUpdate(Model model, UpdateType info, object data)
     {
 
     }

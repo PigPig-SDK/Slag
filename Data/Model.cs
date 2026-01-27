@@ -10,7 +10,7 @@ namespace Models;
 
 public class Model : IDisposable
 {
-    public string ObjectName = "Undefined Model";
+    public string ObjectName = "Model";
     public List<Vertex> Verticies { get; private set; } = [];
     private List<Face> _Faces = [];
     private HashSet<Edge> _Edges = [];
@@ -37,19 +37,17 @@ public class Model : IDisposable
     public void AddVertex(Vertex vertex)
     {
         Verticies.Add(vertex);
-        UpdateAllComponents(ModelUpdateType.Vertex | ModelUpdateType.Membership, vertex);
+        UpdateAllComponents(UpdateType.Vertex | UpdateType.Membership, vertex);
     }
 
-    public void AddEdge(Edge edge, ModelUpdateType info = ModelUpdateType.None)
+    public void AddEdge(Edge edge, UpdateType info = UpdateType.None)
     {
         _Edges.Add(edge);
-        UpdateAllComponents(ModelUpdateType.Edge | ModelUpdateType.Membership | info, edge);
+        UpdateAllComponents(UpdateType.Edge | UpdateType.Membership | info, edge);
     }
 
     public void AddFace(params uint[] indicies) => AddFace(new List<uint>(indicies));
-
     public void AddFace(List<uint> indicies) => AddFace(new Face(indicies));
-
     public void AddFace(Face face)
     {
         foreach(uint i in face.Indicies)
@@ -66,10 +64,10 @@ public class Model : IDisposable
         for(int i = 0; i < face.Indicies.Count - 1; i++) {
             uint start = (uint)face.Indicies[i];
             uint end = (uint)face.Indicies[i + 1];
-            AddEdge(new Edge(start, end), ModelUpdateType.Ignore);
+            AddEdge(new Edge(start, end), UpdateType.Ignore);
         }
-        AddEdge(new Edge(face.Indicies[0], face.Indicies[^1]), ModelUpdateType.Ignore);
-        UpdateAllComponents(ModelUpdateType.Face | ModelUpdateType.Membership, face);
+        AddEdge(new Edge(face.Indicies[0], face.Indicies[^1]), UpdateType.Ignore);
+        UpdateAllComponents(UpdateType.Face | UpdateType.Membership, face);
     }
 
     public void RemoveVertex(int index)
@@ -86,19 +84,19 @@ public class Model : IDisposable
         {
             e.DecrementForIndex(index);
         }
-        UpdateAllComponents(ModelUpdateType.Vertex | ModelUpdateType.Membership, index);
+        UpdateAllComponents(UpdateType.Vertex | UpdateType.Membership, index);
     }
 
     public void RemoveFace(Face face)
     {
         _Faces.Remove(face);
-        UpdateAllComponents(ModelUpdateType.Face | ModelUpdateType.Membership, face);
+        UpdateAllComponents(UpdateType.Face | UpdateType.Membership, face);
     }
 
     public void RemoveEdge(Edge edge)
     {
         _Edges.Remove(edge);
-        UpdateAllComponents(ModelUpdateType.Edge | ModelUpdateType.Membership, edge);
+        UpdateAllComponents(UpdateType.Edge | UpdateType.Membership, edge);
     }
 
     private void GenerateIndicies()
@@ -186,7 +184,7 @@ public class Model : IDisposable
 
     public bool HasComponent(Type type) => _Components.ContainsKey(type);
 
-    void UpdateAllComponents(ModelUpdateType info, object variable)
+    void UpdateAllComponents(UpdateType info, object variable)
     {
         foreach (var component in _Components.Values) component.OnModelUpdate(this, info, variable);
     }

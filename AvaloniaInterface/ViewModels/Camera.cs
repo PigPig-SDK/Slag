@@ -83,14 +83,16 @@ public class Camera
             RaycastHit? hit = FindRaycastHit(screenLocation);
             if (hit != null)
             {
-                //MS IS NEVER NULL! IF MS IS NULL A MUCH LARGER BUG HAS OCCURED!
                 ModelSelection? ms = hit!.Model.GetComponent<ModelSelection>();
-                ms!.DeselectAll(ModelUpdateType.Ignore);
+
+                if (ms == null) throw new InvalidOperationException("Model dosn't contain ModelSelection!");
+
+                ms.DeselectAll(UpdateType.Ignore);
                 foreach (uint index in hit!.Face.Indicies)
                 {
-                    ms!.SelectIndex(index, ModelUpdateType.Ignore);
+                    ms.SelectIndex(index, UpdateType.Ignore);
                 }
-                ms.BroadcastMassUpdate(ModelUpdateType.Face);
+                ms.BroadcastMassUpdate(UpdateType.Face);
             }
             return;
         }

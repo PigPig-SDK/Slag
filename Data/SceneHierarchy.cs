@@ -36,21 +36,9 @@ public class SceneHierarchy
         OnModelRemoved?.Invoke(model);
     }
 
-    public IEnumerable<Model> SceneModels()
-    {
-        foreach (var model in Models)
-        {
-            yield return model;
-        }
-    }
+    public IEnumerable<Model> SceneModels() => Models;
 
-    public IEnumerable<Model> SceneTools()
-    {
-        foreach (var model in Tools)
-        {
-            yield return model;
-        }
-    }
+    public IEnumerable<Model> SceneTools() => Tools;
 
     public IEnumerable<Model> AllModels()
     {

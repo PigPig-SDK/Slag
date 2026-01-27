@@ -16,9 +16,15 @@ public class Face
 
     public Model? ParentModel = null;
 
-    public Face(List<uint> indicies) => Indicies = indicies;
+    public Face(List<uint> indicies)
+    {
+        Indicies = indicies;
+    }
 
-    public Face(params uint[] values) => Indicies = [.. values];
+    public Face(params uint[] values)
+    {
+        Indicies = [.. values];
+    }
 
     public override bool Equals(object? obj)
     {

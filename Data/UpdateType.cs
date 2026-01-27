@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models;
 [Flags]
-public enum ModelUpdateType
+public enum UpdateType
 {
     None = 0,
     Vertex = 1 << 0,

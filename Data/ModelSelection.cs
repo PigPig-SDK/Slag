@@ -14,30 +14,30 @@ public class ModelSelection : ModelComponent
     /// <summary>
     /// First parameter is the index, second parameter is true if selected, false if deselected
     /// </summary>
-    public event Action<uint, bool, ModelUpdateType>? OnSelectionChanged;
+    public event Action<uint, bool, UpdateType>? OnSelectionChanged;
 
-    public event Action<ModelUpdateType>? OnSelectionMassUpdate;
+    public event Action<UpdateType>? OnSelectionMassUpdate;
 
     public ModelSelection(Model model)
     {
         this.model = model;
     }
 
-    public void SelectIndex(uint index, ModelUpdateType updateInfo = ModelUpdateType.Vertex)
+    public void SelectIndex(uint index, UpdateType updateInfo = UpdateType.Vertex)
     {
         SelectedIndicies.Add(index);
         OnSelectionChanged?.Invoke(index, true, updateInfo);
     }
 
-    public void DeselectAll(ModelUpdateType updateInfo = ModelUpdateType.Vertex)
+    public void DeselectAll(UpdateType updateInfo = UpdateType.Vertex)
     {
         SelectedIndicies.Clear();
         OnSelectionMassUpdate?.Invoke(updateInfo);
     }
 
-    public void BroadcastMassUpdate(ModelUpdateType updateInfo) => OnSelectionMassUpdate?.Invoke(updateInfo);
+    public void BroadcastMassUpdate(UpdateType updateInfo) => OnSelectionMassUpdate?.Invoke(updateInfo);
 
-    public void DeselectIndex(uint index, ModelUpdateType updateInfo = ModelUpdateType.Vertex)
+    public void DeselectIndex(uint index, UpdateType updateInfo = UpdateType.Vertex)
     {
         SelectedIndicies.Remove(index);
         OnSelectionChanged?.Invoke(index, false, updateInfo);
@@ -45,7 +45,7 @@ public class ModelSelection : ModelComponent
 
     public override void Dispose() { }
 
-    public override void OnModelUpdate(Model model, ModelUpdateType info, object data)
+    public override void OnModelUpdate(Model model, UpdateType info, object data)
     {
         
 
