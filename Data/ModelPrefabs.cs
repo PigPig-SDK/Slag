@@ -45,7 +45,7 @@ public static class ModelPrefabs
         Model torus = new();
         torus.ObjectName = "Torus";
 
-        float pi = 3.1415f;
+        const float pi = MathF.PI;
 
         float torusStep = (2.0f * pi) / (float)torusIterations;
         float ringStep = (2.0f * pi) / (float)ringIterations;
@@ -78,6 +78,46 @@ public static class ModelPrefabs
             }
         }
         return torus;
+    }
+
+    /// <returns>A cylinder</returns>
+    public static Model InstanceBasicCylinder(float height, float radius, int triangulation)
+    {
+        Model cylinder = new();
+        cylinder.ObjectName = "Cylinder";
+
+        float step = (2.0f * MathF.PI) / triangulation;
+
+        for (int i = 0; i < triangulation; i++)
+        {
+            //Top first, followed by bottom
+            cylinder.AddVertex(new Vertex(MathF.Sin(step * i), height/2, MathF.Cos(step * i)));
+            cylinder.AddVertex(new Vertex(MathF.Sin(step * i), -height/2, MathF.Cos(step * i)));
+        }
+
+        for (uint i = 0; i < cylinder.Verticies.Count; i += 2)
+        {
+            uint top = i;
+            uint bottom = i + 1;
+            uint next = (uint)((i + 2) % cylinder.Verticies.Count);
+            uint nextTop = next;
+            uint nextBottom = next + 1;
+            cylinder.AddFace(bottom, nextBottom, nextTop, top);
+        }
+
+        uint[] topFace = new uint[triangulation];
+        uint[] bottomFace = new uint[triangulation];
+
+        for (uint i = 0; i < triangulation; i++)
+        {
+            topFace[i] = (i * 2);
+            bottomFace[i] = (i * 2) + 1;
+        }
+
+        cylinder.AddFace(bottomFace);
+        cylinder.AddFace(topFace);
+
+        return cylinder;
     }
 
     /// <returns>A basic cone</returns>
