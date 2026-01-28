@@ -55,6 +55,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <ComboBox Grid.Row="0" Grid.Column="0" Width="120"
@@ -68,14 +69,17 @@
                     <ComboBoxItem Content="Points"/>
                 </ComboBox>
 
-                <Button Grid.Row="0" Grid.Column="1" Width="30" Height="30" CornerRadius="0" Background="Transparent">
+                <Button Grid.Row="0" Grid.Column="1" Width="30" Height="30" CornerRadius="0" Background="Transparent" x:Name="vertexButton" Click="OnVertexPressed">
                     <Image Width="25" MinWidth="0" Source="../Assets/vertex.png"/>
                 </Button>
-                <Button Grid.Row="0" Grid.Column="2" Width="30" Height="30" CornerRadius="0" Background="Transparent">
+                <Button Grid.Row="0" Grid.Column="2" Width="30" Height="30" CornerRadius="0" Background="Transparent" x:Name="edgeButton" Click="OnEdgePressed">
                     <Image Width="25" MinWidth="0" Source="../Assets/edge.png"/>
                 </Button>
-                <Button Grid.Row="0" Grid.Column="3" Width="30" Height="30" CornerRadius="0" Background="Orange">
+                <Button Grid.Row="0" Grid.Column="3" Width="30" Height="30" CornerRadius="0" Background="Transparent" x:Name="faceButton" Click="OnFacePressed">
                     <Image Width="25" MinWidth="0" Source="../Assets/face.png"/>
+                </Button>
+                <Button Grid.Row="0" Grid.Column="4" Width="30" Height="30" CornerRadius="0" Background="Orange" x:Name="objectButton" Click="OnShapePressed">
+                    <Image Width="25" MinWidth="0" Source="../Assets/object.png"/>
                 </Button>
             </Grid>
         </Grid>

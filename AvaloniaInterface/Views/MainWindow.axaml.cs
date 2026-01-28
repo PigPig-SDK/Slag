@@ -40,5 +40,23 @@ namespace OpenglAvaloniaTest.Views
                     break;
             }
         }
+
+        private void OnVertexPressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SelectionModeChange(ViewModels.SelectionMode.Vertex);
+
+        private void OnEdgePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SelectionModeChange(ViewModels.SelectionMode.Edge);
+
+        private void OnFacePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SelectionModeChange(ViewModels.SelectionMode.Face);
+
+        private void OnShapePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SelectionModeChange(ViewModels.SelectionMode.Object);
+
+        private void SelectionModeChange(ViewModels.SelectionMode mode)
+        {
+            SelectionManager.CurrentSelectionMode = mode;
+
+            faceButton.Background = (mode == ViewModels.SelectionMode.Face) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
+            vertexButton.Background = (mode == ViewModels.SelectionMode.Vertex) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
+            objectButton.Background = (mode == ViewModels.SelectionMode.Object) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
+            edgeButton.Background = (mode == ViewModels.SelectionMode.Edge) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
+        }
     }
 }
