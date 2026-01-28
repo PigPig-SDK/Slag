@@ -51,7 +51,7 @@ namespace OpenglAvaloniaTest.Views
 
         private void SelectionModeChange(ViewModels.SelectionMode mode)
         {
-            SelectionManager.CurrentSelectionMode = mode;
+            SelectionManager.Instance.CurrentSelectionMode = mode;
 
             faceButton.Background = (mode == ViewModels.SelectionMode.Face) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
             vertexButton.Background = (mode == ViewModels.SelectionMode.Vertex) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;

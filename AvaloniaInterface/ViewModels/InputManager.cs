@@ -11,9 +11,20 @@ using System.Threading.Tasks;
 
 namespace OpenglAvaloniaTest.ViewModels;
 
+[Flags]
+public enum UserControlMode
+{
+    None = 0,
+    Shift = 1 << 0,
+    Ctrl = 1 << 1,
+    Alt = 1 << 2,
+}
+
 public class InputManager
 {
     public static InputManager Singleton = new InputManager();
+
+    public UserControlMode UserControlMode { get; private set; } = UserControlMode.None;
 
     public void OnMouseUp(object? sender, PointerReleasedEventArgs e)
     {
@@ -31,20 +42,7 @@ public class InputManager
         if (properties.IsRightButtonPressed)
         {
             Vector2 screenLocation = new Vector2((float)e.GetPosition(GLControl.Instance).X, (float)e.GetPosition(GLControl.Instance).Y);
-            RaycastHit? hit = Camera.Instance?.FindRaycastHit(screenLocation);
-            if (hit != null)
-            {
-                ModelSelection? ms = hit!.Model.GetComponent<ModelSelection>();
-
-                if (ms == null) throw new InvalidOperationException("Model dosn't contain ModelSelection!");
-
-                ms.DeselectAll(UpdateType.Ignore);
-                foreach (uint index in hit!.Face.Indicies)
-                {
-                    ms.SelectIndex(index, UpdateType.Ignore);
-                }
-                ms.BroadcastMassUpdate(UpdateType.Face);
-            }
+            SelectionManager.Instance.CheckForSelection(screenLocation);
             return;
         }
 
@@ -53,13 +51,31 @@ public class InputManager
 
     public void OnKeyDown(object? sender, KeyEventArgs e)
     {
-        switch(e.Key)
+        switch (e.Key)
         {
+            case Key.LeftCtrl: case Key.RightCtrl:
+                {
+                    UserControlMode |= UserControlMode.Ctrl;
+                    break;
+                }
             case Key.Delete:
                 {
 
                     break;
                 }
         }
+    }
+
+    internal void OnKeyUp(object? sender, KeyEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case Key.LeftCtrl:case Key.RightCtrl:
+                {
+                    UserControlMode &= ~UserControlMode.Ctrl;
+                    break;
+                }
+        }
+
     }
 }

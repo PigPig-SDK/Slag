@@ -60,6 +60,7 @@ public class GLControl : OpenGlControlBase
         PointerReleased += InputManager.Singleton.OnMouseUp;
         PointerMoved += InputManager.Singleton.OnPointerMove;
         KeyDown += InputManager.Singleton.OnKeyDown;
+        KeyUp += InputManager.Singleton.OnKeyUp;
         
         AddHandler(PointerWheelChangedEvent, _camera.OnWheel, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
         
