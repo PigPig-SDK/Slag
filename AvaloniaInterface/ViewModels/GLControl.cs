@@ -53,16 +53,23 @@ public class GLControl : OpenGlControlBase
         Instance = this;
         //Link camera
         _camera = new Camera(this);
-        this.PointerPressed += _camera.OnMouseDown;
-        this.PointerReleased += _camera.OnMouseUp;
-        this.PointerMoved += _camera.OnPointerMove;
-        this.AddHandler(PointerWheelChangedEvent, _camera.OnWheel, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
+        Focusable = true;
+
+        PointerPressed += OnPress;
+        PointerPressed += InputManager.Singleton.OnMouseDown;
+        PointerReleased += InputManager.Singleton.OnMouseUp;
+        PointerMoved += InputManager.Singleton.OnPointerMove;
+        KeyDown += InputManager.Singleton.OnKeyDown;
+        
+        AddHandler(PointerWheelChangedEvent, _camera.OnWheel, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
         
         renderModeToShaderProgram = new() {
             { RenderMode.Triangles, _triangleShaderProgram },
             { RenderMode.Edges, _edgeShaderProgram },
             { RenderMode.Verts, _vertexShaderProgram} };
     }
+
+    private void OnPress(object? sender, PointerPressedEventArgs e) => Focus();
 
     public void OnModelAdded(Model model) => _LateModelAddition.Add(model);
 

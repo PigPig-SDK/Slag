@@ -10,9 +10,12 @@ using System.Threading.Tasks;
 using OpenTK.Mathematics;
 using Models;
 using OpenglAvaloniaTest.ViewModels;
+using Avalonia.Controls.Converters;
 
 public class Camera
 {
+    public static Camera? Instance = null;
+
     //camera controls
     //Pitch and YAW are in radians
     private float _pitch = float.Pi / 4;
@@ -30,12 +33,14 @@ public class Camera
 
     public Camera(OpenGlControlBase glBase)
     {
+        Instance = this;
         _glBase = glBase;
     }
 
     public void OnWheel(object? sender, PointerWheelEventArgs e)
     {
         _zoom -= ZoomAmmount * (float)e.Delta.Y;
+        if(_zoom < 0.1f) _zoom = 0.1f;
     }
 
     public void OnPointerMove(object? sender, Avalonia.Input.PointerEventArgs e)
@@ -75,28 +80,6 @@ public class Camera
 
     public void OnMouseDown(object? sender, PointerPressedEventArgs e)
     {
-        var properties = e.GetCurrentPoint(_glBase).Properties;
-        if(properties.IsRightButtonPressed)
-        {
-            Console.WriteLine("Detect ray in scene");
-            Vector2 screenLocation = new Vector2((float)e.GetPosition(_glBase).X, (float)e.GetPosition(_glBase).Y);
-            RaycastHit? hit = FindRaycastHit(screenLocation);
-            if (hit != null)
-            {
-                ModelSelection? ms = hit!.Model.GetComponent<ModelSelection>();
-
-                if (ms == null) throw new InvalidOperationException("Model dosn't contain ModelSelection!");
-
-                ms.DeselectAll(UpdateType.Ignore);
-                foreach (uint index in hit!.Face.Indicies)
-                {
-                    ms.SelectIndex(index, UpdateType.Ignore);
-                }
-                ms.BroadcastMassUpdate(UpdateType.Face);
-            }
-            return;
-        }
-
         _lastDragLocation = e.GetPosition(_glBase);
         _isDragging = true;
     }
@@ -117,10 +100,17 @@ public class Camera
 
     public Matrix4 CreateLookAt() => Matrix4.LookAt(Origin, LookAt, Up);
 
-    public Matrix4 CreatePrespective(float aspect) => Matrix4.CreatePerspectiveFieldOfView(FOV, (aspect == 0)? 1.0f : aspect, 0.01f, 100000f);
+    public Matrix4 CreatePrespective(float aspect)
+    {
+        //TODO: Test orthographic projection
+        //return Matrix4.CreateOrthographic(10*aspect, 10, 0, 1000);
+
+        return Matrix4.CreatePerspectiveFieldOfView(FOV, (aspect == 0) ? 1.0f : aspect, 0.01f, 100000f);
+    }
 
     /// <summary>
     /// Gets FOV in Radians
     /// </summary>
     public float FOV => (MathF.PI/180.0f) * 90.0f;
+
 }
