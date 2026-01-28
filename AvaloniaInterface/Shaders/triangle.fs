@@ -35,7 +35,7 @@ void main()
 
     vec4 dColor = desiredColor;
 
-    if(blendedMetaData == 1.0)
+    if(blendedMetaData > 0.999)
         dColor = vec4(1.0, 0.647, 0.0, 1.0);
 
     FragColor = (dColor * 0.5 + 0.5) * (ambient + diffuse + specular);
