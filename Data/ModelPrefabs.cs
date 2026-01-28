@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Models;
 
-public static class ModelPrefabs
+public static partial class ModelPrefabs
 {
     /// <summary>
     /// Note: This objects edges will intentionally be smoothed when triangulated
