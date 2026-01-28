@@ -2,6 +2,7 @@
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 
 namespace OpenglAvaloniaTest.ViewModels;
 
@@ -14,7 +15,7 @@ public class SelectionManager
 
     public SelectionMode CurrentSelectionMode
     {
-        get => _SelectionMode; 
+        get => _SelectionMode;
         set {
             SelectionMode oldValue = _SelectionMode;
             _SelectionMode = value;
@@ -22,11 +23,30 @@ public class SelectionManager
         }
     }
 
+    private Model? _CurrentModel = null;
+
+    private HashSet<object> _CurrentSelection = new();
+
+    private SelectionManager()
+    {
+        SceneHierarchy.Instance.OnModelRemoved += OnModelDeleted;
+    }
+
+    private void OnModelDeleted(Model obj)
+    {
+        
+        if(obj == _CurrentModel)
+        {
+            _CurrentModel = null;
+            Console.WriteLine("Deleted Selected model");
+        }
+    }
+
     private void AdjustSelection(SelectionMode oldValue)
     {
         if (_CurrentModel == null || CurrentSelectionMode == oldValue) return;
 
-        if(CurrentSelectionMode == SelectionMode.Object)//Object mode to model editing mode.
+        if (CurrentSelectionMode == SelectionMode.Object)//Object mode to model editing mode.
         {
             ClearSelection();
             _CurrentSelection.Clear();
@@ -37,12 +57,10 @@ public class SelectionManager
         }
     }
 
-    private Model? _CurrentModel = null;
-
-    private HashSet<object> _CurrentSelection = new();
-
     public void SelectModel(Model model)
     {
+        if (_CurrentModel == model) return;
+
         ClearSelectedModel();
         _CurrentModel = model;
     }
@@ -64,6 +82,7 @@ public class SelectionManager
         RaycastHit? hit = Camera.Instance?.FindRaycastHit(screenPosition);
         if (hit != null)
         {
+            SelectModel(hit.Model);
             ModelSelection? ms = hit!.Model.GetComponent<ModelSelection>();
 
             if (ms == null) throw new InvalidOperationException("Model dosn't contain ModelSelection!");
@@ -76,6 +95,10 @@ public class SelectionManager
                 ms.SelectIndex(index, UpdateType.Ignore);
             }
             ms.BroadcastMassUpdate(UpdateType.Face);
+        }
+        else
+        {
+            ClearSelectedModel();
         }
     }
 }
