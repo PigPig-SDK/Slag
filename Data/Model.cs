@@ -14,6 +14,7 @@ public class Model : IDisposable
     public List<Vertex> Verticies { get; private set; } = [];
     private List<Face> _Faces = [];
     private HashSet<Edge> _Edges = [];
+    protected bool IsDisposed = false;
 
     public uint[] Indicies = [];
     public bool Hidden = false;
@@ -208,7 +209,8 @@ public class Model : IDisposable
 
     public void Dispose()
     {
-        foreach(var component in _Components.Values)
+        IsDisposed = true;
+        foreach (var component in _Components.Values)
         {
             component.Dispose();
         }
