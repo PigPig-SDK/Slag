@@ -18,9 +18,9 @@ public partial class HierarchyView : UserControl
     public HierarchyView()
     {
         InitializeComponent();
-        foreach (Model model in SceneHierarchy.Instance.SceneModels())
+        foreach (Model model in SceneHierarchy.Instance.GetModels(HierarchyType.Model))
         {
-            OnModelAdded(model);
+            OnModelAdded(HierarchyType.Model,model);
         }
         DetachedFromVisualTree += OnDetach;
         AttachedToVisualTree += OnAttach;
@@ -42,7 +42,7 @@ public partial class HierarchyView : UserControl
         _attached = false;
     }
 
-    private void OnModelRemoved(Model model)
+    private void OnModelRemoved(HierarchyType hierarchyType, Model model)
     {
         if (!_Mapping.ContainsKey(model)) return;
 
@@ -50,7 +50,7 @@ public partial class HierarchyView : UserControl
         _Mapping.Remove(model);
     }
 
-    private void OnModelAdded(Model model)
+    private void OnModelAdded(HierarchyType hierarchyType,Model model)
     {
         HierarchyModel modelView = new HierarchyModel { Model = model };
         HierarchyStack.Children.Add(modelView);
@@ -68,26 +68,26 @@ public partial class HierarchyView : UserControl
 
     private void OnAddCubePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        SceneHierarchy.Instance.AddModel(ModelPrefabs.Cube());
+        SceneHierarchy.Instance.AddModel(HierarchyType.Model,ModelPrefabs.Cube());
     }
 
     private void OnAddSpherePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        SceneHierarchy.Instance.AddModel(ModelPrefabs.Sphere(10, 1));
+        SceneHierarchy.Instance.AddModel(HierarchyType.Model, ModelPrefabs.Sphere(10, 1));
     }
 
     private void OnAddCylinderPressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        SceneHierarchy.Instance.AddModel(ModelPrefabs.Cylinder(1,1,10));
+        SceneHierarchy.Instance.AddModel(HierarchyType.Model, ModelPrefabs.Cylinder(1,1,10));
     }
 
     private void OnAddConePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        SceneHierarchy.Instance.AddModel(ModelPrefabs.Cone(10, 1, 1));
+        SceneHierarchy.Instance.AddModel(HierarchyType.Model, ModelPrefabs.Cone(10, 1, 1));
     }
 
     private void OnAddTorusPressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        SceneHierarchy.Instance.AddModel(ModelPrefabs.Torus(20, 20, 2, 1));
+        SceneHierarchy.Instance.AddModel(HierarchyType.Model, ModelPrefabs.Torus(20, 20, 2, 1));
     }
 }

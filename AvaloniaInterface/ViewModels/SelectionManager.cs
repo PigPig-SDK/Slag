@@ -32,9 +32,8 @@ public class SelectionManager
         SceneHierarchy.Instance.OnModelRemoved += OnModelDeleted;
     }
 
-    private void OnModelDeleted(Model obj)
+    private void OnModelDeleted(HierarchyType hierarchyType, Model obj)
     {
-        
         if(obj == _CurrentModel)
         {
             _CurrentModel = null;

@@ -72,7 +72,7 @@ public class GLControl : OpenGlControlBase
 
     private void OnPress(object? sender, PointerPressedEventArgs e) => Focus();
 
-    public void OnModelAdded(Model model) => _LateModelAddition.Add(model);
+    public void OnModelAdded(HierarchyType hierarchyType, Model model) => _LateModelAddition.Add(model);
 
     public static void CheckError(GlInterface gl)
     {
@@ -100,7 +100,7 @@ public class GLControl : OpenGlControlBase
         gl.UseProgram(_triangleShaderProgram.ProgramID);
 
         //Add components and buffer data to opengl.
-        foreach (Model model in SceneHierarchy.Instance.AllModels())
+        foreach (Model model in SceneHierarchy.Instance.GetModels(HierarchyType.All))
         {
             BindOpenglComponent(model, gl);
         }
@@ -166,7 +166,7 @@ public class GLControl : OpenGlControlBase
     private unsafe void RenderTools(GlInterface gl, ref Matrix4 view, ref Matrix4 proj)
     {
         gl.Disable(GL_DEPTH_TEST);
-        foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneTools()))
+        foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.GetModels(HierarchyType.Tool)))
         {
             if (component.model.Hidden) continue;
 
@@ -189,7 +189,7 @@ public class GLControl : OpenGlControlBase
             {
                 ShaderProgram activeShader = renderModeToShaderProgram[renderMode];
                 activeShader.UseProgram(gl, view, proj, _camera.Origin);
-                foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.SceneModels()))
+                foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.GetModels(HierarchyType.Model)))
                 {
                     if (component.model.Hidden) continue;
                     Matrix4 modelTransformation = component.model.GetModelMatrix();

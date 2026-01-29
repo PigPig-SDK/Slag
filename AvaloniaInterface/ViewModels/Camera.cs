@@ -75,7 +75,7 @@ public class Camera
         float aspect = (float)(width / height);
         Vector2 screenSize = new Vector2((float)width, (float)height);
 
-        return Raycast.GetObjectHitScreenLocation(SceneHierarchy.Instance.SceneModels(), Origin, Up, LookAt, aspect, FOV, screenLocation, screenSize);
+        return Raycast.GetObjectHitScreenLocation(SceneHierarchy.Instance.GetModels(HierarchyType.Model), Origin, Up, LookAt, aspect, FOV, screenLocation, screenSize);
     }
 
     public void OnMouseDown(object? sender, PointerPressedEventArgs e)

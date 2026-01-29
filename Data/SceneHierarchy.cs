@@ -10,46 +10,40 @@ public class SceneHierarchy
 {
     public static SceneHierarchy Instance = new();
 
-    private List<Model> Models { get; set; } = [ModelPrefabs.Cube()];
-
-    private List<Model> Tools { get; set; } = [ModelPrefabs.AxisTriad()];
-
-    public event Action<Model>? OnModelAdded;
-
-    public event Action<Model>? OnModelRemoved;
-
-    public void AddModel(Model model)
+    public Dictionary<HierarchyType, List<Model>> HierarchyCategories { get; private set; } = new()
     {
-        Models.Add(model);
-        OnModelAdded?.Invoke(model);
+        { HierarchyType.Model, [ModelPrefabs.Cube()] },
+        { HierarchyType.Tool, [ModelPrefabs.AxisTriad()] },
+    };
+
+    public event Action<HierarchyType,Model>? OnModelAdded;
+
+    public event Action<HierarchyType, Model>? OnModelRemoved;
+
+    public void AddModel(HierarchyType hierarchyType, Model model)
+    {
+        HierarchyCategories[hierarchyType].Add(model);
+        OnModelAdded?.Invoke(hierarchyType,model);
     }
 
-    public void AddToolModel(Model model)
-    {
-        Tools.Add(model);
-    }
-
-    public void RemoveModel(Model model)
+    public void RemoveModel(HierarchyType hierarchyType, Model model)
     {
         model.Dispose();
-        Models.Remove(model);
-        OnModelRemoved?.Invoke(model);
+        HierarchyCategories[hierarchyType].Remove(model);
+        OnModelRemoved?.Invoke(hierarchyType,model);
     }
 
-    public IEnumerable<Model> SceneModels() => Models;
-
-    public IEnumerable<Model> SceneTools() => Tools;
-
-    public IEnumerable<Model> AllModels()
+    public IEnumerable<Model> GetModels(HierarchyType hierarchyType)
     {
-        foreach (var model in Models)
+        foreach(HierarchyType hierarchy in HierarchyCategories.Keys)
         {
-            yield return model;
-        }
-        foreach (var model in Tools)
-        { 
-            yield return model;
+            if(hierarchyType.HasFlag(hierarchy))
+            {
+                foreach(Model model in HierarchyCategories[hierarchy])
+                {
+                    yield return model;
+                }
+            }
         }
     }
-
 }

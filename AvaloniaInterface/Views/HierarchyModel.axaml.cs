@@ -80,7 +80,7 @@ public partial class HierarchyModel : UserControl
     {
         if (Model == null) return;
 
-        SceneHierarchy.Instance.RemoveModel(Model!);
+        SceneHierarchy.Instance.RemoveModel(HierarchyType.Model, Model!);
     }
 
     private void OnPositionTextChanged(object? sender, TextChangedEventArgs e)
