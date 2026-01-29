@@ -15,6 +15,12 @@ public struct Vertex
         Position = position;
         UV = uv;
     }
+    public Vertex(Vector3 position, Vector3 normal, Vector2 uv)
+    {
+        Position = position;
+        UV = uv;
+        Normal = normal;
+    }
     public Vertex(float x, float y, float z)
     {
         Position.X = x;
