@@ -1,4 +1,5 @@
 ﻿using Models;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenglAvaloniaTest.ViewModels;
 
-public class ModelSelection : ModelComponent
+public class SelectionComponent : ModelComponent
 {
     private HashSet<uint> SelectedIndicies = [];
 
@@ -18,13 +19,13 @@ public class ModelSelection : ModelComponent
 
     public event Action<UpdateType>? OnSelectionMassUpdate;
 
-    public void SelectIndex(uint index, UpdateType updateInfo = UpdateType.Vertex)
+    public void SelectIndex(uint index, UpdateType updateInfo = UpdateType.Selection)
     {
         SelectedIndicies.Add(index);
         OnSelectionChanged?.Invoke(index, true, updateInfo);
     }
 
-    public void DeselectAll(UpdateType updateInfo = UpdateType.Vertex)
+    public void DeselectAll(UpdateType updateInfo = UpdateType.Selection)
     {
         SelectedIndicies.Clear();
         OnSelectionMassUpdate?.Invoke(updateInfo);
@@ -32,7 +33,7 @@ public class ModelSelection : ModelComponent
 
     public void BroadcastMassUpdate(UpdateType updateInfo) => OnSelectionMassUpdate?.Invoke(updateInfo);
 
-    public void DeselectIndex(uint index, UpdateType updateInfo = UpdateType.Vertex)
+    public void DeselectIndex(uint index, UpdateType updateInfo = UpdateType.Selection)
     {
         SelectedIndicies.Remove(index);
         OnSelectionChanged?.Invoke(index, false, updateInfo);
@@ -40,9 +41,8 @@ public class ModelSelection : ModelComponent
 
     public override void Dispose() { }
 
-    public override void OnModelUpdate(Model model, UpdateType info, object data)
+    public override void OnModelUpdate(Model model, UpdateType info, object? data)
     {
-        
 
     }
 
@@ -52,8 +52,30 @@ public class ModelSelection : ModelComponent
 
     public static bool BindSelectionComponent(Model model)
     {
-        if (!model.HasComponent(typeof(ModelSelection)))
-            model.AddComponent<ModelSelection>(new ModelSelection());
+        if (!model.HasComponent(typeof(SelectionComponent)))
+            model.AddComponent<SelectionComponent>(new SelectionComponent());
         return true;
+    }
+
+    public IEnumerable<uint> IterateSelection()
+    {
+        foreach(uint item in SelectedIndicies) yield return item;
+    }
+
+    public Vector3 GetCenter()
+    {
+        if(SelectedIndicies.Count == 0)
+        {
+            return Vector3.Zero;
+        }
+
+        Vector3 sum = Vector3.Zero;
+
+        foreach (uint ind in SelectedIndicies)
+        {
+            Vertex v = Model.GetVertex(ind);
+            sum += v.Position;
+        }
+        return sum / SelectedIndicies.Count;
     }
 }
