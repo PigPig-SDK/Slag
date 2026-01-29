@@ -4,13 +4,14 @@ using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using static Avalonia.OpenGL.GlConsts;
 using static OpenglAvaloniaTest.ViewModels.GlConstantsExtended;
 
 namespace OpenglAvaloniaTest.ViewModels;
 
-public class GLModelComponent : ModelComponent
+public class GLComponent : ModelComponent
 {
     private int? _VertexBufferObject = null;
     private int? _IndiciesBuffer = null;
@@ -30,7 +31,7 @@ public class GLModelComponent : ModelComponent
 
     public override void OnAddedToModel(Model model)
     {
-        ModelSelection? modelSelection = model.GetComponent<ModelSelection>();
+        SelectionComponent? modelSelection = model.GetComponent<SelectionComponent>();
         modelSelection!.OnSelectionChanged += OnSelectionChanged;
         modelSelection!.OnSelectionMassUpdate += OnSelectionMassUpdate;
     }
@@ -47,13 +48,28 @@ public class GLModelComponent : ModelComponent
         byte[] selectionData = new byte[_VertexCount];
         for (int i = 0; i < selectionData.Length; i++)
         {
-            selectionData[i] = model.GetComponent<ModelSelection>()!.IsVertexSelected((uint)i) ? (byte)1 : (byte)0;
+            selectionData[i] = Model.GetComponent<SelectionComponent>()!.IsVertexSelected((uint)i) ? (byte)1 : (byte)0;
         }
 
         gl.BindBuffer(GL_ARRAY_BUFFER, _SelectionBuffer!.Value);
         fixed (byte* ptr = selectionData)
         {
             gl!.BufferSubData(GL_ARRAY_BUFFER, (nint)0, (nint)(_VertexCount * sizeof(byte)), (IntPtr)ptr);
+        }
+    }
+
+    public unsafe void ModelMassUpdate(GlInterface? gl)
+    {
+        if (gl == null)
+        {
+            Console.WriteLine("Tried to update selection buffer when opengl interface is null!");
+            return;
+        }
+        Vertex[] verts = Model.Verticies.ToArray();
+        gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
+        fixed (Vertex* ptr = verts)
+        {
+            gl.BufferSubData(GL_ARRAY_BUFFER, 0,Vertex.GetSize() * verts.Length, (nint)ptr);
         }
     }
 
@@ -76,6 +92,7 @@ public class GLModelComponent : ModelComponent
 
     public void OpenglRestart(GlInterface gl)
     {
+        Console.WriteLine("Opengl Reset");
         //Clear buffers
         _IndiciesBuffer = null;
         _VertexBufferObject = null;
@@ -128,7 +145,7 @@ public class GLModelComponent : ModelComponent
 
     public unsafe void UpdateEdgeBuffers(GlInterface gl)
     {
-        uint[] edgeIndicies = model.GetEdgeIndicies();
+        uint[] edgeIndicies = Model.GetEdgeIndicies();
 
         gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _EdgeIndiciesBuffer!.Value);
         fixed (uint* ptr = edgeIndicies)
@@ -145,7 +162,7 @@ public class GLModelComponent : ModelComponent
         List<uint> indiciesList = []; //List that will encounter lots of modification
         _SharpIndicies.Clear();
 
-        model.GenerateTriangulatedModel(ref verts, ref indiciesList);
+        Model.GenerateTriangulatedModel(ref verts, ref indiciesList);
 
         //Recalculates the model to account for 'sharp' edges
         ComputeSmoothing(ref indiciesList);
@@ -193,9 +210,9 @@ public class GLModelComponent : ModelComponent
 
     public static bool BindOpenglComponent(Model model, GlInterface gl)
     {
-        if (!model.HasComponent(typeof(GLModelComponent)))
+        if (!model.HasComponent(typeof(GLComponent)))
         {
-            GLModelComponent? glComponent = model.AddComponent<GLModelComponent>(new GLModelComponent()) as GLModelComponent;
+            GLComponent? glComponent = model.AddComponent<GLComponent>(new GLComponent()) as GLComponent;
 
             if (glComponent == null) return false;
             glComponent.GenerateBuffers(gl);
@@ -260,21 +277,25 @@ public class GLModelComponent : ModelComponent
         }
     }
 
-    public override void OnModelUpdate(Model model, UpdateType info, object data)
+    public override void OnModelUpdate(Model model, UpdateType info, object? data)
     {
-
+        if((info & (UpdateType.Locational)) != 0)
+        {
+            Console.WriteLine("Location updated");
+            GLControl.Instance?.ModelActions.Push(ModelMassUpdate);
+        }
     }
 
-    public static IEnumerable<GLModelComponent> AllComponents(IEnumerable<Model> models)
+    public static IEnumerable<GLComponent> AllComponents(IEnumerable<Model> models)
     {
         foreach (Model model in models)
         {
-            if (!model.TryGetComponent<GLModelComponent>(out ModelComponent? component))//Add component it DNE!
+            if (!model.TryGetComponent<GLComponent>(out ModelComponent? component))//Add component it DNE!
             {
                 //component = model.AddComponent<GLModelComponent>(new GLModelComponent());
                 continue;
             }
-            yield return (GLModelComponent)component!;
+            yield return (GLComponent)component!;
         }
     }
 

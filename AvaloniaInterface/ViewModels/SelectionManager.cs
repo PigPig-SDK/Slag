@@ -23,7 +23,7 @@ public class SelectionManager
         }
     }
 
-    private Model? _CurrentModel = null;
+    public Model? CurrentModel { get; private set; } = null;
 
     private HashSet<object> _CurrentSelection = new();
 
@@ -34,16 +34,16 @@ public class SelectionManager
 
     private void OnModelDeleted(HierarchyType hierarchyType, Model obj)
     {
-        if(obj == _CurrentModel)
+        if(obj == CurrentModel)
         {
-            _CurrentModel = null;
+            CurrentModel = null;
             Console.WriteLine("Deleted Selected model");
         }
     }
 
     private void AdjustSelection(SelectionMode oldValue)
     {
-        if (_CurrentModel == null || CurrentSelectionMode == oldValue) return;
+        if (CurrentModel == null || CurrentSelectionMode == oldValue) return;
 
         if (CurrentSelectionMode == SelectionMode.Object)//Object mode to model editing mode.
         {
@@ -58,22 +58,22 @@ public class SelectionManager
 
     public void SelectModel(Model model)
     {
-        if (_CurrentModel == model) return;
+        if (CurrentModel == model) return;
 
         ClearSelectedModel();
-        _CurrentModel = model;
+        CurrentModel = model;
     }
 
     private void ClearSelectedModel()
     {
         ClearSelection();
-        _CurrentModel = null;
+        CurrentModel = null;
     }
 
     private void ClearSelection()
     {
-        if (_CurrentModel == null) return;//Cannot do anything.
-        _CurrentModel.GetComponent<ModelSelection>()?.DeselectAll();
+        if (CurrentModel == null) return;//Cannot do anything.
+        CurrentModel.GetComponent<SelectionComponent>()?.DeselectAll();
     }
 
     public void CheckForSelection(Vector2 screenPosition)
@@ -82,7 +82,7 @@ public class SelectionManager
         if (hit != null)
         {
             SelectModel(hit.Model);
-            ModelSelection? ms = hit!.Model.GetComponent<ModelSelection>();
+            SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>();
 
             if (ms == null) throw new InvalidOperationException("Model dosn't contain ModelSelection!");
 
@@ -93,7 +93,7 @@ public class SelectionManager
             {
                 ms.SelectIndex(index, UpdateType.Ignore);
             }
-            ms.BroadcastMassUpdate(UpdateType.Face);
+            ms.BroadcastMassUpdate(UpdateType.Selection);
         }
         else
         {

@@ -8,11 +8,11 @@ namespace Models;
 
 public abstract class ModelComponent : IDisposable
 {
-    public Model model = null!;//This should be set by the model when attached!
+    public Model Model = null!;//This should be set by the model when attached!
 
     ~ModelComponent() { Dispose(); }
 
-    public abstract void OnModelUpdate(Model model, UpdateType info, object data);
+    public abstract void OnModelUpdate(Model model, UpdateType info, object? data);
 
     public abstract void Dispose();
 

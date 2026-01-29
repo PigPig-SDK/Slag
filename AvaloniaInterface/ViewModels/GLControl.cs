@@ -102,8 +102,8 @@ public class GLControl : OpenGlControlBase
         //Add components and buffer data to opengl.
         foreach (Model model in SceneHierarchy.Instance.GetModels(HierarchyType.All))
         {
-            ModelSelection.BindSelectionComponent(model);
-            GLModelComponent.BindOpenglComponent(model, gl);
+            SelectionComponent.BindSelectionComponent(model);
+            GLComponent.BindOpenglComponent(model, gl);
         }
 
         SceneHierarchy.Instance.OnModelAdded += OnModelAdded;
@@ -115,8 +115,8 @@ public class GLControl : OpenGlControlBase
 
         foreach (Model model in _LateModelAddition)
         {
-            ModelSelection.BindSelectionComponent(model);
-            GLModelComponent.BindOpenglComponent(model, gl);
+            SelectionComponent.BindSelectionComponent(model);
+            GLComponent.BindOpenglComponent(model, gl);
         }
         _LateModelAddition.Clear();
     }
@@ -157,11 +157,11 @@ public class GLControl : OpenGlControlBase
     private unsafe void RenderTools(GlInterface gl, ref Matrix4 view, ref Matrix4 proj)
     {
         gl.Disable(GL_DEPTH_TEST);
-        foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.GetModels(HierarchyType.Tool)))
+        foreach (GLComponent component in GLComponent.AllComponents(SceneHierarchy.Instance.GetModels(HierarchyType.Tool)))
         {
-            if (component.model.Hidden) continue;
+            if (component.Model.Hidden) continue;
 
-            Matrix4 modelTransformation = component.model.GetModelMatrix();
+            Matrix4 modelTransformation = component.Model.GetModelMatrix();
             _triangleShaderProgram.UseProgram(gl, view, proj, _camera.Origin);
             gl.UniformMatrix4fv(_triangleShaderProgram.ModelMatrixLocation, 1, false, (float*)&modelTransformation);
             
@@ -180,10 +180,10 @@ public class GLControl : OpenGlControlBase
             {
                 ShaderProgram activeShader = renderModeToShaderProgram[renderMode];
                 activeShader.UseProgram(gl, view, proj, _camera.Origin);
-                foreach (GLModelComponent component in GLModelComponent.AllComponents(SceneHierarchy.Instance.GetModels(HierarchyType.Model)))
+                foreach (GLComponent component in GLComponent.AllComponents(SceneHierarchy.Instance.GetModels(HierarchyType.Model)))
                 {
-                    if (component.model.Hidden) continue;
-                    Matrix4 modelTransformation = component.model.GetModelMatrix();
+                    if (component.Model.Hidden) continue;
+                    Matrix4 modelTransformation = component.Model.GetModelMatrix();
                     gl.UniformMatrix4fv(activeShader.ModelMatrixLocation, 1, false, (float*)&modelTransformation);
 
                     switch(renderMode)

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenglAvaloniaTest.ViewModels;
+namespace OpenglAvaloniaTest.Commands;
 
 public class CommandInvoker
 {
@@ -13,7 +13,7 @@ public class CommandInvoker
 
     public ICommand? CurrentCommand { get; set; }
 
-    public void RunCommand(ICommand command, (KeyEventArgs key, PointerEventArgs mouse) args)
+    public void RunCommand(ICommand command, (KeyEventArgs? key, PointerEventArgs? mouse, CommandInfo info) args)
     {
         if(CurrentCommand != null)
         {
@@ -24,12 +24,13 @@ public class CommandInvoker
         CurrentCommand = command;
         ExecuteCommandStep(args);
     }
-
-    public void ExecuteCommandStep((KeyEventArgs key, PointerEventArgs mouse) args)
+    /// <param name="args">The user input to process</param>
+    /// <returns>True if the command was processed, False if no command is active</returns>
+    public bool ExecuteCommandStep((KeyEventArgs? key, PointerEventArgs? mouse, CommandInfo info) args)
     {
         if(CurrentCommand == null)
-            return;
-        CommandState commandState = CurrentCommand.Execute();
+            return false;
+        CommandState commandState = CurrentCommand.Execute(args);
         if (commandState != CommandState.Idle)
         {
             CurrentCommand = CurrentCommand.Next;
@@ -37,6 +38,11 @@ public class CommandInvoker
             {
                 ExecuteCommandStep(args);
             }
+            else if(commandState == CommandState.Finished)
+            {
+                CurrentCommand = null;
+            }
         }   
+        return true;
     }
 }

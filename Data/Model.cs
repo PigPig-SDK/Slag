@@ -1,10 +1,4 @@
-﻿using OpenglAvaloniaTest.ViewModels;
-using OpenTK.Mathematics;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
+﻿using OpenTK.Mathematics;
 
 namespace Models;
 
@@ -27,18 +21,36 @@ public class Model : IDisposable
 
     public Dictionary<(uint,uint,uint), Face> TriangleToFaceMapping = [];
 
-    public Vertex GetVertex(int index) => Verticies[index];
+    public Vertex GetVertex(uint index)
+    {
+        if(index < 0 || index > Verticies.Count -1)
+        {
+            throw new ArgumentOutOfRangeException($"{nameof(index)} is out of range");
+        }
+        return Verticies[(int)index];
+    }
+
+    public bool TryMoveVertex(uint index, Vector3 newPos)
+    {
+        if(index < 0 || index > Verticies.Count -1)
+        {
+            return false;
+        }
+        Vertex v = Verticies[(int)index];
+        Verticies[(int)index] = new Vertex(v.Position,v.Normal,v.UV);
+        return true;
+    }
 
     public void AddVertex(Vertex vertex)
     {
         Verticies.Add(vertex);
-        UpdateAllComponents(UpdateType.Vertex | UpdateType.Membership, vertex);
+        UpdateAllComponents(UpdateType.Membership, vertex);
     }
 
     public void AddEdge(Edge edge, UpdateType info = UpdateType.None)
     {
         _Edges.Add(edge);
-        UpdateAllComponents(UpdateType.Edge | UpdateType.Membership | info, edge);
+        UpdateAllComponents(UpdateType.Membership | info, edge);
     }
 
     public void AddFace(params uint[] indicies) => AddFace(new List<uint>(indicies));
@@ -62,7 +74,7 @@ public class Model : IDisposable
             AddEdge(new Edge(start, end), UpdateType.Ignore);
         }
         AddEdge(new Edge(face.Indicies[0], face.Indicies[^1]), UpdateType.Ignore);
-        UpdateAllComponents(UpdateType.Face | UpdateType.Membership, face);
+        UpdateAllComponents(UpdateType.Membership, face);
     }
 
     public void RemoveVertex(int index)
@@ -79,19 +91,19 @@ public class Model : IDisposable
         {
             e.DecrementForIndex(index);
         }
-        UpdateAllComponents(UpdateType.Vertex | UpdateType.Membership, index);
+        UpdateAllComponents(UpdateType.Membership, index);
     }
 
     public void RemoveFace(Face face)
     {
         _Faces.Remove(face);
-        UpdateAllComponents(UpdateType.Face | UpdateType.Membership, face);
+        UpdateAllComponents(UpdateType.Membership, face);
     }
 
     public void RemoveEdge(Edge edge)
     {
         _Edges.Remove(edge);
-        UpdateAllComponents(UpdateType.Edge | UpdateType.Membership, edge);
+        UpdateAllComponents(UpdateType.Membership, edge);
     }
 
     private void GenerateIndicies()
@@ -123,7 +135,6 @@ public class Model : IDisposable
         Matrix4 rotY = Matrix4.CreateRotationY(Rotation.Y);
         Matrix4 rotZ = Matrix4.CreateRotationZ(Rotation.Z);
         return rotZ * rotY * rotX; // ZYX order of rotation...
-        
     }
 
     public Matrix4 GetScaleMatrix() => Matrix4.CreateScale(Scale);
@@ -141,7 +152,7 @@ public class Model : IDisposable
     {
         if(component is null) throw new ArgumentNullException($"Invalid component: {nameof(T)} | {nameof(component)}");
         _Components[typeof(T)] = component;
-        component.model = this;
+        component.Model = this;
         component.OnAddedToModel(this);
         return component;
     }
@@ -179,7 +190,7 @@ public class Model : IDisposable
 
     public bool HasComponent(Type type) => _Components.ContainsKey(type);
 
-    void UpdateAllComponents(UpdateType info, object variable)
+    public void UpdateAllComponents(UpdateType info, object? variable)
     {
         foreach (var component in _Components.Values) component.OnModelUpdate(this, info, variable);
     }
