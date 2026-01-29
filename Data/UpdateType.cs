@@ -9,11 +9,9 @@ namespace Models;
 public enum UpdateType
 {
     None = 0,
-    Vertex = 1 << 0,
-    Edge  = 1 << 1,
-    Face = 1 << 2,
-    Locational = 1 << 2,
-    Membership = 1 << 3,
-    Ignore = 1 << 3,
-    ComponentAddition = 1 << 4,
+    Locational = 1 << 0,
+    Membership = 1 << 1,
+    Ignore = 1 << 2,
+    ComponentAddition = 1 << 3,
+    Selection = 1 << 4,
 }
