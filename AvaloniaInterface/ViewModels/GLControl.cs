@@ -102,37 +102,28 @@ public class GLControl : OpenGlControlBase
         //Add components and buffer data to opengl.
         foreach (Model model in SceneHierarchy.Instance.GetModels(HierarchyType.All))
         {
-            BindOpenglComponent(model, gl);
+            ModelSelection.BindSelectionComponent(model);
+            GLModelComponent.BindOpenglComponent(model, gl);
         }
 
         SceneHierarchy.Instance.OnModelAdded += OnModelAdded;
     }
 
-    public bool BindOpenglComponent(Model model, GlInterface gl)
-    {
-        if (model.HasComponent(typeof(GLModelComponent))) return false;
-        GLModelComponent? glComponent = model.AddComponent<GLModelComponent>(new GLModelComponent()) as GLModelComponent;
-        
-        if(glComponent == null) return false;
-        glComponent.GenerateBuffers(gl);
-
-        return true;
-    }
-
-    void CheckLateObjects(GlInterface gl)
+    void CheckAppendingModels(GlInterface gl)
     {
         if (_LateModelAddition.Count == 0) return;
 
         foreach (Model model in _LateModelAddition)
         {
-            BindOpenglComponent(model, gl);
+            ModelSelection.BindSelectionComponent(model);
+            GLModelComponent.BindOpenglComponent(model, gl);
         }
         _LateModelAddition.Clear();
     }
 
     protected override unsafe void OnOpenGlRender(GlInterface gl, int fb)
     {
-        CheckLateObjects(gl);
+        CheckAppendingModels(gl);
 
         gl.BindFramebuffer(GlConsts.GL_FRAMEBUFFER, fb);
         var scaling = (this.VisualRoot != null) ? this.VisualRoot!.RenderScaling : 1.0;

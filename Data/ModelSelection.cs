@@ -18,11 +18,6 @@ public class ModelSelection : ModelComponent
 
     public event Action<UpdateType>? OnSelectionMassUpdate;
 
-    public ModelSelection(Model model)
-    {
-        this.model = model;
-    }
-
     public void SelectIndex(uint index, UpdateType updateInfo = UpdateType.Vertex)
     {
         SelectedIndicies.Add(index);
@@ -54,4 +49,11 @@ public class ModelSelection : ModelComponent
     public override void OnAddedToModel(Model model) { }
 
     public bool IsVertexSelected(uint i) => SelectedIndicies.Contains(i);
+
+    public static bool BindSelectionComponent(Model model)
+    {
+        if (!model.HasComponent(typeof(ModelSelection)))
+            model.AddComponent<ModelSelection>(new ModelSelection());
+        return true;
+    }
 }

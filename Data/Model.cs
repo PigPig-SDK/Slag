@@ -27,12 +27,6 @@ public class Model : IDisposable
 
     public Dictionary<(uint,uint,uint), Face> TriangleToFaceMapping = [];
 
-    public Model()
-    {
-        //Default components
-        _Components.Add(typeof(ModelSelection), new ModelSelection(this));
-    }
-
     public Vertex GetVertex(int index) => Verticies[index];
 
     public void AddVertex(Vertex vertex)

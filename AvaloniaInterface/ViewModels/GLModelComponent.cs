@@ -82,17 +82,8 @@ public class GLModelComponent : ModelComponent
         GenerateBuffers(gl);
     }
 
-    private string GetInvalidBuffer()
-    {
-        return $"{(_VertexBufferObject == null ? $"{nameof(_VertexBufferObject)}, " : null)}{(_IndiciesBuffer == null ? $"{nameof(_IndiciesBuffer)}" : null)}";
-    }
-
     public void GenerateBuffers(GlInterface gl)
     {
-        if (_IndiciesBuffer != null && _VertexBufferObject != null)
-        {
-            throw new InvalidOperationException($"Accidentally tried to assign {GetInvalidBuffer()} before setting null!");
-        }
         glInterface = gl;
 
         //Setup Buffers
@@ -198,6 +189,18 @@ public class GLModelComponent : ModelComponent
     private void ComputeSmoothing(ref List<uint> indiciesList)
     {
         //Not implemented yet.
+    }
+
+    public static bool BindOpenglComponent(Model model, GlInterface gl)
+    {
+        if (!model.HasComponent(typeof(GLModelComponent)))
+        {
+            GLModelComponent? glComponent = model.AddComponent<GLModelComponent>(new GLModelComponent()) as GLModelComponent;
+
+            if (glComponent == null) return false;
+            glComponent.GenerateBuffers(gl);
+        }
+        return true;
     }
 
     public unsafe void RenderModel(GlInterface gl)
