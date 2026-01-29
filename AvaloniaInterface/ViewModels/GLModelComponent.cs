@@ -184,11 +184,6 @@ public class GLModelComponent : ModelComponent
 
         //Buffer selection
         byte[] selectionData = new byte[verts.Length];
-        for (int i = 0; i < selectionData.Length; i++)
-        {
-            selectionData[i] = i % 10 == 0 ? (byte)1 : (byte)0;//Temporary selection data
-        }
-
         gl.BindBuffer(GL_ARRAY_BUFFER, _SelectionBuffer!.Value);
         fixed (byte* ptr = selectionData)
         {
