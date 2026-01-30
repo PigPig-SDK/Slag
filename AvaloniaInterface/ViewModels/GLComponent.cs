@@ -66,12 +66,14 @@ public class GLComponent : ModelComponent
             return;
         }
 
-        Vertex[] verts = Model.Verticies.ToArray();
-        ComputeNormals(verts, Model.Indicies.ToArray());//Yikes!
+        Vertex[] verts = Model.Verticies.BackingField();
+        _VertexCount = Model.Verticies.Count;
+        ComputeNormals(verts, Model.Indicies);
+
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
         fixed (Vertex* ptr = verts)
         {
-            gl.BufferSubData(GL_ARRAY_BUFFER, (nint)0, Vertex.GetSize() * verts.Length, (IntPtr)ptr);
+            gl.BufferSubData(GL_ARRAY_BUFFER, (nint)0, Vertex.GetSize() * _VertexCount, (IntPtr)ptr);
         }
     }
 
@@ -174,13 +176,13 @@ public class GLComponent : ModelComponent
         //Manage edges
         ComputeNormals(verts, indicies);
         _IndiciesCount = indicies.Length;
-        _VertexCount = verts.Length;
+        _VertexCount = Model.Verticies.Count;
 
         //Inform of vert data
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
         fixed (Vertex* ptr = verts)
         {
-            gl.BufferData(GL_ARRAY_BUFFER, Vertex.GetSize() * verts.Length, (nint)ptr, GL_STATIC_DRAW);
+            gl.BufferData(GL_ARRAY_BUFFER, Vertex.GetSize() * _VertexCount, (nint)ptr, GL_STATIC_DRAW);
         }
         Console.WriteLine($"{nameof(verts)} Upload Error: {gl.GetError()}");
 

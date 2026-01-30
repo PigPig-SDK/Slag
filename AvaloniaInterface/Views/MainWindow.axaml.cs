@@ -2,7 +2,9 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using OpenglAvaloniaTest.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace OpenglAvaloniaTest.Views
 {

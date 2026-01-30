@@ -49,9 +49,11 @@ public class MoveCommand : ICommand
         SelectionComponent? selection = model.GetComponent<SelectionComponent>();
         if(selection == null) throw new Exception($"No selection component {nameof(selection)}!");
 
-        foreach(uint index in selection.SelectionIndicies())
+        Vertex[] vertices = model.Verticies.BackingField();
+
+        foreach (uint index in selection.SelectionIndicies())
         {
-            model.TryMoveVertex(index, _StartingPosition[index] + MoveDir * ammount * _MoveDistanceScale);
+            vertices[index].Position = _StartingPosition[index] + MoveDir * ammount * _MoveDistanceScale;
         }
         model.UpdateAllComponents(UpdateType.Locational, null);
     }

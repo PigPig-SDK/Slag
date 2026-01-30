@@ -30,17 +30,6 @@ public class Model : IDisposable
         return Verticies[(int)index];
     }
 
-    public bool TryMoveVertex(uint index, Vector3 newPos)
-    {
-        if(index < 0 || index > Verticies.Count -1)
-        {
-            return false;
-        }
-        Vertex v = Verticies[(int)index];
-        Verticies[(int)index] = new Vertex(newPos, v.Normal,v.UV);
-        return true;
-    }
-
     public void AddVertex(Vertex vertex)
     {
         Verticies.Add(vertex);
@@ -205,7 +194,7 @@ public class Model : IDisposable
 
     public void GenerateTriangulatedModel(ref Vertex[] verts, ref List<uint> indicies)
     {
-        verts = Verticies.ToArray();
+        verts = Verticies.BackingField();
         GenerateIndicies();
         indicies = new (Indicies);
     }
