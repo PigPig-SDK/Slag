@@ -37,7 +37,7 @@ public class Model : IDisposable
             return false;
         }
         Vertex v = Verticies[(int)index];
-        Verticies[(int)index] = new Vertex(v.Position,v.Normal,v.UV);
+        Verticies[(int)index] = new Vertex(newPos, v.Normal,v.UV);
         return true;
     }
 

@@ -57,7 +57,7 @@ public class SelectionComponent : ModelComponent
         return true;
     }
 
-    public IEnumerable<uint> IterateSelection()
+    public IEnumerable<uint> SelectionIndicies()
     {
         foreach(uint item in SelectedIndicies) yield return item;
     }

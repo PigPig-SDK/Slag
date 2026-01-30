@@ -3,6 +3,7 @@ using Models;
 using OpenglAvaloniaTest.ViewModels;
 using OpenTK.Mathematics;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace OpenglAvaloniaTest.Commands;
@@ -11,27 +12,32 @@ public class MoveCommand : ICommand
 {
     public ICommand? Next { get; set; }
 
-    
-    public Vector3 MoveDir = new Vector3(0,1,0);
+    private const float _MoveDistanceScale = 0.01f;
+    public Vector3 MoveDir = Vector3.Zero;
     public Vector3 StartPos = new Vector3(0,0,0);
     private Vector2? _MouseStartPos = null;
 
+    private Dictionary<uint, Vector3> _StartingPosition = [];
 
     private CommandState Initialize()
     {
-        Vector3? pos = SelectionManager.Instance.CurrentModel!.GetComponent<SelectionComponent>()?.GetCenter();
-        if(pos.HasValue)
-        {
-            StartPos = pos.Value;
-            Console.WriteLine($"MoveCommand initialized at position {StartPos}");
-        }
-        else
-        {
-            Console.WriteLine("MoveCommand initialization failed: Could not get selection center.");
-            return CommandState.Finished;
-        }
+        Model? activeModel = SelectionManager.Instance.CurrentModel;
+        if (activeModel == null) return CommandState.Finished;//Cannot execute command
 
-        Console.WriteLine("Executing MoveCommand");
+        SelectionComponent? selection = activeModel.GetComponent<SelectionComponent>();
+        if(selection is null) return CommandState.Finished;
+
+        StartPos = selection.GetCenter();
+        int count = 0;
+        foreach(uint index in selection.SelectionIndicies())
+        {
+            Vertex vert = activeModel.GetVertex(index);
+            count++;
+            _StartingPosition[index] = vert.Position;
+            MoveDir += vert.Position.Normalized();
+        }
+        MoveDir /= count;
+        Console.WriteLine($"Move dir : {MoveDir}");
         return CommandState.Idle;//Continue the command.
     }
 
@@ -43,9 +49,9 @@ public class MoveCommand : ICommand
         SelectionComponent? selection = model.GetComponent<SelectionComponent>();
         if(selection == null) throw new Exception($"No selection component {nameof(selection)}!");
 
-        foreach(uint index in selection.IterateSelection())
+        foreach(uint index in selection.SelectionIndicies())
         {
-            model.TryMoveVertex(index, Vector3.Zero);
+            model.TryMoveVertex(index, _StartingPosition[index] + MoveDir * ammount * _MoveDistanceScale);
         }
         model.UpdateAllComponents(UpdateType.Locational, null);
     }

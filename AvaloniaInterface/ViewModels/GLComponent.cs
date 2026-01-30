@@ -27,7 +27,7 @@ public class GLComponent : ModelComponent
 
     private GlInterface? glInterface = null;
 
-    private Dictionary<uint, List<uint>> _SharpIndicies = [];
+    private Dictionary<uint, List<uint>> _SharpIndicies = []; 
 
     public override void OnAddedToModel(Model model)
     {
@@ -65,11 +65,13 @@ public class GLComponent : ModelComponent
             Console.WriteLine("Tried to update selection buffer when opengl interface is null!");
             return;
         }
+
         Vertex[] verts = Model.Verticies.ToArray();
+        ComputeNormals(verts, Model.Indicies.ToArray());//Yikes!
         gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
         fixed (Vertex* ptr = verts)
         {
-            gl.BufferSubData(GL_ARRAY_BUFFER, 0,Vertex.GetSize() * verts.Length, (nint)ptr);
+            gl.BufferSubData(GL_ARRAY_BUFFER, (nint)0, Vertex.GetSize() * verts.Length, (IntPtr)ptr);
         }
     }
 
@@ -281,7 +283,6 @@ public class GLComponent : ModelComponent
     {
         if((info & (UpdateType.Locational)) != 0)
         {
-            Console.WriteLine("Location updated");
             GLControl.Instance?.ModelActions.Push(ModelMassUpdate);
         }
     }
