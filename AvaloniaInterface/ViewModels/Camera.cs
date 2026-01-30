@@ -75,7 +75,7 @@ public class Camera
         float aspect = (float)(width / height);
         Vector2 screenSize = new Vector2((float)width, (float)height);
 
-        return Raycast.GetObjectHitScreenLocation(SceneHierarchy.Instance.GetModels(HierarchyType.Model), Origin, Up, LookAt, aspect, FOV, screenLocation, screenSize);
+        return Raycast.GetObjectHitScreenLocation(SceneHierarchy.Instance.GetModels(HierarchyType.Model), Origin, WorldUp, LookAt, aspect, FOV, screenLocation, screenSize);
     }
 
     public void OnMouseDown(object? sender, PointerPressedEventArgs e)
@@ -88,17 +88,21 @@ public class Camera
 
     public Vector3 LookAt => _cameraOffset;
 
-    public Vector3 Up => Vector3.UnitY;
+    public Vector3 WorldUp => Vector3.UnitY;
+
+    public Vector3 Right => GetRealitiveDirections().realitiveRight;
+
+    public Vector3 Up => GetRealitiveDirections().realitiveUp;
 
     public (Vector3 realitiveRight, Vector3 realitiveUp) GetRealitiveDirections()
     {
         Vector3 lookDir = Vector3.Normalize(Origin - LookAt);
-        Vector3 realitiveRight = Vector3.Cross(Up, lookDir);
+        Vector3 realitiveRight = Vector3.Cross(WorldUp, lookDir);
         Vector3 realitiveUp = Vector3.Cross(realitiveRight, lookDir);
-        return (realitiveRight, realitiveUp);
+        return (realitiveRight.Normalized(), realitiveUp.Normalized());
     }
 
-    public Matrix4 CreateLookAt() => Matrix4.LookAt(Origin, LookAt, Up);
+    public Matrix4 CreateLookAt() => Matrix4.LookAt(Origin, LookAt, WorldUp);
 
     public Matrix4 CreatePrespective(float aspect)
     {

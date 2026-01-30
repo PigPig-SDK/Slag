@@ -13,7 +13,8 @@ public class MoveCommand : ICommand
     public ICommand? Next { get; set; }
 
     private const float _MoveDistanceScale = 0.01f;
-    public Vector3 MoveDir = Vector3.Zero;
+    public Vector3? OverrideMoveDirection = null;
+    public (Vector3 realitiveRight, Vector3 realitiveUp) CameraMoveDirections;
     public Vector3 StartPos = new Vector3(0,0,0);
     private Vector2? _MouseStartPos = null;
 
@@ -28,20 +29,21 @@ public class MoveCommand : ICommand
         if(selection is null) return CommandState.Finished;
 
         StartPos = selection.GetCenter();
-        int count = 0;
-        foreach(uint index in selection.SelectionIndicies())
+
+        if(Camera.Instance == null) throw new InvalidOperationException($"No camera in {nameof(MoveCommand)} {nameof(Initialize)}");
+
+        CameraMoveDirections = Camera.Instance.GetRealitiveDirections();
+
+        foreach (uint index in selection.SelectionIndicies())
         {
             Vertex vert = activeModel.GetVertex(index);
-            count++;
             _StartingPosition[index] = vert.Position;
-            MoveDir += vert.Position.Normalized();
         }
-        MoveDir /= count;
-        Console.WriteLine($"Move dir : {MoveDir}");
+
         return CommandState.Idle;//Continue the command.
     }
 
-    private void MoveSelection(float ammount)
+    private void MoveSelection(Vector2 mouseDelta)
     {
         Model? model = SelectionManager.Instance.CurrentModel;
         if (model == null) throw new Exception("No current model in MoveCommand.MoveSelection");
@@ -51,9 +53,19 @@ public class MoveCommand : ICommand
 
         Vertex[] vertices = model.Verticies.BackingField();
 
+        Vector3 moveDirection = (CameraMoveDirections.realitiveRight * mouseDelta.X) + (CameraMoveDirections.realitiveUp * mouseDelta.Y);
+        moveDirection *= _MoveDistanceScale;
+
         foreach (uint index in selection.SelectionIndicies())
         {
-            vertices[index].Position = _StartingPosition[index] + MoveDir * ammount * _MoveDistanceScale;
+            if(OverrideMoveDirection != null)
+            {
+                //Do nothing.
+            }
+            else
+            {
+                vertices[index].Position = _StartingPosition[index] + moveDirection;
+            }
         }
         model.UpdateAllComponents(UpdateType.Locational, null);
     }
@@ -62,33 +74,36 @@ public class MoveCommand : ICommand
     {
         //No model, no command.
         if (SelectionManager.Instance.CurrentModel == null) return CommandState.Finished;
-
-        if(args.info.HasFlag(CommandInfo.Initialization))
-            return Initialize();
+        //Initialization
+        if (args.info.HasFlag(CommandInfo.Initialization)) return Initialize();
+        //Block keyup inputs
+        if (args.info.HasFlag(CommandInfo.KeyUp)) return CommandState.Idle;
 
         //Is a mouse input
-        if ((args.info & CommandInfo.KeyInfo) == 0)
+        if ((args.info & CommandInfo.MouseEvent) != 0)
         {
             var mouseInfo = args.mouseEvent!.GetPosition(GLControl.Instance);
             if (_MouseStartPos == null) _MouseStartPos = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y);
-
             Vector2 mouseDelta = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y) - _MouseStartPos.Value;
-            MoveSelection(mouseDelta.Length);
+            MoveSelection(mouseDelta);
+
+            if(args.info.HasFlag(CommandInfo.MouseDown))
+                return CommandState.Finished;
         }
 
-            //Don't register keyup events
-        if (args.info.HasFlag(CommandInfo.KeyUp)) return CommandState.Idle;
-
+        //Keyboard input
         switch(args.keyEvent?.Key)
         {
             case Key.G:
-                Console.WriteLine("Move confirmed");
                 return CommandState.Finished;
             case Key.Escape:
-                Console.WriteLine("Move declined");
-                return CommandState.Finished;
+                {
+                    MoveSelection(Vector2.Zero);
+                    return CommandState.Finished;
+                }
+                
         }
-
+        
         return CommandState.Idle;
     }
 }

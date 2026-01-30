@@ -58,7 +58,7 @@ public class GLComponent : ModelComponent
         }
     }
 
-    public unsafe void ModelMassUpdate(GlInterface? gl)
+    public unsafe void UpdateModel(GlInterface? gl)
     {
         if (gl == null)
         {
@@ -285,7 +285,7 @@ public class GLComponent : ModelComponent
     {
         if((info & (UpdateType.Locational)) != 0)
         {
-            GLControl.Instance?.ModelActions.Push(ModelMassUpdate);
+            GLControl.Instance?.ModelActions.Push(UpdateModel);
         }
     }
 
