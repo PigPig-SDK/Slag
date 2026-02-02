@@ -4,61 +4,57 @@ using OpenglAvaloniaTest.ViewModels;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace OpenglAvaloniaTest.Commands;
 
-public class MoveCommand : ICommand
+public class ScaleCommand : ICommand
 {
     public ICommand? Next { get; set; }
 
-    private const float _MoveDistanceScale = 0.01f;
-    public (Vector3 realitiveRight, Vector3 realitiveUp) CameraMoveDirections;
-    private Vector2? _MouseStartPos = null;
+    private const float _MoveDistanceScale = 0.005f;
+    public Vector3 SelectionCenter = new Vector3(0, 0, 0);
     private Vector3 _ActiveAxis = new Vector3(1, 1, 1);
+    private Vector2 _MouseScreenCenter = Vector2.Zero;
 
-
-    private Dictionary<uint, Vector3> _StartingPosition = [];
+    private Dictionary<uint, (Vector3 position, Vector3 moveNormal)> _StartingPosition = [];
 
     private CommandState Initialize()
     {
+        if (Camera.Instance == null) throw new InvalidOperationException($"No camera in {nameof(MoveCommand)} {nameof(Initialize)}");
+        if (GLControl.Instance == null) throw new InvalidOperationException($"No such {nameof(GLControl.Instance)}");
+
         Model? activeModel = SelectionManager.Instance.CurrentModel;
         if (activeModel == null) return CommandState.Finished;//Cannot execute command
 
         SelectionComponent? selection = activeModel.GetComponent<SelectionComponent>();
-        if(selection is null) return CommandState.Finished;
+        if (selection is null) return CommandState.Finished;
 
-        if(Camera.Instance == null) throw new InvalidOperationException($"No camera in {nameof(MoveCommand)} {nameof(Initialize)}");
-
-        CameraMoveDirections = Camera.Instance.GetRealitiveDirections();
-
+        SelectionCenter = selection.GetCenter();
+        //Compute center.
+        _MouseScreenCenter = Camera.Instance.WorldToScreen(selection.GetWorldCenter());
+        int selectedCount = 0;
         foreach (uint index in selection.SelectionIndicies())
         {
             Vertex vert = activeModel.GetVertex(index);
-            _StartingPosition[index] = vert.Position;
+            _StartingPosition[index] = (vert.Position, (SelectionCenter - vert.Position).Normalized());
+            selectedCount++;
         }
-
         return CommandState.Idle;//Continue the command.
     }
 
-    private void MoveSelection(Vector2 mouseDelta)
+    private void Scale(float ammount)
     {
         Model? model = SelectionManager.Instance.CurrentModel;
         if (model == null) throw new Exception("No current model in MoveCommand.MoveSelection");
 
         SelectionComponent? selection = model.GetComponent<SelectionComponent>();
-        if(selection == null) throw new Exception($"No selection component {nameof(selection)}!");
+        if (selection == null) throw new Exception($"No selection component {nameof(selection)}!");
 
         Vertex[] vertices = model.Verticies.BackingField();
 
-        Vector3 moveDirection = (CameraMoveDirections.realitiveRight * mouseDelta.X) + (CameraMoveDirections.realitiveUp * mouseDelta.Y);
-        moveDirection *= _MoveDistanceScale;
-
         foreach (uint index in selection.SelectionIndicies())
         {
-
-            vertices[index].Position = (_StartingPosition[index] + (moveDirection * _ActiveAxis));
-            
+            vertices[index].Position = _StartingPosition[index].position + ((_StartingPosition[index].moveNormal* ammount) * _ActiveAxis);
         }
         model.UpdateAllComponents(UpdateType.Locational, null);
     }
@@ -76,18 +72,18 @@ public class MoveCommand : ICommand
         if ((args.info & CommandInfo.MouseEvent) != 0)
         {
             var mouseInfo = args.mouseEvent!.GetPosition(GLControl.Instance);
-            if (_MouseStartPos == null) _MouseStartPos = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y);
-            Vector2 mouseDelta = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y) - _MouseStartPos.Value;
-            MoveSelection(mouseDelta);
+            Vector2 mouseDelta = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y) - _MouseScreenCenter;
 
-            if(args.info.HasFlag(CommandInfo.MouseDown))
+            Scale((250 - mouseDelta.Length) *_MoveDistanceScale);
+
+            if (args.info.HasFlag(CommandInfo.MouseDown))//Accept.
                 return CommandState.Finished;
         }
 
         //Keyboard input
-        switch(args.keyEvent?.Key)
+        switch (args.keyEvent?.Key)
         {
-            case Key.G:
+            case Key.S://Accept.
                 return CommandState.Finished;
             case Key.X:
                 _ActiveAxis = new Vector3(1, 0, 0);
@@ -100,12 +96,12 @@ public class MoveCommand : ICommand
                 return CommandState.Idle;
             case Key.Escape:
                 {
-                    MoveSelection(Vector2.Zero);
+                    Scale(0.0f);
                     return CommandState.Finished;
                 }
-                
+
         }
-        
+
         return CommandState.Idle;
     }
 }
