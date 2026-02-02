@@ -40,6 +40,32 @@ public static partial class ModelPrefabs
         return cube;
     }
 
+    public static Model BBoxVisualizer(Vector3 start, Vector3 end)
+    {
+        Model bboxVisualizer = new();
+        bboxVisualizer.ObjectName = "VISUALIZER";
+
+        //Add verts
+        bboxVisualizer.AddVertex(new Vertex(end.X, end.Y, end.Z)); // 0
+        bboxVisualizer.AddVertex(new Vertex(end.X, start.Y, end.Z)); // 1
+        bboxVisualizer.AddVertex(new Vertex(start.Y, start.Y, end.Z)); // 2
+        bboxVisualizer.AddVertex(new Vertex(start.Y, end.Y, end.Z)); // 3
+        bboxVisualizer.AddVertex(new Vertex(end.X, start.Y, start.Z)); // 4
+        bboxVisualizer.AddVertex(new Vertex(end.X, end.Y, start.Z)); // 5
+        bboxVisualizer.AddVertex(new Vertex(start.X, end.Y, start.Z)); // 6
+        bboxVisualizer.AddVertex(new Vertex(start.X, start.Y, start.Z)); // 7
+
+        //AddFace
+        bboxVisualizer.AddFace(0, 1, 2, 3);//Left
+        bboxVisualizer.AddFace(6, 7, 4, 5);//Right
+        bboxVisualizer.AddFace(2, 7, 6, 3);//Front
+        bboxVisualizer.AddFace(0, 5, 4, 1);//Back
+        bboxVisualizer.AddFace(1, 4, 7, 2);//Top
+        bboxVisualizer.AddFace(3, 6, 5, 0);//Bottom
+
+        return bboxVisualizer;
+    }
+
     /// <returns>A basic cube for debugging</returns>
     public static Model Torus(int torusIterations, int ringIterations, float torusRadius, float ringRadius)
     {
@@ -135,7 +161,6 @@ public static partial class ModelPrefabs
                     uint index = ringIndex + 1;
                     uint indexNext = (index % step) + 1;
                     circle.AddFace(rootIndex - indexNext, rootIndex - index, rootIndex);
-
                 }
             }
             else//Body rings

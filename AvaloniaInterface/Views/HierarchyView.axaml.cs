@@ -88,6 +88,8 @@ public partial class HierarchyView : UserControl
 
     private void OnAddTorusPressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        SceneHierarchy.Instance.AddModel(HierarchyType.Model, ModelPrefabs.Torus(20, 20, 2, 1));
+        //SceneHierarchy.Instance.AddModel(HierarchyType.Model, ModelPrefabs.Torus(20, 20, 2, 1));
+        //Stress test torus
+        SceneHierarchy.Instance.AddModel(HierarchyType.Model, ModelPrefabs.Torus(1000, 1000, 40, 20));
     }
 }

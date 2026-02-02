@@ -33,6 +33,8 @@ public class GLControl : OpenGlControlBase
     private ShaderProgram _edgeShaderProgram = new();
     private ShaderProgram _vertexShaderProgram = new();
 
+    public float Aspect { get; private set; } = 0;
+
     private Camera _camera;
 
     private const string TriangleVertexShader = "Shaders/triangle.vs";
@@ -102,8 +104,8 @@ public class GLControl : OpenGlControlBase
         //Add components and buffer data to opengl.
         foreach (Model model in SceneHierarchy.Instance.GetModels(HierarchyType.All))
         {
-            SelectionComponent.BindSelectionComponent(model);
-            GLComponent.BindOpenglComponent(model, gl);
+            SelectionComponent.BindComponent(model);
+            GLComponent.BindComponent(model, gl);
         }
 
         SceneHierarchy.Instance.OnModelAdded += OnModelAdded;
@@ -115,8 +117,9 @@ public class GLControl : OpenGlControlBase
 
         foreach (Model model in _LateModelAddition)
         {
-            SelectionComponent.BindSelectionComponent(model);
-            GLComponent.BindOpenglComponent(model, gl);
+            SelectionComponent.BindComponent(model);
+            GLComponent.BindComponent(model, gl);
+            BVHComponent.BindComponent(model);
         }
         _LateModelAddition.Clear();
     }
@@ -134,8 +137,8 @@ public class GLControl : OpenGlControlBase
 
         //Camera controls
         Matrix4 view = _camera.CreateLookAt();
-        float aspect = (float)(Bounds.Width / (double)Bounds.Height);
-        Matrix4 proj = _camera.CreatePrespective(aspect);
+        Aspect = (float)(Bounds.Width / (double)Bounds.Height);
+        Matrix4 proj = _camera.CreatePrespective(Aspect);
 
         //PRIMARY RENDERING!
         ExecuteGlStack(gl);

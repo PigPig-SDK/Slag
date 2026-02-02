@@ -22,6 +22,7 @@ public class SceneHierarchy
 
     public void AddModel(HierarchyType hierarchyType, Model model)
     {
+        model.hierarchyType = hierarchyType;
         HierarchyCategories[hierarchyType].Add(model);
         OnModelAdded?.Invoke(hierarchyType,model);
     }

@@ -102,10 +102,6 @@ public static class Raycast
                 }
             }
         }
-        //if (hit != null)
-        //{
-        //    SceneHierarchy.Instance.AddModel(ModelPrefabs.DebugTriangleLine(origin, hit!.HitPoint));
-        //}
 
         return hit;
     }

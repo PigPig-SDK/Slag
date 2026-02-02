@@ -1,16 +1,18 @@
 ﻿using Avalonia;
+using Avalonia.Controls.Converters;
 using Avalonia.Input;
 using Avalonia.OpenGL.Controls;
+using Models;
+using OpenglAvaloniaTest.ViewModels;
+using OpenTK.Mathematics;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 //using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using OpenTK.Mathematics;
-using Models;
-using OpenglAvaloniaTest.ViewModels;
-using Avalonia.Controls.Converters;
 
 public class Camera
 {
@@ -110,6 +112,24 @@ public class Camera
         //return Matrix4.CreateOrthographic(10*aspect, 10, 0, 1000);
 
         return Matrix4.CreatePerspectiveFieldOfView(FOV, (aspect == 0) ? 1.0f : aspect, 0.01f, 100000f);
+    }
+
+    public Vector2 WorldToScreen(Vector3 position)
+    {
+        Matrix4 matrix = CreateLookAt() * CreatePrespective(GLControl.Instance!.Aspect);
+        Vector4 p4 = new Vector4(position);
+        p4.W = 1.0f;
+        p4 = (p4 * matrix);//translate to clip space
+        p4 /= p4.W;
+        Vector2 worldToScreen = p4.Xy; 
+
+        //To resolution
+        worldToScreen.X = (float)((worldToScreen.X + 1.0) / 2.0 * GLControl.Instance.Bounds.Width);
+        worldToScreen.Y = (float)((worldToScreen.Y + 1.0) / 2.0 * GLControl.Instance.Bounds.Height);
+
+        Console.WriteLine(worldToScreen);
+
+        return worldToScreen;
     }
 
     /// <summary>

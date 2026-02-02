@@ -1,14 +1,7 @@
-﻿using Avalonia;
-using Avalonia.Controls.Platform;
-using Avalonia.Input;
-using Models;
+﻿using Avalonia.Input;
 using OpenglAvaloniaTest.Commands;
 using OpenTK.Mathematics;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace OpenglAvaloniaTest.ViewModels;
 
@@ -35,9 +28,13 @@ public class InputManager
                     CommandInvoker.Singleton.RunCommand(new MoveCommand(), (e, null, CommandInfo.Initialization | CommandInfo.KeyDown));
                     break;
                 }
+            case Key.S:
+                {
+                    CommandInvoker.Singleton.RunCommand(new ScaleCommand(), (e, null, CommandInfo.Initialization | CommandInfo.KeyDown));
+                    break;
+                }
             case Key.Delete:
                 {
-
                     break;
                 }
         }
@@ -68,6 +65,14 @@ public class InputManager
     public void OnPointerMove(object? sender, PointerEventArgs e)
     {
         if (CommandInvoker.Singleton.ExecuteCommandStep((null, e, CommandInfo.MouseMove))) return;
+
+        var properties = e.GetCurrentPoint(GLControl.Instance).Properties;
+        if(properties.IsRightButtonPressed)
+        {
+            Vector2 screenLocation = new Vector2((float)e.GetPosition(GLControl.Instance).X, (float)e.GetPosition(GLControl.Instance).Y);
+            SelectionManager.Instance.CheckForSelection(screenLocation);
+            return;
+        }
 
         Camera.Instance?.OnPointerMove(sender, e);
     }

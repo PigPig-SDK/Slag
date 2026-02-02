@@ -212,12 +212,11 @@ public class GLComponent : ModelComponent
         //Not implemented yet.
     }
 
-    public static bool BindOpenglComponent(Model model, GlInterface gl)
+    public static bool BindComponent(Model model, GlInterface gl)
     {
         if (!model.HasComponent(typeof(GLComponent)))
         {
             GLComponent? glComponent = model.AddComponent<GLComponent>(new GLComponent()) as GLComponent;
-
             if (glComponent == null) return false;
             glComponent.GenerateBuffers(gl);
         }

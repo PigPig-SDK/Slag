@@ -9,9 +9,9 @@ public class Model : IDisposable
     private List<Face> _Faces = [];
     private HashSet<Edge> _Edges = [];
     protected bool IsDisposed = false;
-
     public uint[] Indicies = [];
     public bool Hidden = false;
+    public HierarchyType hierarchyType = HierarchyType.All;
 
     private Dictionary<Type, ModelComponent> _Components = [];
 
@@ -19,7 +19,22 @@ public class Model : IDisposable
     public Vector3 Rotation = Vector3.Zero;
     public Vector3 Scale = Vector3.One;
 
+    //Store starting index
+    public Dictionary<uint, List<int>> VertexToTriangleMapping = [];
     public Dictionary<(uint,uint,uint), Face> TriangleToFaceMapping = [];
+
+
+    public Vertex? TryGetVertex(uint index)
+    {
+        try
+        {
+            return GetVertex(index);
+        }
+        catch(ArgumentOutOfRangeException)
+        {
+            return null;
+        }
+    }
 
     public Vertex GetVertex(uint index)
     {
@@ -135,6 +150,13 @@ public class Model : IDisposable
         return GetScaleMatrix()
             * GetRotationMatrix()
             * GetTranslationMatrix();
+    }
+
+    public Vector3 TransformPointByModelMatrix(Vector3 point)
+    {
+        Vector4 point4d = new Vector4(point, 1.0f);
+        point4d = GetModelMatrix() * point4d;
+        return point4d.Xyz;
     }
 
     public ModelComponent AddComponent<T>(ModelComponent component)

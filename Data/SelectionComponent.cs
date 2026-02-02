@@ -50,7 +50,7 @@ public class SelectionComponent : ModelComponent
 
     public bool IsVertexSelected(uint i) => SelectedIndicies.Contains(i);
 
-    public static bool BindSelectionComponent(Model model)
+    public static bool BindComponent(Model model)
     {
         if (!model.HasComponent(typeof(SelectionComponent)))
             model.AddComponent<SelectionComponent>(new SelectionComponent());
@@ -62,12 +62,15 @@ public class SelectionComponent : ModelComponent
         foreach(uint item in SelectedIndicies) yield return item;
     }
 
+    public Vector3 GetWorldCenter()
+    {
+        return Model.TransformPointByModelMatrix(GetCenter());
+    }
+
     public Vector3 GetCenter()
     {
         if(SelectedIndicies.Count == 0)
-        {
             return Vector3.Zero;
-        }
 
         Vector3 sum = Vector3.Zero;
 
@@ -76,6 +79,7 @@ public class SelectionComponent : ModelComponent
             Vertex v = Model.GetVertex(ind);
             sum += v.Position;
         }
-        return sum / SelectedIndicies.Count;
+
+        return sum/SelectedIndicies.Count;
     }
 }
