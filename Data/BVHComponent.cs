@@ -1,14 +1,12 @@
 ﻿using OpenglAvaloniaTest.ViewModels;
 using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Models;
 
+/// <summary>
+/// TODO: Implement
+/// Premature optimization, leaving be for now.
+/// </summary>
 public class BVHComponent : ModelComponent
 {
     private BVHNode _root = new();
@@ -34,10 +32,6 @@ public class BVHComponent : ModelComponent
         List<uint> tempIndicies = [.. Model.Indicies];
         Dictionary<BVHNode, (int start, int size)> tempMapping = [];
         tempMapping[_root] = (0,tempIndicies.Count - 1);
-        int splitAxis = 0;
-
-        //Define comparson by axis for sorting
-        var compare = Comparer<uint>.Create((a, b) => { return Model.TryGetVertex(a)!.Value.Position[splitAxis].CompareTo(Model.TryGetVertex(b)!.Value.Position[splitAxis]);});
 
         while (pending.Count > 0)
         {
@@ -51,11 +45,11 @@ public class BVHComponent : ModelComponent
             {
                 Vector3 curVolume = node.End - node.Start;
                 //Find largest axis
-                splitAxis = curVolume.X > curVolume.Y && curVolume.X > curVolume.Z ? 0 :
+                int splitAxis = curVolume.X > curVolume.Y && curVolume.X > curVolume.Z ? 0 :
                 curVolume.Y > curVolume.Z ? 1 : 2;
 
                 //Sort indicies in range by axis
-                tempIndicies.Sort(range.start, range.start + range.size, compare);
+                SortBasedOnAxis(splitAxis, node.Start[splitAxis] + (curVolume[splitAxis] / 2.0), range, ref tempIndicies);
 
                 //Create child nodes
                 node.left = new BVHNode { parent = node };
@@ -65,7 +59,6 @@ public class BVHComponent : ModelComponent
                 int leftSize = range.size / 2;
                 //Extra element when odd.
                 int rightSize = range.size - leftSize;
-                Console.WriteLine($"{leftSize} : {rightSize}");
 
                 tempMapping[node.left] = (range.start, leftSize);
                 tempMapping[node.right] = (range.start + leftSize, rightSize);
@@ -81,6 +74,25 @@ public class BVHComponent : ModelComponent
                 {
                     node.AddIndex(Model, index, false);
                 }
+            }
+        }
+    }
+
+    private void SortBasedOnAxis(int splitAxis, double splitPos, (int start, int size) range, ref List<uint> indicies)
+    {
+        int i = range.start;
+        int j = range.start + range.size;
+        while(i < j)
+        {
+            if (Model.Verticies[(int)indicies[i]].Position[splitAxis] < splitPos)
+                i++;
+            else
+            {
+                //Swap
+                indicies[i] ^= indicies[j];
+                indicies[j] ^= indicies[i];
+                indicies[i] ^= indicies[j];
+                --j;
             }
         }
     }

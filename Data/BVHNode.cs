@@ -1,9 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Models;
 
@@ -61,6 +56,6 @@ internal class BVHNode
             Refit(vertex.Value.Position);
         }
         _visualizer = ModelPrefabs.BBoxVisualizer(Start, End);
-        SceneHierarchy.Instance.AddModel(HierarchyType.Tool, _visualizer);
+        //SceneHierarchy.Instance.AddModel(HierarchyType.Tool, _visualizer);
     }
 }
