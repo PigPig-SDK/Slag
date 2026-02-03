@@ -2,6 +2,7 @@
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Sockets;
 
 namespace OpenglAvaloniaTest.ViewModels;
@@ -78,15 +79,57 @@ public class SelectionManager
 
     public void CheckForSelection(Vector2 screenPosition)
     {
+        switch (_SelectionMode)
+        {
+            case SelectionMode.Face:
+                    CheckForFaceSelection(screenPosition);
+                    break;
+            case SelectionMode.Vertex:
+                CheckForVertexSelection(screenPosition);
+                break;
+
+        }
+
+    }
+
+    private void CheckForVertexSelection(Vector2 screenPosition)
+    {
+        if (Camera.Instance == null)
+        {
+            throw new InvalidOperationException($"{nameof(Camera.Instance)} is not initialzied!");
+        }
+
+        VertexHit? hit = Raycast.GetVertexHit(SceneHierarchy.Instance.GetModels(HierarchyType.Model), Camera.Instance.ScreenToGlCoords(screenPosition), Camera.Instance.ViewMatrix);
+
+        if (hit != null)
+        {
+            SelectModel(hit.Model);
+            SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>();
+            if (ms == null) throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
+
+            if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
+                ms.DeselectAll(UpdateType.Ignore);
+
+            ms.SelectIndex(hit.VertexIndex, UpdateType.Ignore);
+            ms.BroadcastMassUpdate(UpdateType.Selection);
+        }
+        else
+        {
+            ClearSelectedModel();
+        }
+    }
+
+    private void CheckForFaceSelection(Vector2 screenPosition)
+    {
         RaycastHit? hit = Camera.Instance?.FindRaycastHit(screenPosition);
         if (hit != null)
         {
             SelectModel(hit.Model);
             SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>();
 
-            if (ms == null) throw new InvalidOperationException("Model dosn't contain ModelSelection!");
+            if (ms == null) throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
 
-            if(!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
+            if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ms.DeselectAll(UpdateType.Ignore);
 
             foreach (uint index in hit!.Face.Indicies)

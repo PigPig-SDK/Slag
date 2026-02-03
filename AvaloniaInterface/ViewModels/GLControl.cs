@@ -119,7 +119,8 @@ public class GLControl : OpenGlControlBase
         {
             SelectionComponent.BindComponent(model);
             GLComponent.BindComponent(model, gl);
-            BVHComponent.BindComponent(model);
+            //TODO: Implement BVH if optimization is truly warranted.
+            //BVHComponent.BindComponent(model);
         }
         _LateModelAddition.Clear();
     }

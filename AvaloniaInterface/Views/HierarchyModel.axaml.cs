@@ -1,16 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Models;
-using OpenglAvaloniaTest.ViewModels;
 using System;
-using System.Diagnostics;
-using System.Globalization;
-using System.Text.RegularExpressions;
+using System.Runtime.Intrinsics.Arm;
+
 
 namespace OpenglAvaloniaTest;
 

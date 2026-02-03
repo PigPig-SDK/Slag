@@ -10,12 +10,10 @@ namespace Models;
 public class RaycastHit
 {
     public Model Model;
-    public Face? Face;
-    public (uint v1, uint v2, uint v3)? triangleIndicies;
-    public Vector3? BarycentricPoint;
+    public Face Face;
+    public (uint v1, uint v2, uint v3) triangleIndicies;
+    public Vector3 BarycentricPoint;
     public Vector3 HitPoint;
-    public uint? vertex;
-    public Edge? edge;
 
     public RaycastHit(Model model, Face face, Vector3 hitPoint, Vector3 barycentricPoint, (uint v1, uint v2, uint v3) triangleIndicies)
     {

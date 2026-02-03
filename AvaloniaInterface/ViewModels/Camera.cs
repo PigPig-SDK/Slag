@@ -70,6 +70,24 @@ public class Camera
         _isDragging = false;
     }
 
+    public Vector2 ScreenToGlCoords(Vector2 screenPosition)
+    {
+        if(GLControl.Instance == null)
+        {
+            throw new InvalidOperationException($"{nameof(GLControl)}Instance is null!");
+        }
+
+        float width = (float)GLControl.Instance.Bounds.Width;
+        float height = (float)GLControl.Instance.Bounds.Height;
+
+        Vector2 pos = new Vector2((screenPosition.X / width) * 2.0f - 1.0f, 1.0f - (screenPosition.Y / height) * 2.0f);
+
+        return new Vector2(
+        MathHelper.Clamp(pos.X, -1, 1),
+        MathHelper.Clamp(pos.Y, -1, 1)
+        );
+    }
+
     public RaycastHit? FindRaycastHit(Vector2 screenLocation)
     {
         double width = _glBase.Bounds.Width;
@@ -114,9 +132,11 @@ public class Camera
         return Matrix4.CreatePerspectiveFieldOfView(FOV, (aspect == 0) ? 1.0f : aspect, 0.01f, 100000f);
     }
 
+    public Matrix4 ViewMatrix => CreateLookAt() * CreatePrespective(GLControl.Instance!.Aspect);
+
     public Vector2 WorldToScreen(Vector3 position)
     {
-        Matrix4 matrix = CreateLookAt() * CreatePrespective(GLControl.Instance!.Aspect);
+        Matrix4 matrix = ViewMatrix;
         Vector4 p4 = new Vector4(position);
         p4.W = 1.0f;
         p4 = (p4 * matrix);//translate to clip space

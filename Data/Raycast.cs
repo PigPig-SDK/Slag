@@ -1,9 +1,5 @@
 ﻿using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Models;
 
@@ -73,6 +69,43 @@ public static class Raycast
         return ComputeRaycastHit(models, origin, direction);
     }
 
+    /// <summary>
+    /// Gets the closest vertex to the current cursor.
+    /// </summary>
+    /// <param name="models">The models we are set to test against</param>
+    /// <param name="glScreenPos"></param>
+    /// <param name="cameraMatrix"></param>
+    /// <returns></returns>
+    public static VertexHit? GetVertexHit(IEnumerable<Model> models, Vector2 glScreenPos, Matrix4 cameraMatrix)
+    {
+        VertexHit? hit = null;
+        float closestDistance = float.PositiveInfinity;
+        Vector3 screenposRealitive = new Vector3(glScreenPos.X, glScreenPos.Y, 0);
+
+        foreach (Model model in models)
+        {
+            uint index = 0;
+            foreach (Vertex v in model.Verticies)
+            {
+                //Vertex to camera space
+                Vector4 pos = new Vector4(v.Position, 1.0f);
+                pos = pos * cameraMatrix;
+                Vector3 vertexCamera = (pos.Xyz)/pos.W;
+
+                //Takes Z into account as well to avoid selecting vertices behind other ones.
+                float distanceCheck = Vector3.DistanceSquared(screenposRealitive, vertexCamera);
+
+                if (distanceCheck < closestDistance)
+                {
+                    closestDistance = distanceCheck;
+                    hit = new VertexHit(model, index, distanceCheck);
+                }
+                index++;
+            }
+        }
+        return hit;
+    }
+
     public static RaycastHit? ComputeRaycastHit(IEnumerable<Model> models, Vector3 origin, Vector3 direction)
     {
         RaycastHit? hit = null; 
@@ -95,7 +128,7 @@ public static class Raycast
                     //Translate hitpoint by model transformation
                     Vector3 hitPoint = (new Vector4(hitPoints!.Value.hitPoint, 1.0f) * model.GetModelMatrix()).Xyz;
 
-                    float distanceCheck = Vector3.Distance(originHomo, hitPoint);
+                    float distanceCheck = Vector3.DistanceSquared(originHomo, hitPoint);
                     if (distanceCheck > closestDistance) continue;
                     closestDistance = distanceCheck;
                     hit = new (model, model.TriangleToFaceMapping[triangleIndicies], hitPoint, hitPoints!.Value.barryCoords, triangleIndicies);
