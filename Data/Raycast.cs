@@ -69,6 +69,13 @@ public static class Raycast
         return ComputeRaycastHit(models, origin, direction);
     }
 
+    public static EdgeHit? GetEdgeHit(IEnumerable<Model> models, Vector2 glScreenPos, Matrix4 cameraMatrix)
+    {
+        EdgeHit? hit = null;
+
+        return hit;
+    }
+
     /// <summary>
     /// Gets the closest vertex to the current cursor.
     /// </summary>
@@ -138,4 +145,8 @@ public static class Raycast
 
         return hit;
     }
+}
+
+public class EdgeHit
+{
 }
