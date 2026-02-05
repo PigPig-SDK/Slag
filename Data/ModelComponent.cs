@@ -12,7 +12,7 @@ public abstract class ModelComponent : IDisposable
 
     ~ModelComponent() { Dispose(); }
 
-    public abstract void OnModelUpdate(Model model, UpdateType info, object? data);
+    public abstract void OnModelUpdate(Model model, UpdateType info, object? data); 
 
     public abstract void Dispose();
 

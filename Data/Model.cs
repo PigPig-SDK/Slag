@@ -83,7 +83,7 @@ public class Model : IDisposable
         UpdateAllComponents(UpdateType.Membership, face);
     }
 
-    public void RemoveVertex(int index)
+    public void RemoveVertex(int index, UpdateType info = UpdateType.Membership)
     {
         Verticies.RemoveAt(index);
 
@@ -97,19 +97,19 @@ public class Model : IDisposable
         {
             e.DecrementForIndex(index);
         }
-        UpdateAllComponents(UpdateType.Membership, index);
+        UpdateAllComponents(info, index);
     }
 
-    public void RemoveFace(Face face)
+    public void RemoveFace(Face face, UpdateType info = UpdateType.Membership)
     {
         _Faces.Remove(face);
-        UpdateAllComponents(UpdateType.Membership, face);
+        UpdateAllComponents(info, face);
     }
 
-    public void RemoveEdge(Edge edge)
+    public void RemoveEdge(Edge edge, UpdateType info = UpdateType.Membership)
     {
         _Edges.Remove(edge);
-        UpdateAllComponents(UpdateType.Membership, edge);
+        UpdateAllComponents(info, edge);
     }
 
     private void GenerateIndicies()

@@ -25,16 +25,17 @@ public class InputManager
                 }
             case Key.G:
                 {
-                    CommandInvoker.Singleton.RunCommand(new MoveCommand(), (e, null, CommandInfo.Initialization | CommandInfo.KeyDown));
+                    CommandInvoker.Singleton?.RunCommand(new MoveCommand(), (e, null, CommandInfo.Initialization | CommandInfo.KeyDown));
                     break;
                 }
             case Key.S:
                 {
-                    CommandInvoker.Singleton.RunCommand(new ScaleCommand(), (e, null, CommandInfo.Initialization | CommandInfo.KeyDown));
+                    CommandInvoker.Singleton?.RunCommand(new ScaleCommand(), (e, null, CommandInfo.Initialization | CommandInfo.KeyDown));
                     break;
                 }
             case Key.Delete:
                 {
+                    SelectionManager.Instance?.DeleteCurrentSelection();
                     break;
                 }
         }

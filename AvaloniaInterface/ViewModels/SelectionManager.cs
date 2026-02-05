@@ -2,8 +2,6 @@
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net.Sockets;
 
 namespace OpenglAvaloniaTest.ViewModels;
 
@@ -82,8 +80,8 @@ public class SelectionManager
         switch (_SelectionMode)
         {
             case SelectionMode.Face:
-                    CheckForFaceSelection(screenPosition);
-                    break;
+                CheckForFaceSelection(screenPosition);
+                break;
             case SelectionMode.Vertex:
                 CheckForVertexSelection(screenPosition);
                 break;
@@ -92,7 +90,6 @@ public class SelectionManager
                 break;
 
         }
-
     }
 
     private void CheckForVertexSelection(Vector2 screenPosition)
@@ -115,6 +112,7 @@ public class SelectionManager
 
             ms.SelectIndex(hit.VertexIndex, UpdateType.Ignore);
             ms.BroadcastMassUpdate(UpdateType.Selection);
+            _CurrentSelection.Add(hit.VertexIndex);
         }
         else
         {
@@ -147,6 +145,7 @@ public class SelectionManager
             ms.SelectIndex(hit.Edge.Vertex1, UpdateType.Ignore);
             ms.SelectIndex(hit.Edge.Vertex2, UpdateType.Ignore);
             ms.BroadcastMassUpdate(UpdateType.Selection);
+            _CurrentSelection.Add(hit.Edge);
         }
         else
         {
@@ -172,10 +171,39 @@ public class SelectionManager
                 ms.SelectIndex(index, UpdateType.Ignore);
             }
             ms.BroadcastMassUpdate(UpdateType.Selection);
+            _CurrentSelection.Add(hit.Face);
         }
         else
         {
             ClearSelectedModel();
         }
+    }
+
+    public void DeleteCurrentSelection()
+    {
+
+        if(CurrentModel == null) return;
+
+        foreach (object obj in _CurrentSelection)
+        {
+            if (obj is uint index)
+            {
+                CurrentModel.RemoveVertex((int)index, UpdateType.Ignore);
+                Console.WriteLine($"Delete vert {index}");
+            }
+            else if (obj is Edge edge)
+            {
+                CurrentModel.RemoveEdge(edge, UpdateType.Ignore);
+                Console.WriteLine($"Delete edge {edge}");
+            }
+            else if (obj is Face face)
+            {
+                CurrentModel.RemoveFace(face, UpdateType.Ignore);
+                Console.WriteLine($"Delete face {face}");
+            }
+        }
+
+        CurrentModel.UpdateAllComponents(UpdateType.Membership, null);
+        _CurrentSelection.Clear();
     }
 }

@@ -3,8 +3,6 @@ using Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using static Avalonia.OpenGL.GlConsts;
 using static OpenglAvaloniaTest.ViewModels.GlConstantsExtended;
@@ -27,7 +25,7 @@ public class GLComponent : ModelComponent
 
     private GlInterface? glInterface = null;
 
-    private Dictionary<uint, List<uint>> _SharpIndicies = []; 
+    private Dictionary<uint, List<uint>> _SharpIndicies = [];
 
     public override void OnAddedToModel(Model model)
     {
@@ -285,6 +283,12 @@ public class GLComponent : ModelComponent
         if((info & (UpdateType.Locational)) != 0)
         {
             GLControl.Instance?.ModelActions.Push(UpdateModel);
+        }
+
+        //Redraw requested.
+        if((info & UpdateType.Membership) != 0)
+        {
+            GLControl.Instance?.ModelActions.Push(InitializeTrangleBuffers);
         }
     }
 
