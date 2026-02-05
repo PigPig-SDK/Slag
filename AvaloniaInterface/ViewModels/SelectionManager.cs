@@ -87,6 +87,9 @@ public class SelectionManager
             case SelectionMode.Vertex:
                 CheckForVertexSelection(screenPosition);
                 break;
+            case SelectionMode.Edge:
+                CheckForEdgeSelection(screenPosition);
+                break;
 
         }
 
@@ -111,6 +114,38 @@ public class SelectionManager
                 ms.DeselectAll(UpdateType.Ignore);
 
             ms.SelectIndex(hit.VertexIndex, UpdateType.Ignore);
+            ms.BroadcastMassUpdate(UpdateType.Selection);
+        }
+        else
+        {
+            ClearSelectedModel();
+        }
+    }
+
+    private void CheckForEdgeSelection(Vector2 screenPosition)
+    {
+        if (Camera.Instance == null)
+        {
+            throw new InvalidOperationException($"{nameof(Camera.Instance)} is not initialzied!");
+        }
+
+        EdgeHit? hit = Raycast.GetEdgeHit(
+            SceneHierarchy.Instance.GetModels(HierarchyType.Model), 
+            Camera.Instance.ScreenToGlCoords(screenPosition), 
+            Camera.Instance.ViewMatrix,
+            Camera.Instance.Origin);
+
+        if (hit != null)
+        {
+            SelectModel(hit.Model);
+            SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>();
+            if (ms == null) throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
+
+            if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
+                ms.DeselectAll(UpdateType.Ignore);
+
+            ms.SelectIndex(hit.Edge.Vertex1, UpdateType.Ignore);
+            ms.SelectIndex(hit.Edge.Vertex2, UpdateType.Ignore);
             ms.BroadcastMassUpdate(UpdateType.Selection);
         }
         else

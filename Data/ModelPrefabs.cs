@@ -320,8 +320,6 @@ public static partial class ModelPrefabs
         triad.AddVertex(new Vertex(0, 1, 0));//4
 
         triad.AddEdge(new Edge(0, 1));
-        triad.AddEdge(new Edge(1, 2));
-        triad.AddEdge(new Edge(2, 0));
 
         return triad;
     }

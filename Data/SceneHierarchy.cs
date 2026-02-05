@@ -12,7 +12,7 @@ public class SceneHierarchy
 
     public Dictionary<HierarchyType, List<Model>> HierarchyCategories { get; private set; } = new()
     {
-        { HierarchyType.Model, [ModelPrefabs.Cube()] },
+        { HierarchyType.Model, [ModelPrefabs.DebugEdges()] },
         { HierarchyType.Tool, [ModelPrefabs.AxisTriad()] },
     };
 

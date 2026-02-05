@@ -5,6 +5,8 @@ namespace Models;
 
 public static class Raycast
 {
+    private const float LineSelectionDistance = 0.01f;
+
     public static bool HasHitBoundingBox(Model model, Vector3 origin, Vector3 direction)
     {
         return true;
@@ -69,10 +71,58 @@ public static class Raycast
         return ComputeRaycastHit(models, origin, direction);
     }
 
-    public static EdgeHit? GetEdgeHit(IEnumerable<Model> models, Vector2 glScreenPos, Matrix4 cameraMatrix)
+    public static EdgeHit? GetEdgeHit(IEnumerable<Model> models, Vector2 glScreenPos, Matrix4 cameraMatrix, Vector3 cameraCenter)
     {
+        /**
+         * The following code maps the edge to 2d space, creating a line.
+         * The selection is determined by a small tangent line being created at the cursor.
+         * The selection line and the edge line is then intersection tested.
+         * 
+         * To solve Z problems, the closest intersecting line is picked.
+         * 'Close' is determined by the lines center. Not perfect, but it works enough for me to use it.
+         */
         EdgeHit? hit = null;
+        float closestDistance = float.PositiveInfinity;
 
+        foreach (Model model in models)
+        {
+            if (model.Hidden) continue;//Do not scan against hidden models.
+
+            foreach (Edge edge in model.Edges)
+            {
+                //Get verts
+                Vector3 start = model.GetVertex(edge.Vertex1).Position;
+                Vector3 end = model.GetVertex(edge.Vertex2).Position;
+
+                //Vertex to camera space
+                Vector4 startScreenSpace = new Vector4(start, 1.0f) * model.GetModelMatrix() * cameraMatrix;
+                startScreenSpace /= startScreenSpace.W;
+                Vector4 endScreenSpace = new Vector4(end, 1.0f) * model.GetModelMatrix() * cameraMatrix;
+                endScreenSpace /= endScreenSpace.W;
+
+                //Compute tangent
+                Vector2 tangentDir = (endScreenSpace.Xy - startScreenSpace.Xy);
+                tangentDir = new Vector2(tangentDir.Y, -tangentDir.X);
+                tangentDir.Normalize();
+                tangentDir *= LineSelectionDistance;
+
+                //Create user selection line
+                Vector2 selectStart = glScreenPos + tangentDir;
+                Vector2 selectEnd = glScreenPos - tangentDir;
+
+                //Compute line intersection
+                if (LineIntersection.FindSegmentIntersection(startScreenSpace.Xy, endScreenSpace.Xy, selectStart, selectEnd, out Vector2 intersectionPoint))
+                {
+                    //Compute center to see if its the closest to the camera
+                    Vector3 lineCenter = (start + end) / 2f;
+
+                    float distance = Vector3.DistanceSquared(cameraCenter, lineCenter);
+                    if (distance > closestDistance) continue;
+                    closestDistance = distance;
+                    hit = new EdgeHit(edge, model);
+                }
+            }
+        }
         return hit;
     }
 
@@ -91,12 +141,14 @@ public static class Raycast
 
         foreach (Model model in models)
         {
+            if (model.Hidden) continue;//Do not scan against hidden models.
+
             uint index = 0;
             foreach (Vertex v in model.Verticies)
             {
                 //Vertex to camera space
                 Vector4 pos = new Vector4(v.Position, 1.0f);
-                pos = pos * cameraMatrix;
+                pos = pos * model.GetModelMatrix() * cameraMatrix;
                 Vector3 vertexCamera = (pos.Xyz)/pos.W;
 
                 //Takes Z into account as well to avoid selecting vertices behind other ones.
@@ -145,8 +197,4 @@ public static class Raycast
 
         return hit;
     }
-}
-
-public class EdgeHit
-{
 }

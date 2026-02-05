@@ -8,6 +8,8 @@ public class Model : IDisposable
     public List<Vertex> Verticies { get; private set; } = [];
     private List<Face> _Faces = [];
     private HashSet<Edge> _Edges = [];
+    public IEnumerable<Edge> Edges => _Edges;
+
     protected bool IsDisposed = false;
     public uint[] Indicies = [];
     public bool Hidden = false;
