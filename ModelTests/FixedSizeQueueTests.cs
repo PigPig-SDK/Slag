@@ -1,0 +1,39 @@
+﻿using Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Xunit.Sdk;
+
+namespace ModelTests;
+
+public class FixedSizeQueueTests
+{
+    [Fact]
+    public void SizeOne_EnqueueDequeue_Accepted()
+    {
+        FixedSizeQueue<int> queue = new(1);
+        queue.Enqueue(1);
+        queue.Enqueue(2);
+        int output = queue.Dequeue();
+        Assert.Equal(2, output);
+    }
+    [Fact]
+    public void SizeTwo_EnqueueDequeue_Accepted()
+    {
+        FixedSizeQueue<int> queue = new(2);
+        queue.Enqueue(1);
+        queue.Enqueue(2);
+        int output = queue.Dequeue();
+        int output2 = queue.Dequeue();
+        Assert.Equal(1, output);
+        Assert.Equal(2, output2);
+    }
+    [Fact]
+    public void Dequeue_Enqueue_Accepted()
+    {
+        FixedSizeQueue<int> queue = new(1);
+        Assert.Throws<InvalidOperationException>(() => queue.Dequeue());
+    }
+}

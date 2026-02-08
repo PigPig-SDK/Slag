@@ -1,4 +1,5 @@
 ﻿using Avalonia.Input;
+using Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ public class CommandInvoker
     public static CommandInvoker Singleton = new();
 
     public ICommand? CurrentCommand { get; set; }
+
+    private FixedSizeQueue<ICommand> _UndoQueue = new(40);
 
     public void RunCommand(ICommand command, (KeyEventArgs? key, PointerEventArgs? mouse, CommandInfo info) args)
     {
@@ -33,6 +36,8 @@ public class CommandInvoker
         CommandState commandState = CurrentCommand.Execute(args);
         if (commandState != CommandState.Idle)
         {
+            _UndoQueue.Enqueue(CurrentCommand);
+            Console.WriteLine(_UndoQueue);
             CurrentCommand = CurrentCommand.Next;
             if(CurrentCommand != null && commandState == CommandState.Continue)// Continue immediately to next command
             {
@@ -42,7 +47,14 @@ public class CommandInvoker
             {
                 CurrentCommand = null;
             }
-        }   
+        }
+        return true;
+    }
+    public bool ExecuteUndo()
+    {
+        if(_UndoQueue.Count < 0) return false;
+
+        _UndoQueue.Dequeue();
         return true;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Avalonia.Input;
+using OpenglAvaloniaTest.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,12 @@ namespace OpenglAvaloniaTest.Commands;
 
 internal class DeleteCommand : ICommand
 {
-    public ICommand? Next { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public ICommand? Next { get; set; }
 
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
-        throw new NotImplementedException();
+        SelectionManager.Instance.DeleteCurrentSelection();
+        return CommandState.Finished;
     }
 
     public void Redo()
