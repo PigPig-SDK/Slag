@@ -35,7 +35,7 @@ public class InputManager
                 }
             case Key.Delete:
                 {
-                    SelectionManager.Instance?.DeleteCurrentSelection();
+                    CommandInvoker.Singleton?.RunCommand(new DeleteCommand(), (e, null, CommandInfo.Initialization | CommandInfo.KeyDown));
                     break;
                 }
         }
@@ -71,7 +71,7 @@ public class InputManager
         if(properties.IsRightButtonPressed)
         {
             Vector2 screenLocation = new Vector2((float)e.GetPosition(GLControl.Instance).X, (float)e.GetPosition(GLControl.Instance).Y);
-            SelectionManager.Instance.CheckForSelection(screenLocation);
+            SelectionManager.Instance.CheckForSelection(screenLocation, true);
             return;
         }
 
@@ -86,7 +86,7 @@ public class InputManager
         if (properties.IsRightButtonPressed)
         {
             Vector2 screenLocation = new Vector2((float)e.GetPosition(GLControl.Instance).X, (float)e.GetPosition(GLControl.Instance).Y);
-            SelectionManager.Instance.CheckForSelection(screenLocation);
+            SelectionManager.Instance.CheckForSelection(screenLocation, false);
             return;
         }
 

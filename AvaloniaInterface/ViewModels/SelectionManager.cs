@@ -1,4 +1,5 @@
-﻿using Models;
+﻿using Avalonia.Rendering.Composition;
+using Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -71,24 +72,24 @@ public class SelectionManager
         _CurrentSelection.Clear();
     }
 
-    public void CheckForSelection(Vector2 screenPosition)
+    public void CheckForSelection(Vector2 screenPosition, bool isDrag)
     {
         switch (_SelectionMode)
         {
             case SelectionMode.Face:
-                CheckForFaceSelection(screenPosition);
+                CheckForFaceSelection(screenPosition, isDrag);
                 break;
             case SelectionMode.Vertex:
-                CheckForVertexSelection(screenPosition);
+                CheckForVertexSelection(screenPosition, isDrag);
                 break;
             case SelectionMode.Edge:
-                CheckForEdgeSelection(screenPosition);
+                CheckForEdgeSelection(screenPosition, isDrag);
                 break;
 
         }
     }
 
-    private void CheckForVertexSelection(Vector2 screenPosition)
+    private void CheckForVertexSelection(Vector2 screenPosition, bool isDrag)
     {
         if (Camera.Instance == null)
         {
@@ -106,17 +107,27 @@ public class SelectionManager
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
 
-            ms.SelectIndex(hit.VertexIndex, UpdateType.Ignore);
-            ms.BroadcastMassUpdate(UpdateType.Selection);
-            _CurrentSelection.Add(hit.VertexIndex);
+            //Select
+            if (!ms.IsVertexSelected(hit.VertexIndex))
+            {
+                ms.SelectIndex(hit.VertexIndex, UpdateType.Ignore);
+                ms.BroadcastMassUpdate(UpdateType.Selection);
+                _CurrentSelection.Add(hit.VertexIndex);
+            }
+            else if (!isDrag)//Deselect
+            {
+                ms.DeselectIndex(hit.VertexIndex, UpdateType.Ignore);
+                ms.BroadcastMassUpdate(UpdateType.Selection);
+                _CurrentSelection.Remove(hit.VertexIndex);
+            }
         }
-        else
+        else if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))
         {
             ClearSelectedModel();
         }
     }
 
-    private void CheckForEdgeSelection(Vector2 screenPosition)
+    private void CheckForEdgeSelection(Vector2 screenPosition, bool isDrag)
     {
         if (Camera.Instance == null)
         {
@@ -138,18 +149,29 @@ public class SelectionManager
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
 
-            ms.SelectIndex(hit.Edge.Vertex1, UpdateType.Ignore);
-            ms.SelectIndex(hit.Edge.Vertex2, UpdateType.Ignore);
-            ms.BroadcastMassUpdate(UpdateType.Selection);
-            _CurrentSelection.Add(hit.Edge);
+            if(!_CurrentSelection.Contains(hit.Edge))
+            {
+                ms.SelectIndex(hit.Edge.Vertex1, UpdateType.Ignore);
+                ms.SelectIndex(hit.Edge.Vertex2, UpdateType.Ignore);
+                _CurrentSelection.Add(hit.Edge);
+                ms.BroadcastMassUpdate(UpdateType.Selection);
+            }
+            else if(!isDrag)
+            {
+                ms.DeselectIndex(hit.Edge.Vertex1, UpdateType.Ignore);
+                ms.DeselectIndex(hit.Edge.Vertex2, UpdateType.Ignore);
+                _CurrentSelection.Remove(hit.Edge);
+                ms.BroadcastMassUpdate(UpdateType.Selection);
+            }
+            
         }
-        else
+        else if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))
         {
             ClearSelectedModel();
         }
     }
 
-    private void CheckForFaceSelection(Vector2 screenPosition)
+    private void CheckForFaceSelection(Vector2 screenPosition, bool isDrag)
     {
         RaycastHit? hit = Camera.Instance?.FindRaycastHit(screenPosition);
         if (hit != null)
@@ -164,14 +186,26 @@ public class SelectionManager
                 ClearSelection();
             }
 
-            foreach (uint index in hit!.Face.Indicies)
+            if (!_CurrentSelection.Contains(hit.Face))
             {
-                ms.SelectIndex(index, UpdateType.Ignore);
+                foreach (uint index in hit!.Face.Indicies)
+                {
+                    ms.SelectIndex(index, UpdateType.Ignore);
+                }
+                ms.BroadcastMassUpdate(UpdateType.Selection);
+                _CurrentSelection.Add(hit.Face);
             }
-            ms.BroadcastMassUpdate(UpdateType.Selection);
-            _CurrentSelection.Add(hit.Face);
+            else if (!isDrag)
+            {
+                foreach (uint index in hit!.Face.Indicies)
+                {
+                    ms.DeselectIndex(index, UpdateType.Ignore);
+                }
+                ms.BroadcastMassUpdate(UpdateType.Selection);
+                _CurrentSelection.Remove(hit.Face);
+            }
         }
-        else
+        else if(!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))
         {
             ClearSelectedModel();
         }
@@ -179,13 +213,12 @@ public class SelectionManager
 
     public void DeleteCurrentSelection()
     {
-
         if(CurrentModel == null) return;
 
         foreach (object obj in _CurrentSelection)
         {
             if (obj is uint index)
-            {
+            {  
                 CurrentModel.RemoveVertex((int)index, UpdateType.Ignore);
                 //Console.WriteLine($"Delete vert {index}");
             }
