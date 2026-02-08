@@ -24,16 +24,17 @@ public class Model : IDisposable
     //Store starting index
     public Dictionary<(uint,uint,uint), Face> TriangleToFaceMapping = [];
 
-
-    public Vertex? TryGetVertex(uint index)
+    public bool TryGetVertex(uint index, out Vertex? vertex)
     {
+        vertex = null;
         try
         {
-            return GetVertex(index);
+            vertex = GetVertex(index);
+            return true;
         }
         catch(ArgumentOutOfRangeException)
         {
-            return null;
+            return false;
         }
     }
 

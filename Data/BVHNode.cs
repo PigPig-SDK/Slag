@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using System;
 
 namespace Models;
 
@@ -16,9 +17,8 @@ internal class BVHNode
     {
         if(Indicies == null) Indicies = new List<uint>();
         Indicies.Add(index);
-        Vertex? vertex = model.TryGetVertex(index);
-        if (vertex == null) return;
-        RefitParents(vertex.Value.Position);
+        if (!model.TryGetVertex(index, out Vertex? vertex)) return;
+        RefitParents(vertex!.Value.Position);
     }
 
     public void RemoveIndex(Model model, uint id)
@@ -51,9 +51,8 @@ internal class BVHNode
     {
         for(int i = range.start; i < range.start + range.size; i++)
         {
-            Vertex? vertex = model.TryGetVertex(indicies[i]);
-            if (vertex == null) continue;
-            Refit(vertex.Value.Position);
+            if (!model.TryGetVertex(indicies[i], out Vertex? vertex)) continue;
+            Refit(vertex!.Value.Position);
         }
         _visualizer = ModelPrefabs.BBoxVisualizer(Start, End);
         //SceneHierarchy.Instance.AddModel(HierarchyType.Tool, _visualizer);
