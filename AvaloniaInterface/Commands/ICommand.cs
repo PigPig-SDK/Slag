@@ -13,4 +13,8 @@ public interface ICommand
     /// </summary>
     /// <returns>The command state after execution</returns>
     CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args);
+
+    public void Undo();
+
+    public void Redo();
 }

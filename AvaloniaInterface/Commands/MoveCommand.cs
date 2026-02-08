@@ -17,7 +17,6 @@ public class MoveCommand : ICommand
     private Vector2? _MouseStartPos = null;
     private Vector3 _ActiveAxis = new Vector3(1, 1, 1);
 
-
     private Dictionary<uint, Vector3> _StartingPosition = [];
 
     private CommandState Initialize()
@@ -103,9 +102,18 @@ public class MoveCommand : ICommand
                     MoveSelection(Vector2.Zero);
                     return CommandState.Finished;
                 }
-                
         }
         
         return CommandState.Idle;
+    }
+
+    public void Undo()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Redo()
+    {
+        throw new NotImplementedException();
     }
 }

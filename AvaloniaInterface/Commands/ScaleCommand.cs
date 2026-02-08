@@ -104,4 +104,14 @@ public class ScaleCommand : ICommand
 
         return CommandState.Idle;
     }
+
+    public void Undo()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Redo()
+    {
+        throw new NotImplementedException();
+    }
 }
