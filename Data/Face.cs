@@ -14,6 +14,8 @@ public class Face
 {
     public List<uint> Indicies;
 
+    public List<Edge> Edges { get; set; } = [];
+
     public Model? ParentModel = null;
 
     public Face(List<uint> indicies)

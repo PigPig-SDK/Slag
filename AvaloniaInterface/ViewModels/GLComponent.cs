@@ -147,6 +147,7 @@ public class GLComponent : ModelComponent
 
     public unsafe void UpdateEdgeBuffers(GlInterface gl)
     {
+        gl.BindVertexArray(_EdgeArrayObject!.Value);
         uint[] edgeIndicies = Model.GetEdgeIndicies();
 
         gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _EdgeIndiciesBuffer!.Value);
@@ -160,6 +161,8 @@ public class GLComponent : ModelComponent
 
     public unsafe void InitializeTrangleBuffers(GlInterface gl)
     {
+        gl.BindVertexArray(_TriangleArrayObject!.Value);
+
         Vertex[] verts = [];
         List<uint> indiciesList = []; //List that will encounter lots of modification
         _SharpIndicies.Clear();
@@ -289,6 +292,7 @@ public class GLComponent : ModelComponent
         if((info & UpdateType.Membership) != 0)
         {
             GLControl.Instance?.ModelActions.Push(InitializeTrangleBuffers);
+            GLControl.Instance?.ModelActions.Push(UpdateEdgeBuffers);
         }
     }
 

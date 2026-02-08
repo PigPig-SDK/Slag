@@ -47,11 +47,6 @@ public class SelectionManager
         if (CurrentSelectionMode == SelectionMode.Object)//Object mode to model editing mode.
         {
             ClearSelection();
-            _CurrentSelection.Clear();
-        }
-        else
-        {
-            _CurrentSelection.Clear();
         }
     }
 
@@ -73,6 +68,7 @@ public class SelectionManager
     {
         if (CurrentModel == null) return;//Cannot do anything.
         CurrentModel.GetComponent<SelectionComponent>()?.DeselectAll();
+        _CurrentSelection.Clear();
     }
 
     public void CheckForSelection(Vector2 screenPosition)
@@ -108,7 +104,7 @@ public class SelectionManager
             if (ms == null) throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
 
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
-                ms.DeselectAll(UpdateType.Ignore);
+                ClearSelection();
 
             ms.SelectIndex(hit.VertexIndex, UpdateType.Ignore);
             ms.BroadcastMassUpdate(UpdateType.Selection);
@@ -140,7 +136,7 @@ public class SelectionManager
             if (ms == null) throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
 
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
-                ms.DeselectAll(UpdateType.Ignore);
+                ClearSelection();
 
             ms.SelectIndex(hit.Edge.Vertex1, UpdateType.Ignore);
             ms.SelectIndex(hit.Edge.Vertex2, UpdateType.Ignore);
@@ -164,7 +160,9 @@ public class SelectionManager
             if (ms == null) throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
 
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
-                ms.DeselectAll(UpdateType.Ignore);
+            {
+                ClearSelection();
+            }
 
             foreach (uint index in hit!.Face.Indicies)
             {
@@ -189,17 +187,17 @@ public class SelectionManager
             if (obj is uint index)
             {
                 CurrentModel.RemoveVertex((int)index, UpdateType.Ignore);
-                Console.WriteLine($"Delete vert {index}");
+                //Console.WriteLine($"Delete vert {index}");
             }
             else if (obj is Edge edge)
             {
                 CurrentModel.RemoveEdge(edge, UpdateType.Ignore);
-                Console.WriteLine($"Delete edge {edge}");
+                //Console.WriteLine($"Delete edge {edge}");
             }
             else if (obj is Face face)
             {
                 CurrentModel.RemoveFace(face, UpdateType.Ignore);
-                Console.WriteLine($"Delete face {face}");
+                //Console.WriteLine($"Delete face {face}");
             }
         }
 

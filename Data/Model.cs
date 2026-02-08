@@ -22,7 +22,6 @@ public class Model : IDisposable
     public Vector3 Scale = Vector3.One;
 
     //Store starting index
-    public Dictionary<uint, List<int>> VertexToTriangleMapping = [];
     public Dictionary<(uint,uint,uint), Face> TriangleToFaceMapping = [];
 
 
@@ -55,7 +54,13 @@ public class Model : IDisposable
 
     public void AddEdge(Edge edge, UpdateType info = UpdateType.None)
     {
-        _Edges.Add(edge);
+        if (_Edges.TryGetValue(edge, out Edge? hashEdge) && hashEdge != null)
+        {
+           hashEdge.Faces.AddRange(edge.Faces);
+        }
+        else
+            _Edges.Add(edge);
+
         UpdateAllComponents(UpdateType.Membership | info, edge);
     }
 
@@ -77,15 +82,14 @@ public class Model : IDisposable
         for(int i = 0; i < face.Indicies.Count - 1; i++) {
             uint start = (uint)face.Indicies[i];
             uint end = (uint)face.Indicies[i + 1];
-            AddEdge(new Edge(start, end), UpdateType.Ignore);
+            AddEdge(new Edge(start, end, face), UpdateType.Ignore);
         }
-        AddEdge(new Edge(face.Indicies[0], face.Indicies[^1]), UpdateType.Ignore);
+        AddEdge(new Edge(face.Indicies[0], face.Indicies[^1], face), UpdateType.Ignore);
         UpdateAllComponents(UpdateType.Membership, face);
     }
 
     public void RemoveVertex(int index, UpdateType info = UpdateType.Membership)
     {
-        Verticies.RemoveAt(index);
 
         //Manage faces
         int editCount = _Faces.RemoveAll(x => x.Contains((uint)index));
@@ -93,10 +97,16 @@ public class Model : IDisposable
 
         //Manage edges
         editCount += _Edges.RemoveWhere(x => x.Contains(index));
-        foreach(Edge e  in _Edges)
+
+        //Remap old edges by replacing them with new ones.
+        foreach (Edge e in _Edges.Where(x => x.RequiresDecrement(index)).Select(x => x).ToArray())
         {
+            _Edges.Remove(e);
             e.DecrementForIndex(index);
+            _Edges.Add(e);
         }
+
+        Verticies.RemoveAt(index);
         UpdateAllComponents(info, index);
     }
 
@@ -108,6 +118,11 @@ public class Model : IDisposable
 
     public void RemoveEdge(Edge edge, UpdateType info = UpdateType.Membership)
     {
+        foreach(Face f in edge.Faces)
+        {
+            RemoveFace(f, info);
+        }
+
         _Edges.Remove(edge);
         UpdateAllComponents(info, edge);
     }
