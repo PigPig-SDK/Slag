@@ -6,6 +6,8 @@ namespace Models;
 public static class Raycast
 {
     private const float LineSelectionDistance = 0.01f;
+    private const float VertexSelectionDistance = 0.001f;
+
 
     public static bool HasHitBoundingBox(Model model, Vector3 origin, Vector3 direction)
     {
@@ -136,7 +138,7 @@ public static class Raycast
     public static VertexHit? GetVertexHit(IEnumerable<Model> models, Vector2 glScreenPos, Matrix4 cameraMatrix)
     {
         VertexHit? hit = null;
-        float closestDistance = float.PositiveInfinity;
+        float closestZDistance = float.PositiveInfinity;
         Vector3 screenposRealitive = new Vector3(glScreenPos.X, glScreenPos.Y, 0);
 
         foreach (Model model in models)
@@ -152,11 +154,12 @@ public static class Raycast
                 Vector3 vertexCamera = (pos.Xyz)/pos.W;
 
                 //Takes Z into account as well to avoid selecting vertices behind other ones.
-                float distanceCheck = Vector3.DistanceSquared(screenposRealitive, vertexCamera);
+                float distanceCheck = Vector2.DistanceSquared(screenposRealitive.Xy, vertexCamera.Xy);
+                float distanceZ = vertexCamera.Z - screenposRealitive.Z;
 
-                if (distanceCheck < closestDistance)
+                if (distanceCheck < VertexSelectionDistance  && distanceZ < closestZDistance)
                 {
-                    closestDistance = distanceCheck;
+                    closestZDistance = distanceZ;
                     hit = new VertexHit(model, index, distanceCheck);
                 }
                 index++;
