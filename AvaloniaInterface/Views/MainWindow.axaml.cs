@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Models;
+using OpenglAvaloniaTest.Commands;
 using OpenglAvaloniaTest.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -76,7 +77,11 @@ namespace OpenglAvaloniaTest.Views
 
             IReadOnlyList<IStorageFile> files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
-                Title = "Open Text File",
+                Title = "Open OBJ File",
+                FileTypeFilter = new[] {
+                    new FilePickerFileType("OBJ Files") {
+                        Patterns = new[] { "*.obj" },
+                    } },
                 AllowMultiple = true
             });
 
@@ -102,6 +107,62 @@ namespace OpenglAvaloniaTest.Views
                     streamReader.Close();
                 }
             }
+        }
+
+        private async void OnFileSave(object? sender, RoutedEventArgs e)
+        {
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel == null)
+            {
+                return;
+            }
+
+            IStorageFile? file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = "Save Scene As...",
+                SuggestedFileName = "ObjectSet",
+                DefaultExtension = "obj",
+                FileTypeChoices = new[]
+                {
+                    new FilePickerFileType("OBJ Files")
+                    {
+                        Patterns = new[] { "*.obj" },
+                    },
+                    new FilePickerFileType("All Files")
+                    {
+                        Patterns = new[] { "*.*" }
+                    }
+                },
+                ShowOverwritePrompt = true
+            });
+
+            if (file == null) return;//User didnt make a selection
+            Console.WriteLine("SelectionMade");
+        }
+
+        private void OnScale(object? sender, RoutedEventArgs e)
+        {
+            CommandInvoker.Singleton?.RunCommand(new ScaleCommand(), (null, null, CommandInfo.Initialization | CommandInfo.KeyDown));
+        }
+
+        private void OnMove(object? sender, RoutedEventArgs e)
+        {
+            CommandInvoker.Singleton?.RunCommand(new MoveCommand(), (null, null, CommandInfo.Initialization | CommandInfo.KeyDown));
+        }
+
+        private void OnDelete(object? sender, RoutedEventArgs e)
+        {
+            CommandInvoker.Singleton?.RunCommand(new DeleteCommand(), (null, null, CommandInfo.Initialization | CommandInfo.KeyDown));
+        }
+
+        private void OnUndoPressed(object? sender, RoutedEventArgs e)
+        {
+            CommandInvoker.Singleton?.ExecuteUndo();
+        }
+
+        private void OnRedoPressed(object? sender, RoutedEventArgs e)
+        {
+            CommandInvoker.Singleton?.ExecuteRedo();
         }
     }
 }
