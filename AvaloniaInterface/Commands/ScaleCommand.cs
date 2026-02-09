@@ -15,8 +15,10 @@ public class ScaleCommand : ICommand
     public Vector3 SelectionCenter = new Vector3(0, 0, 0);
     private Vector3 _ActiveAxis = new Vector3(1, 1, 1);
     private Vector2 _MouseScreenCenter = Vector2.Zero;
+    private List<uint>? _SelectedIndicies = null;
 
     private Dictionary<uint, (Vector3 position, Vector3 moveNormal)> _StartingPosition = [];
+    private float _ScaleValue;
 
     private CommandState Initialize()
     {
@@ -28,6 +30,8 @@ public class ScaleCommand : ICommand
 
         SelectionComponent? selection = activeModel.GetComponent<SelectionComponent>();
         if (selection is null) return CommandState.Finished;
+
+        _SelectedIndicies = [.. selection.SelectionIndicies()];
 
         SelectionCenter = selection.GetCenter();
         //Compute center.
@@ -47,12 +51,11 @@ public class ScaleCommand : ICommand
         Model? model = SelectionManager.Instance.CurrentModel;
         if (model == null) throw new Exception("No current model in MoveCommand.MoveSelection");
 
-        SelectionComponent? selection = model.GetComponent<SelectionComponent>();
-        if (selection == null) throw new Exception($"No selection component {nameof(selection)}!");
+        if (_SelectedIndicies == null) throw new Exception($"No selection set {nameof(_SelectedIndicies)}!");
 
         Vertex[] vertices = model.Verticies.BackingField();
 
-        foreach (uint index in selection.SelectionIndicies())
+        foreach (uint index in _SelectedIndicies)
         {
             vertices[index].Position = _StartingPosition[index].position + ((_StartingPosition[index].moveNormal* ammount) * _ActiveAxis);
         }
@@ -73,9 +76,8 @@ public class ScaleCommand : ICommand
         {
             var mouseInfo = args.mouseEvent!.GetPosition(GLControl.Instance);
             Vector2 mouseDelta = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y) - _MouseScreenCenter;
-
-            Scale((250 - mouseDelta.Length) *_MoveDistanceScale);
-
+            _ScaleValue = (250 - mouseDelta.Length) * _MoveDistanceScale;
+            Scale(_ScaleValue);
             if (args.info.HasFlag(CommandInfo.MouseDown))//Accept.
                 return CommandState.Finished;
         }
@@ -104,14 +106,12 @@ public class ScaleCommand : ICommand
 
         return CommandState.Idle;
     }
-
     public void Undo()
     {
-        throw new NotImplementedException();
+        Scale(0);
     }
-
     public void Redo()
     {
-        throw new NotImplementedException();
+        Scale(_ScaleValue);
     }
 }

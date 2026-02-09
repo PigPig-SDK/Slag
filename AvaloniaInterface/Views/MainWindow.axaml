@@ -27,6 +27,14 @@
         <Menu Grid.Row="0" Background="#1a1a1a">
             <MenuItem Header="_File" Focusable="False">
                 <MenuItem Header="_Open" Click="OnFileOpen"/>
+                <MenuItem Header="Save" Click="OnFileSave"/>
+            </MenuItem>
+            <MenuItem Header="Edit" Focusable="False">
+                <MenuItem Header="Scale (S)" Click="OnScale"/>
+                <MenuItem Header="Move (G)" Click="OnMove"/>
+                <MenuItem Header="Delete (DEL)" Click="OnDelete"/>
+                <MenuItem Header="Undo (CTRL+Z)" Click="OnUndoPressed"/>
+                <MenuItem Header="Redo (CTRL+R)" Click="OnRedoPressed"/>
             </MenuItem>
         </Menu>
 

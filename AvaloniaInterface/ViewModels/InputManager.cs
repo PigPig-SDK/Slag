@@ -38,6 +38,18 @@ public class InputManager
                     CommandInvoker.Singleton?.RunCommand(new DeleteCommand(), (e, null, CommandInfo.Initialization | CommandInfo.KeyDown));
                     break;
                 }
+            case Key.Z:
+                {
+                    if(UserControlMode.HasFlag(UserControlMode.Ctrl))
+                        CommandInvoker.Singleton.ExecuteUndo();
+                    break;
+                }
+            case Key.Y:
+                {
+                    if (UserControlMode.HasFlag(UserControlMode.Ctrl))
+                        CommandInvoker.Singleton.ExecuteRedo();
+                    break;
+                }
         }
     }
 

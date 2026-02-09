@@ -18,6 +18,8 @@ public class MoveCommand : ICommand
     private Vector3 _ActiveAxis = new Vector3(1, 1, 1);
 
     private Dictionary<uint, Vector3> _StartingPosition = [];
+    private List<uint>? _SelectedIndicies = null;
+    private Vector2 _MoveDistance;
 
     private CommandState Initialize()
     {
@@ -30,8 +32,9 @@ public class MoveCommand : ICommand
         if(Camera.Instance == null) throw new InvalidOperationException($"No camera in {nameof(MoveCommand)} {nameof(Initialize)}");
 
         CameraMoveDirections = Camera.Instance.GetRealitiveDirections();
+        _SelectedIndicies = [..selection.SelectionIndicies()];
 
-        foreach (uint index in selection.SelectionIndicies())
+        foreach (uint index in _SelectedIndicies)
         {
             Vertex vert = activeModel.GetVertex(index);
             _StartingPosition[index] = vert.Position;
@@ -45,15 +48,14 @@ public class MoveCommand : ICommand
         Model? model = SelectionManager.Instance.CurrentModel;
         if (model == null) throw new Exception("No current model in MoveCommand.MoveSelection");
 
-        SelectionComponent? selection = model.GetComponent<SelectionComponent>();
-        if(selection == null) throw new Exception($"No selection component {nameof(selection)}!");
+        if(_SelectedIndicies == null) throw new Exception($"No selection exists {nameof(_SelectedIndicies)}!");
 
         Vertex[] vertices = model.Verticies.BackingField();
 
         Vector3 moveDirection = (CameraMoveDirections.realitiveRight * mouseDelta.X) + (CameraMoveDirections.realitiveUp * mouseDelta.Y);
         moveDirection *= _MoveDistanceScale;
 
-        foreach (uint index in selection.SelectionIndicies())
+        foreach (uint index in _SelectedIndicies)
         {
 
             vertices[index].Position = (_StartingPosition[index] + (moveDirection * _ActiveAxis));
@@ -76,8 +78,9 @@ public class MoveCommand : ICommand
         {
             var mouseInfo = args.mouseEvent!.GetPosition(GLControl.Instance);
             if (_MouseStartPos == null) _MouseStartPos = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y);
-            Vector2 mouseDelta = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y) - _MouseStartPos.Value;
-            MoveSelection(mouseDelta);
+            _MoveDistance = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y) - _MouseStartPos.Value;
+
+            MoveSelection(_MoveDistance);
 
             if(args.info.HasFlag(CommandInfo.MouseDown))
                 return CommandState.Finished;
@@ -109,11 +112,11 @@ public class MoveCommand : ICommand
 
     public void Undo()
     {
-        throw new NotImplementedException();
+        MoveSelection(Vector2.Zero);
     }
 
     public void Redo()
     {
-        throw new NotImplementedException();
+        MoveSelection(_MoveDistance);
     }
 }

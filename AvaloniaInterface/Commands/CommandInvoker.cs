@@ -14,7 +14,8 @@ public class CommandInvoker
 
     public ICommand? CurrentCommand { get; set; }
 
-    private FixedSizeQueue<ICommand> _UndoQueue = new(40);
+    private FixedSizeStack<ICommand> _UndoQueue = new(40);
+    private FixedSizeStack<ICommand> _RedoQueue = new(40);
 
     public void RunCommand(ICommand command, (KeyEventArgs? key, PointerEventArgs? mouse, CommandInfo info) args)
     {
@@ -36,7 +37,8 @@ public class CommandInvoker
         CommandState commandState = CurrentCommand.Execute(args);
         if (commandState != CommandState.Idle)
         {
-            _UndoQueue.Enqueue(CurrentCommand);
+            _UndoQueue.Push(CurrentCommand);
+            _RedoQueue.Clear();
             Console.WriteLine(_UndoQueue);
             CurrentCommand = CurrentCommand.Next;
             if(CurrentCommand != null && commandState == CommandState.Continue)// Continue immediately to next command
@@ -50,11 +52,20 @@ public class CommandInvoker
         }
         return true;
     }
+    public bool ExecuteRedo()
+    {
+        if(_RedoQueue.Count <= 0) return false;
+        ICommand command = _RedoQueue.Pop();
+        command.Redo();
+        _UndoQueue.Push(command);
+        return true;
+    }
     public bool ExecuteUndo()
     {
-        if(_UndoQueue.Count < 0) return false;
-
-        _UndoQueue.Dequeue();
+        if(_UndoQueue.Count <= 0) return false;
+        ICommand command = _UndoQueue.Pop();
+        command.Undo();
+        _RedoQueue.Push(command);
         return true;
     }
 }

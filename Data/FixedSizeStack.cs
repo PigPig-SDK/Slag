@@ -6,30 +6,30 @@ using System.Threading.Tasks;
 
 namespace Models;
 
-public class FixedSizeQueue<T>
+public class FixedSizeStack<T>
 {
-    private readonly Queue<T> _queue = new Queue<T>();
+    private readonly Stack<T> _queue = [];
     private readonly Lock _queueLockObj = new();
     public int Capacity { get; internal set; }
 
-    public FixedSizeQueue(int maxSize)
+    public FixedSizeStack(int maxSize)
     {
         Capacity = maxSize;
     }
 
-    public void Enqueue(T item)
+    public void Push(T item)
     {
         lock (_queueLockObj)
         {
             if (_queue.Count >= Capacity)
             {
-                _queue.Dequeue();
+                _queue.Pop();
             }
-            _queue.Enqueue(item);
+            _queue.Push(item);
         }
     }
 
-    public T Dequeue()
+    public T Pop()
     {
         lock (_queueLockObj)
         {
@@ -37,7 +37,7 @@ public class FixedSizeQueue<T>
             {
                 throw new InvalidOperationException("The queue is empty.");
             }
-            return _queue.Dequeue();
+            return _queue.Pop();
         }
     }
 
@@ -53,4 +53,9 @@ public class FixedSizeQueue<T>
     }
 
     public override string? ToString() => string.Join(",", _queue);
+
+    public void Clear()
+    {
+        _queue.Clear();
+    }
 }
