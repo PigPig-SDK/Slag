@@ -249,4 +249,6 @@ public class Model : IDisposable
             component.Dispose();
         }
     }
+
+    public IEnumerable<Face> IterateFaces() => _Faces;
 }

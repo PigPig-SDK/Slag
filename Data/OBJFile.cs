@@ -7,6 +7,7 @@ namespace Models;
 public static class OBJFile
 {
     private const string VertexToken = "v";
+    private const string NormalToken = "vn";
     private const string UvToken = "vt";
     private const string ObjectToken = "o";
     private const string FaceToken = "f";
@@ -30,6 +31,31 @@ public static class OBJFile
         return false;
     }
 
+    public static void SaveOBJ(StreamWriter writer)
+    {
+        if(SceneHierarchy.Instance is null) throw new InvalidOperationException("SceneHierarchy not initialized.");
+
+        //TODO: OPTIMIZE TO REMOVE DUPLICATES!
+        foreach(Model model in SceneHierarchy.Instance.GetModels(HierarchyType.Model))
+        {
+            writer.WriteLine($"{ObjectToken} {model.ObjectName}");
+            //Write all verts to list
+            foreach(Vertex v in model.Verticies)
+                writer.WriteLine($"{VertexToken} {v.Position.X} {v.Position.Y} {v.Position.Z}");
+            //Write normals
+            foreach (Vertex v in model.Verticies)
+                writer.WriteLine($"{NormalToken} {v.Normal.X} {v.Normal.Y} {v.Normal.Z}");
+            //Write uv
+            foreach (Vertex v in model.Verticies)
+                writer.WriteLine($"{UvToken} {v.UV.X} {v.UV.Y}");
+            //Write faces
+            foreach(Face face in model.IterateFaces())
+            {
+                writer.WriteLine($"{FaceToken} {string.Join(" ", face.Indicies.Select(i => $"{i + 1}/{i + 1}/{i + 1}").ToArray())}");
+            }
+        }
+    }
+
     public static List<Model> LoadOBJ(StreamReader reader)
     {
         List<Model> list = [];
@@ -44,7 +70,6 @@ public static class OBJFile
         {
             if (!StreamReaderContainsMultipleObjects(reader))
             {
-                Console.WriteLine("Single Object");
                 FileStream? fileStream = reader.BaseStream as FileStream;
                 if (fileStream != null) 
                     list.Add(new Model { ObjectName = fileStream.Name });
@@ -97,6 +122,7 @@ public static class OBJFile
                         }
                     case ObjectToken:
                         {
+                            //I Think only blender uses this, I find it incredibly helpful so I'm going to steal it.
                             if (tokens.Length != 2) throw new InvalidDataException($"Object name invalid on line : {lineCount}\n{data}");
                             list.Add(new Model { ObjectName = tokens[1] });
                             objVertexMapper.Clear();//Clear for new model.
@@ -176,6 +202,12 @@ public static class OBJFile
                             }
                             list[^1].AddFace(faceData);
                             break;
+                        }
+                    case NormalToken:
+                        break;
+                    default:
+                        {
+                            throw new InvalidDataException($"Invalid line : {lineCount}");
                         }
                 }
             }
