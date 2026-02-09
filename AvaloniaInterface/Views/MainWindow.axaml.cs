@@ -1,10 +1,15 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
+using Models;
 using OpenglAvaloniaTest.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 
 namespace OpenglAvaloniaTest.Views
 {
@@ -59,6 +64,40 @@ namespace OpenglAvaloniaTest.Views
             vertexButton.Background = (mode == ViewModels.SelectionMode.Vertex) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
             objectButton.Background = (mode == ViewModels.SelectionMode.Object) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
             edgeButton.Background = (mode == ViewModels.SelectionMode.Edge) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
+        }
+
+        private async void OnFileOpen(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel == null)
+            {
+                return;
+            }
+
+            IReadOnlyList<IStorageFile> files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = "Open Text File",
+                AllowMultiple = false
+            });
+
+            if (files.Count >= 1)
+            {
+                Stream stream = await files[0].OpenReadAsync();
+                StreamReader streamReader = new(stream);
+                try
+                {
+                    OBJFile.LoadOBJ(streamReader);
+                }
+                catch(InvalidDataException exception)
+                {
+                    Console.WriteLine(exception.Message);
+                }
+                finally
+                {
+                    streamReader.Close();
+                }
+
+            }
         }
     }
 }

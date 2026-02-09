@@ -26,7 +26,7 @@
         <!-- Top menu -->
         <Menu Grid.Row="0" Background="#1a1a1a">
             <MenuItem Header="_File" Focusable="False">
-                <MenuItem Header="_Open" Command="{Binding OpenCommand}"/>
+                <MenuItem Header="_Open" Click="OnFileOpen"/>
             </MenuItem>
         </Menu>
 

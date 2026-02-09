@@ -1,5 +1,9 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
+using CommunityToolkit.Mvvm.Input;
 using System;
+using System.IO;
 using System.Windows.Input;
 
 namespace OpenglAvaloniaTest.ViewModels
@@ -8,10 +12,5 @@ namespace OpenglAvaloniaTest.ViewModels
     {
         public string Greeting { get; } = "Welcome to Avalonia!";
 
-        [RelayCommand]
-        private void OnOpen()
-        {
-            Console.WriteLine("OnOpen");
-        }
     }
 }
