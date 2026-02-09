@@ -77,12 +77,13 @@ namespace OpenglAvaloniaTest.Views
             IReadOnlyList<IStorageFile> files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
                 Title = "Open Text File",
-                AllowMultiple = false
+                AllowMultiple = true
             });
 
-            if (files.Count >= 1)
+            for (int i = 0; i < files.Count; i++)
             {
-                Stream stream = await files[0].OpenReadAsync();
+                Stream stream = await files[i].OpenReadAsync();
+
                 StreamReader streamReader = new(stream);
                 try
                 {
@@ -92,7 +93,7 @@ namespace OpenglAvaloniaTest.Views
                         SceneHierarchy.Instance.AddModel(HierarchyType.Model, model);
                     }
                 }
-                catch(InvalidDataException exception)
+                catch (InvalidDataException exception)
                 {
                     Console.WriteLine(exception.Message);
                 }
@@ -100,7 +101,6 @@ namespace OpenglAvaloniaTest.Views
                 {
                     streamReader.Close();
                 }
-
             }
         }
     }
