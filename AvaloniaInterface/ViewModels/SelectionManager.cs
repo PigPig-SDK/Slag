@@ -173,6 +173,11 @@ public class SelectionManager
 
     private void CheckForFaceSelection(Vector2 screenPosition, bool isDrag)
     {
+        if(SelectionMeshInstance.Instance == null)
+        {
+            throw new InvalidOperationException($"Cannot check for face selection while {nameof(SelectionMeshInstance.Instance)} is null");
+        }
+
         RaycastHit? hit = Camera.Instance?.FindRaycastHit(screenPosition);
         if (hit != null)
         {
@@ -192,8 +197,10 @@ public class SelectionManager
                 {
                     ms.SelectIndex(index, UpdateType.Ignore);
                 }
+
                 ms.BroadcastMassUpdate(UpdateType.Selection);
                 _CurrentSelection.Add(hit.Face);
+                SelectionMeshInstance.Instance.SelectFace(hit.Face);
             }
             else if (!isDrag)
             {
@@ -203,6 +210,7 @@ public class SelectionManager
                 }
                 ms.BroadcastMassUpdate(UpdateType.Selection);
                 _CurrentSelection.Remove(hit.Face);
+                SelectionMeshInstance.Instance.DeselectFace(hit.Face);
             }
         }
         else if(!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))
