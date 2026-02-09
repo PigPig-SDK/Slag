@@ -11,6 +11,25 @@ public static class OBJFile
     private const string ObjectToken = "o";
     private const string FaceToken = "f";
 
+    private static bool StreamReaderContainsMultipleObjects(StreamReader reader)
+    {
+        string? line = "";
+
+        while ((line = reader.ReadLine()) != null)
+        {
+            string[] parts = line.Split(' ');
+            if (parts[0].Equals(ObjectToken))
+            {
+                reader.DiscardBufferedData();
+                reader.BaseStream.Seek(0, SeekOrigin.Begin);//Reset reader.
+                return true;
+            }
+        }
+        reader.DiscardBufferedData();
+        reader.BaseStream.Seek(0, SeekOrigin.Begin);//Reset reader.
+        return false;
+    }
+
     public static List<Model> LoadOBJ(StreamReader reader)
     {
         List<Model> list = [];
@@ -21,9 +40,18 @@ public static class OBJFile
 
         Dictionary<int, int> objVertexMapper = [];// OBJ file vertex -> Model vertex
 
-
         try
         {
+            if (!StreamReaderContainsMultipleObjects(reader))
+            {
+                Console.WriteLine("Single Object");
+                FileStream? fileStream = reader.BaseStream as FileStream;
+                if (fileStream != null) 
+                    list.Add(new Model { ObjectName = fileStream.Name });
+                else
+                    list.Add(new Model { ObjectName = "Object" });
+            }
+
             string? line = "";
             while ((line = reader.ReadLine()) != null)
             {
@@ -78,7 +106,7 @@ public static class OBJFile
                         {
                             if (tokens.Length == 1) throw new InvalidDataException($"Face data not valid on line : {lineCount}\n{data}");
 
-                            List<int> faceData = [];
+                            List<uint> faceData = [];
 
                             for (int i = 1; i < tokens.Length; i++)
                             {
@@ -87,7 +115,7 @@ public static class OBJFile
                                 int? index = null;
                                 int? uvIndex = null;
 
-                                switch (vertexToken.Length)
+                                switch (vertexPositionTokens.Length)
                                 {
                                     case 1://Only vertex location is given.
                                         {
@@ -105,29 +133,51 @@ public static class OBJFile
                                             index = soleIndex;
                                             break;
                                         }
-                                    case 3:
+                                    case 3://given n//n or n/n/n
                                         {
-                                            //TODO IMPLEMENT
+                                            if (!int.TryParse(vertexPositionTokens[0], out int soleIndex))
+                                            {
+                                                throw new InvalidDataException($"Face data not valid on line : {lineCount}\n{data}");
+                                            }
+                                            index = soleIndex;
+                                            if(!string.IsNullOrEmpty(vertexPositionTokens[1]))
+                                            {
+                                                if(!int.TryParse(vertexPositionTokens[1], out int soleUVIndex)) throw new InvalidDataException($"Face data not valid on line : {lineCount}\n{data}");
+                                                uvIndex = soleUVIndex;
+                                            }
                                             break;
                                         }
                                 }
 
                                 if(index == null) throw new InvalidDataException($"Face data not valid on line : {lineCount}\n{data}");
 
+                                index--;//Decrement for indexing (1's to 0's)
+
                                 //Vertex does not appear in mapping list.
                                 if (!objVertexMapper.ContainsKey(index.Value))
                                 {
-                                    objVertexMapper.Add(index.Value, list[^1].Verticies.Count());//Creat OBJ -> Model mapping!
-                                    list[^1].AddVertex(new Vertex(vertexPositions[index.Value].Xyz, Vector2.Zero));
-                                }
+                                    if(index.Value >= vertexPositions.Count)
+                                        throw new InvalidDataException($"Face data invalid, Index id not defined on line: {lineCount}\nID:{index.Value}");
 
-                                faceData.Add(objVertexMapper[index.Value]);
+                                    objVertexMapper.Add(index.Value, list[^1].Verticies.Count());//Creat OBJ -> Model mapping!
+
+                                    if (uvIndex == null)
+                                    {
+                                        list[^1].AddVertex(new Vertex(vertexPositions[index.Value].Xyz, Vector2.Zero));
+                                    }
+                                    else
+                                    {
+                                        uvIndex--;//Decrement for indexing (1's to 0's)
+                                        if (uvIndex.Value >= uv.Count) throw new InvalidDataException($"Face data invalid, TextCord id not defined on line: {lineCount}\nTextCordID:{uvIndex.Value}");
+                                        list[^1].AddVertex(new Vertex(vertexPositions[index.Value].Xyz, uv[uvIndex.Value]));
+                                    }
+                                }
+                                faceData.Add((uint)objVertexMapper[index.Value]);
                             }
+                            list[^1].AddFace(faceData);
                             break;
                         }
                 }
-
-                //Console.WriteLine(data);
             }
         }
         catch (IOException e)

@@ -86,7 +86,11 @@ namespace OpenglAvaloniaTest.Views
                 StreamReader streamReader = new(stream);
                 try
                 {
-                    OBJFile.LoadOBJ(streamReader);
+                    List<Model> models = OBJFile.LoadOBJ(streamReader);
+                    foreach (Model model in models)
+                    {
+                        SceneHierarchy.Instance.AddModel(HierarchyType.Model, model);
+                    }
                 }
                 catch(InvalidDataException exception)
                 {
