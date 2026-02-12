@@ -11,7 +11,7 @@ namespace Models;
 /// 
 /// Note: Vertex1 will always be a lower index than Vertex2. This is to simplify equality.
 /// </summary>
-public class Edge
+public class Edge : ICloneable
 {
     public uint Vertex1 { get; internal set; }
     public uint Vertex2 { get; internal set; }
@@ -64,6 +64,12 @@ public class Edge
     public override int GetHashCode()
     {
         return (EqualityComparer<uint>.Default.GetHashCode(Vertex1)) * -1521134295 + EqualityComparer<uint>.Default.GetHashCode(Vertex1);
+    }
 
+    public object Clone()
+    {
+        var edge = new Edge(Vertex1, Vertex2);
+        edge.IsSharp = IsSharp;
+        return edge;
     }
 }

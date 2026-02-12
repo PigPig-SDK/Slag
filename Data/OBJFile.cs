@@ -49,7 +49,7 @@ public static class OBJFile
             foreach (Vertex v in model.Verticies)
                 writer.WriteLine($"{UvToken} {v.UV.X} {v.UV.Y}");
             //Write faces
-            foreach(Face face in model.IterateFaces())
+            foreach(Face face in model.Faces)
             {
                 writer.WriteLine($"{FaceToken} {string.Join(" ", face.Indicies.Select(i => $"{i + 1}/{i + 1}/{i + 1}").ToArray())}");
             }

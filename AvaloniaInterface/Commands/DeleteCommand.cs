@@ -8,23 +8,12 @@ using System.Threading.Tasks;
 
 namespace OpenglAvaloniaTest.Commands;
 
-internal class DeleteCommand : ICommand
+internal class DeleteCommand : MementoCommand
 {
-    public ICommand? Next { get; set; }
-
-    public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
+    public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
+        CreateState();
         SelectionManager.Instance.DeleteCurrentSelection();
         return CommandState.Finished;
-    }
-
-    public void Redo()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Undo()
-    {
-        throw new NotImplementedException();
     }
 }

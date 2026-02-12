@@ -2,14 +2,12 @@
 
 namespace Models;
 
-public class Model : IDisposable
+public class Model
 {
     public string ObjectName = "Model";
     public List<Vertex> Verticies { get; private set; } = [];
-    private List<Face> _Faces = [];
-    private HashSet<Edge> _Edges = [];
-    public IEnumerable<Edge> Edges => _Edges;
-
+    protected List<Face> _Faces = [];
+    protected HashSet<Edge> _Edges = [];
     protected bool IsDisposed = false;
     public uint[] Indicies = [];
     public bool Hidden = false;
@@ -23,6 +21,16 @@ public class Model : IDisposable
 
     //Store starting index
     public Dictionary<(uint,uint,uint), Face> TriangleToFaceMapping = [];
+
+    /// <summary>
+    /// Model clone constructor.
+    /// </summary>
+    public Model(Model clone)
+    {
+        EmplaceData(clone);
+    }
+
+    public Model() { }
 
     public bool TryGetVertex(uint index, out Vertex? vertex)
     {
@@ -250,5 +258,36 @@ public class Model : IDisposable
         }
     }
 
-    public IEnumerable<Face> IterateFaces() => _Faces;
+    public IEnumerable<Face> Faces => _Faces;
+
+    public IEnumerable<Edge> Edges => _Edges;
+    /// <summary>
+    /// Clones the model data such as Verticies, Faces, Edges and name.
+    /// Does not clone the models components.
+    /// </summary>
+    /// <returns></returns>
+    public Model Clone()
+    { 
+        return new Model(this);
+    }
+
+    public void EmplaceData(Model? modelState)
+    {
+        if(modelState == null)
+            throw new ArgumentNullException(nameof(modelState));
+
+        Verticies.Clear();
+        _Faces.Clear();
+        _Edges.Clear();
+
+        Verticies = [.. modelState.Verticies];
+        foreach (Face face in modelState.Faces)
+            AddFace((Face)face.Clone());
+
+        foreach (Edge edge in modelState.Edges)
+            AddEdge((Edge)edge.Clone());
+
+        GenerateIndicies();
+        UpdateAllComponents(UpdateType.Membership, null);
+    }
 }

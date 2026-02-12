@@ -10,7 +10,7 @@ namespace Models;
 /// The ParentModel property is ignored in hashcode and Equals
 /// </summary>
 /// <param name="indicies">The indicies which define a face. The data for the indicies is stored within ParentModel</param>
-public class Face
+public class Face : ICloneable
 {
     public List<uint> Indicies;
 
@@ -79,7 +79,12 @@ public class Face
                 ParentModel.TriangleToFaceMapping.Add(tuple, this);
             }
         }
-        
-
+    }
+    /// <summary>
+    /// Deep copy, Does not copy Edges array.
+    /// </summary>
+    public object Clone()
+    {
+        return new Face(Indicies.ToArray());
     }
 }
