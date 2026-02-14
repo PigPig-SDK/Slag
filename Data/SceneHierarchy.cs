@@ -10,7 +10,8 @@ public class SceneHierarchy
 {
     public static SceneHierarchy Instance = new();
 
-    public Dictionary<HierarchyType, List<Model>> HierarchyCategories { get; private set; } = new()
+    public IReadOnlyDictionary<HierarchyType, List<Model>> HierarchyCategories => _HierarchyCategories;
+    private Dictionary<HierarchyType, List<Model>> _HierarchyCategories = new()
     {
         { HierarchyType.Model, [ModelPrefabs.DebugEdges()] },
         { HierarchyType.Tool, [ModelPrefabs.AxisTriad(), ModelPrefabs.SelectionInstance()] },
@@ -23,24 +24,24 @@ public class SceneHierarchy
     public void AddModel(HierarchyType hierarchyType, Model model)
     {
         model.hierarchyType = hierarchyType;
-        HierarchyCategories[hierarchyType].Add(model);
+        _HierarchyCategories[hierarchyType].Add(model);
         OnModelAdded?.Invoke(hierarchyType,model);
     }
 
     public void RemoveModel(HierarchyType hierarchyType, Model model)
     {
         model.Dispose();
-        HierarchyCategories[hierarchyType].Remove(model);
+        _HierarchyCategories[hierarchyType].Remove(model);
         OnModelRemoved?.Invoke(hierarchyType,model);
     }
 
     public IEnumerable<Model> GetModels(HierarchyType hierarchyType)
     {
-        foreach(HierarchyType hierarchy in HierarchyCategories.Keys)
+        foreach(HierarchyType hierarchy in _HierarchyCategories.Keys)
         {
             if(hierarchyType.HasFlag(hierarchy))
             {
-                foreach(Model model in HierarchyCategories[hierarchy])
+                foreach(Model model in _HierarchyCategories[hierarchy])
                 {
                     yield return model;
                 }

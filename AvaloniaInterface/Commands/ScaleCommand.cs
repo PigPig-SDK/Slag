@@ -53,7 +53,7 @@ public class ScaleCommand : ICommand
 
         if (_SelectedIndicies == null) throw new Exception($"No selection set {nameof(_SelectedIndicies)}!");
 
-        Vertex[] vertices = model.Verticies.BackingField();
+        Vertex[] vertices = model.GetVertexBackingField();
 
         foreach (uint index in _SelectedIndicies)
         {

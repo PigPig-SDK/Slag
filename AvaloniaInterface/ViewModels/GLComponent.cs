@@ -64,7 +64,7 @@ public class GLComponent : ModelComponent
             return;
         }
 
-        Vertex[] verts = Model.Verticies.BackingField();
+        Vertex[] verts = Model.GetVertexBackingField();
         _VertexCount = Model.Verticies.Count;
         ComputeNormals(verts, Model.Indicies);
 

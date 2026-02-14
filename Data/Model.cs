@@ -5,9 +5,12 @@ namespace Models;
 public class Model
 {
     public string ObjectName = "Model";
-    public List<Vertex> Verticies { get; private set; } = [];
+    private List<Vertex> _Verticies = [];
+    public IReadOnlyList<Vertex> Verticies => _Verticies;
     protected List<Face> _Faces = [];
+    public IReadOnlyList<Face> Faces => _Faces;
     protected HashSet<Edge> _Edges = [];
+    public IReadOnlySet<Edge> Edges => _Edges;
     protected bool IsDisposed = false;
     public uint[] Indicies = [];
     public bool Hidden = false;
@@ -46,18 +49,23 @@ public class Model
         }
     }
 
+    public Vertex[] GetVertexBackingField()
+    {
+        return _Verticies.BackingField<Vertex>();
+    }
+
     public Vertex GetVertex(uint index)
     {
-        if(index < 0 || index > Verticies.Count -1)
+        if(index < 0 || index > _Verticies.Count -1)
         {
             throw new ArgumentOutOfRangeException($"{nameof(index)} is out of range");
         }
-        return Verticies[(int)index];
+        return _Verticies[(int)index];
     }
 
     public void AddVertex(Vertex vertex)
     {
-        Verticies.Add(vertex);
+        _Verticies.Add(vertex);
         UpdateAllComponents(UpdateType.Membership, vertex);
     }
 
@@ -79,7 +87,7 @@ public class Model
     {
         foreach(uint i in face.Indicies)
         {
-            if( i < 0 || i > Verticies.Count -1)
+            if( i < 0 || i > _Verticies.Count -1)
             {
                 throw new ArgumentException($"{nameof(face)} has an index out of range");
             }
@@ -115,7 +123,7 @@ public class Model
             _Edges.Add(e);
         }
 
-        Verticies.RemoveAt(index);
+        _Verticies.RemoveAt(index);
         UpdateAllComponents(info, index);
     }
 
@@ -242,7 +250,7 @@ public class Model
 
     public void GenerateTriangulatedModel(ref Vertex[] verts, ref List<uint> indicies)
     {
-        verts = Verticies.BackingField();
+        verts = _Verticies.BackingField();
         GenerateIndicies();
         indicies = new (Indicies);
     }
@@ -257,10 +265,6 @@ public class Model
             component.Dispose();
         }
     }
-
-    public IEnumerable<Face> Faces => _Faces;
-
-    public IEnumerable<Edge> Edges => _Edges;
     /// <summary>
     /// Clones the model data such as Verticies, Faces, Edges and name.
     /// Does not clone the models components.
@@ -276,11 +280,11 @@ public class Model
         if(modelState == null)
             throw new ArgumentNullException(nameof(modelState));
 
-        Verticies.Clear();
+        _Verticies.Clear();
         _Faces.Clear();
         _Edges.Clear();
 
-        Verticies = [.. modelState.Verticies];
+        _Verticies = [.. modelState._Verticies];
         foreach (Face face in modelState.Faces)
             AddFace((Face)face.Clone(), UpdateType.Ignore);
 

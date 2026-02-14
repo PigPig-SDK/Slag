@@ -50,7 +50,7 @@ public class MoveCommand : ICommand
 
         if(_SelectedIndicies == null) throw new Exception($"No selection exists {nameof(_SelectedIndicies)}!");
 
-        Vertex[] vertices = model.Verticies.BackingField();
+        Vertex[] vertices = model.GetVertexBackingField();
 
         Vector3 moveDirection = (CameraMoveDirections.realitiveRight * mouseDelta.X) + (CameraMoveDirections.realitiveUp * mouseDelta.Y);
         moveDirection *= _MoveDistanceScale;
