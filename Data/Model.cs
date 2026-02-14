@@ -73,9 +73,9 @@ public class Model
         UpdateAllComponents(UpdateType.Membership | info, edge);
     }
 
-    public void AddFace(params uint[] indicies) => AddFace(new List<uint>(indicies));
-    public void AddFace(List<uint> indicies) => AddFace(new Face(indicies));
-    public void AddFace(Face face)
+    public void AddFace(params uint[] indicies) => AddFace(new List<uint>(indicies), UpdateType.Membership);
+    public void AddFace(List<uint> indicies, UpdateType info = UpdateType.Membership) => AddFace(new Face(indicies));
+    public void AddFace(Face face, UpdateType info = UpdateType.Membership)
     {
         foreach(uint i in face.Indicies)
         {
@@ -94,7 +94,7 @@ public class Model
             AddEdge(new Edge(start, end, face), UpdateType.Ignore);
         }
         AddEdge(new Edge(face.Indicies[0], face.Indicies[^1], face), UpdateType.Ignore);
-        UpdateAllComponents(UpdateType.Membership, face);
+        UpdateAllComponents(info, face);
     }
 
     public void RemoveVertex(int index, UpdateType info = UpdateType.Membership)
@@ -282,10 +282,10 @@ public class Model
 
         Verticies = [.. modelState.Verticies];
         foreach (Face face in modelState.Faces)
-            AddFace((Face)face.Clone());
+            AddFace((Face)face.Clone(), UpdateType.Ignore);
 
         foreach (Edge edge in modelState.Edges)
-            AddEdge((Edge)edge.Clone());
+            AddEdge((Edge)edge.Clone(), UpdateType.Ignore);
 
         GenerateIndicies();
         UpdateAllComponents(UpdateType.Membership, null);
