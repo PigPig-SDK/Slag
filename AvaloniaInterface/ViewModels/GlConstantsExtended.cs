@@ -41,4 +41,6 @@ public static class GlConstantsExtended
     public const int GL_TEXTURE_WRAP_T = 10243;
 
     public const int GL_REPEAT = 10497;
+
+    public const int GL_NONE = 0;
 }

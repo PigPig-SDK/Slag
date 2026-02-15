@@ -12,11 +12,15 @@ public static unsafe class GlInterfaceExtensions
 {
     private delegate void Uniform3fDelegate(int location, float x, float y, float z);
     private delegate void LineWidthDelegate(float width);
+    private delegate void ReadBufferDelegate(uint glenum);
+    private delegate void DrawBuffersDelegate(int n, uint[] bufs);
     private delegate void BufferSubDataDelegate(int target, IntPtr offset, IntPtr size, IntPtr data);
 
     private static Uniform3fDelegate? _uniform3f;
     private static LineWidthDelegate? _lineWidth;
     private static BufferSubDataDelegate? _bufferSubData;
+    private static ReadBufferDelegate? _readBuffer;
+    private static DrawBuffersDelegate? _drawBuffers;
 
     public static void BufferSubData(this GlInterface gl, int target, IntPtr offset, IntPtr size, IntPtr data)
     {
@@ -52,5 +56,27 @@ public static unsafe class GlInterfaceExtensions
         }
         
         _lineWidth(width);
+    }
+
+    public static void ReadBuffer(this GlInterface gl, uint param)
+    {
+        if (_readBuffer == null)
+        {
+            nint ptr = gl.GetProcAddress("glReadBuffer");
+            if (ptr == IntPtr.Zero) throw new InvalidOperationException("glReadBuffer not available");
+            _readBuffer = Marshal.GetDelegateForFunctionPointer<ReadBufferDelegate>(ptr);
+        }
+        _readBuffer(param);
+    }
+
+    public static void DrawBuffers(this GlInterface gl, int n, uint[] bufs)
+    {
+        if (_drawBuffers == null)
+        {
+            nint ptr = gl.GetProcAddress("glDrawBuffers");
+            if (ptr == IntPtr.Zero) throw new InvalidOperationException("glDrawBuffers not available");
+            _drawBuffers = Marshal.GetDelegateForFunctionPointer<DrawBuffersDelegate>(ptr);
+        }
+        _drawBuffers(n, bufs);
     }
 }

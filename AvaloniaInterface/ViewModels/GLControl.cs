@@ -47,6 +47,9 @@ public class GLControl : OpenGlControlBase
     Dictionary<RenderMode, ShaderProgram> renderModeToShaderProgram;
 
     private int? _ShadowmapFrameBuffer = null;
+    private int? _DepthMap = null;
+
+    int _ShadowWidth = 1024, _ShadowHeight = 1024;
 
     public GLControl()
     {
@@ -105,15 +108,26 @@ public class GLControl : OpenGlControlBase
         //Generate frame buffers
         _ShadowmapFrameBuffer = gl.GenFramebuffer();
         gl.BindFramebuffer(GL_FRAMEBUFFER, _ShadowmapFrameBuffer.Value);
-        int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+
         int depthMap;
         gl.GenTextures(1, &depthMap);
-        gl.BindTexture(GL_TEXTURE_2D, depthMap);
-        gl.TexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+        _DepthMap = depthMap;
+
+        gl.BindTexture(GL_TEXTURE_2D, _DepthMap.Value);
+        gl.TexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _ShadowWidth, _ShadowHeight, 0, GL_DEPTH_COMPONENT, GlConstantsExtended.GL_UNSIGNED_INT, 0);
         gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         gl.TexParameteri(GL_TEXTURE_2D, GlConstantsExtended.GL_TEXTURE_WRAP_S, GlConstantsExtended.GL_REPEAT);
         gl.TexParameteri(GL_TEXTURE_2D, GlConstantsExtended.GL_TEXTURE_WRAP_T, GlConstantsExtended.GL_REPEAT);
+        gl.FramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _DepthMap.Value, 0);
+        gl.DrawBuffers(1, [GlConstantsExtended.GL_NONE]);
+        gl.ReadBuffer(GlConstantsExtended.GL_NONE);
+
+        var status = gl.CheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (gl.CheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        {
+            throw new Exception($"Shadowmap framebuffer incomplete: {status}");
+        }
 
         //Add components and buffer data to opengl.
         foreach (Model model in SceneHierarchy.Instance.GetModels(HierarchyType.All))
@@ -158,10 +172,9 @@ public class GLControl : OpenGlControlBase
 
         //World rendering
         gl.BindFramebuffer(GlConsts.GL_FRAMEBUFFER, _ShadowmapFrameBuffer!.Value);
-        var scaling = (this.VisualRoot != null) ? this.VisualRoot!.RenderScaling : 1.0;
-        gl.Viewport(0, 0, (int)(Bounds.Width * scaling), (int)(Bounds.Height * scaling));
 
-        gl.ClearColor(0.1f, 0.1f, 0.1f, 0.85f);
+        gl.Viewport(0, 0, _ShadowHeight, _ShadowHeight);
+        gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         gl.Clear(GlConsts.GL_COLOR_BUFFER_BIT | GlConsts.GL_DEPTH_BUFFER_BIT);
 
         //Camera controls
@@ -279,6 +292,10 @@ public class GLControl : OpenGlControlBase
     protected override void OnOpenGlDeinit(GlInterface gl)
     {
         SceneHierarchy.Instance.OnModelAdded -= OnModelAdded;
+
+        if(_DepthMap.HasValue) gl.DeleteTexture(_DepthMap.Value);
+
+        if(_ShadowmapFrameBuffer.HasValue) gl.DeleteFramebuffer(_ShadowmapFrameBuffer.Value);
     }
 
     public override void Render(DrawingContext context)
