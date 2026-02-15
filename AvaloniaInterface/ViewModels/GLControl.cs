@@ -1,10 +1,4 @@
-﻿using Avalonia.OpenGL;
-using Avalonia.OpenGL.Controls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 namespace OpenglAvaloniaTest.ViewModels;
 
 using Avalonia.Input;
@@ -15,9 +9,6 @@ using Avalonia.OpenGL.Controls;
 using Models;
 using OpenTK.Mathematics;
 using System;
-using System.ComponentModel;
-using System.IO;
-using System.Runtime.InteropServices;
 using static Avalonia.OpenGL.GlConsts;
 
 public class GLControl : OpenGlControlBase
@@ -32,6 +23,8 @@ public class GLControl : OpenGlControlBase
     private ShaderProgram _triangleShaderProgram = new();
     private ShaderProgram _edgeShaderProgram = new();
     private ShaderProgram _vertexShaderProgram = new();
+    private ShaderProgram _depthShaderProgram = new();
+
 
     public float Aspect { get; private set; } = 0;
 
@@ -46,9 +39,14 @@ public class GLControl : OpenGlControlBase
     private const string VertexVertexShader = "Shaders/vertex.vs";
     private const string VertexFragmentShader = "Shaders/vertex.fs";
 
+    private const string DepthVertexShader = "Shaders/depth.vs";
+    private const string DepthFragmentShader = "Shaders/depth.fs";
+
     private List<Model> _LateModelAddition = [];
 
     Dictionary<RenderMode, ShaderProgram> renderModeToShaderProgram;
+
+    private int? _ShadowmapFrameBuffer = null;
 
     public GLControl()
     {
@@ -69,7 +67,8 @@ public class GLControl : OpenGlControlBase
         renderModeToShaderProgram = new() {
             { RenderMode.Triangles, _triangleShaderProgram },
             { RenderMode.Edges, _edgeShaderProgram },
-            { RenderMode.Verts, _vertexShaderProgram} };
+            { RenderMode.Verts, _vertexShaderProgram},
+            { RenderMode.Depth, _depthShaderProgram}};
     }
 
     private void OnPress(object? sender, PointerPressedEventArgs e) => Focus();
@@ -97,9 +96,24 @@ public class GLControl : OpenGlControlBase
         Console.WriteLine("Generating vertex shader program...");
         _vertexShaderProgram.GenerateShaderProgram(gl, VertexVertexShader, VertexFragmentShader);
 
+        _depthShaderProgram.GenerateShaderProgram(gl, DepthVertexShader, DepthFragmentShader);
+
         CheckError(gl);
 
         gl.UseProgram(_triangleShaderProgram.ProgramID);
+
+        //Generate frame buffers
+        _ShadowmapFrameBuffer = gl.GenFramebuffer();
+        gl.BindFramebuffer(GL_FRAMEBUFFER, _ShadowmapFrameBuffer.Value);
+        int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+        int depthMap;
+        gl.GenTextures(1, &depthMap);
+        gl.BindTexture(GL_TEXTURE_2D, depthMap);
+        gl.TexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+        gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        gl.TexParameteri(GL_TEXTURE_2D, GlConstantsExtended.GL_TEXTURE_WRAP_S, GlConstantsExtended.GL_REPEAT);
+        gl.TexParameteri(GL_TEXTURE_2D, GlConstantsExtended.GL_TEXTURE_WRAP_T, GlConstantsExtended.GL_REPEAT);
 
         //Add components and buffer data to opengl.
         foreach (Model model in SceneHierarchy.Instance.GetModels(HierarchyType.All))
@@ -129,6 +143,43 @@ public class GLControl : OpenGlControlBase
     {
         CheckAppendingModels(gl);
 
+        ExecuteGlStack(gl);
+
+        RenderShadowmap(gl);
+
+        RenderWorld(gl,fb);
+
+        RequestNextFrameRendering();
+    }
+    private void RenderShadowmap(GlInterface gl)
+    {
+        if(_ShadowmapFrameBuffer == null)
+            throw new InvalidOperationException($"{nameof(_ShadowmapFrameBuffer)} is null while calling {nameof(RenderShadowmap)}!");
+
+        //World rendering
+        gl.BindFramebuffer(GlConsts.GL_FRAMEBUFFER, _ShadowmapFrameBuffer!.Value);
+        var scaling = (this.VisualRoot != null) ? this.VisualRoot!.RenderScaling : 1.0;
+        gl.Viewport(0, 0, (int)(Bounds.Width * scaling), (int)(Bounds.Height * scaling));
+
+        gl.ClearColor(0.1f, 0.1f, 0.1f, 0.85f);
+        gl.Clear(GlConsts.GL_COLOR_BUFFER_BIT | GlConsts.GL_DEPTH_BUFFER_BIT);
+
+        //Camera controls
+        Matrix4 view = _camera.CreateLookAt();
+        Aspect = (float)(Bounds.Width / (double)Bounds.Height);
+        Matrix4 proj = _camera.CreatePrespective(Aspect);
+
+        gl.Enable(GL_DEPTH_TEST);
+        RenderModels(gl, HierarchyType.Model, ref view, ref proj);
+        gl.Disable(GL_DEPTH_TEST);
+        RenderModels(gl, HierarchyType.Tool, ref view, ref proj, RenderMode.Triangles);
+        RenderUI();
+        RenderOverview(gl);
+    }
+
+    private void RenderWorld(GlInterface gl, int fb)
+    {
+        //World rendering
         gl.BindFramebuffer(GlConsts.GL_FRAMEBUFFER, fb);
         var scaling = (this.VisualRoot != null) ? this.VisualRoot!.RenderScaling : 1.0;
         gl.Viewport(0, 0, (int)(Bounds.Width * scaling), (int)(Bounds.Height * scaling));
@@ -141,14 +192,28 @@ public class GLControl : OpenGlControlBase
         Aspect = (float)(Bounds.Width / (double)Bounds.Height);
         Matrix4 proj = _camera.CreatePrespective(Aspect);
 
-        //PRIMARY RENDERING!
-        ExecuteGlStack(gl);
-        RenderModels(gl, ref view, ref proj);
-        RenderTools(gl, ref view, ref proj);
-
-        RequestNextFrameRendering();
+        gl.Enable(GL_DEPTH_TEST);
+        RenderModels(gl, HierarchyType.Model, ref view, ref proj);
+        gl.Disable(GL_DEPTH_TEST);
+        RenderModels(gl, HierarchyType.Tool, ref view, ref proj, RenderMode.Triangles);
+        RenderUI();
+        RenderOverview(gl);
     }
 
+    private void RenderOverview(GlInterface gl)
+    {
+        
+    }
+
+    private void RenderUI()
+    {
+
+    }
+
+    /// <summary>
+    /// This function executes a set of instrctions before drawing the next frame.
+    /// This may include model edits/deletions/additions/ect.
+    /// </summary>
     private void ExecuteGlStack(GlInterface gl)
     {
         while (ModelActions.Count > 0)
@@ -158,41 +223,27 @@ public class GLControl : OpenGlControlBase
         }
     }
 
-    private unsafe void RenderTools(GlInterface gl, ref Matrix4 view, ref Matrix4 proj)
+    private unsafe void RenderModels(GlInterface gl, HierarchyType hierarchy, ref Matrix4 view, ref Matrix4 proj, RenderMode? rendermode = null)
     {
-        gl.Disable(GL_DEPTH_TEST);
-        foreach (GLComponent component in GLComponent.AllComponents(SceneHierarchy.Instance.GetModels(HierarchyType.Tool)))
-        {
-            if (component.Model.Hidden) continue;
-
-            Matrix4 modelTransformation = component.Model.GetModelMatrix();
-            _triangleShaderProgram.UseProgram(gl, view, proj, _camera.Origin);
-            gl.UniformMatrix4fv(_triangleShaderProgram.ModelMatrixLocation, 1, false, (float*)&modelTransformation);
-            
-            component.RenderModel(gl);
-        }
-    }
-
-
-    private unsafe void RenderModels(GlInterface gl, ref Matrix4 view, ref Matrix4 proj)
-    {
-        gl.Enable(GL_DEPTH_TEST);
+        if (rendermode == null) rendermode = RenderMode;
         
-        foreach (RenderMode renderMode in renderModeToShaderProgram.Keys)
+        foreach (RenderMode mode in renderModeToShaderProgram.Keys)
         {
-            if(RenderMode.HasFlag(renderMode))
+            if(rendermode.Value.HasFlag(mode))
             {
-                ShaderProgram activeShader = renderModeToShaderProgram[renderMode];
+                ShaderProgram activeShader = renderModeToShaderProgram[mode];
                 activeShader.UseProgram(gl, view, proj, _camera.Origin);
-                foreach (GLComponent component in GLComponent.AllComponents(SceneHierarchy.Instance.GetModels(HierarchyType.Model)))
+
+                foreach (IRenderObject component in AllRenderables(SceneHierarchy.Instance.GetModels(hierarchy)))
                 {
-                    if (component.Model.Hidden) continue;
-                    Matrix4 modelTransformation = component.Model.GetModelMatrix();
+
+                    if (component.Hidden) continue;
+                    Matrix4 modelTransformation = component.ModelMatrix;
                     gl.UniformMatrix4fv(activeShader.ModelMatrixLocation, 1, false, (float*)&modelTransformation);
 
-                    switch(renderMode)
+                    switch(mode) 
                     {
-                        case RenderMode.Triangles:
+                        default:
                             {
                                 component.RenderModel(gl);
                                 break;
@@ -205,11 +256,22 @@ public class GLControl : OpenGlControlBase
                             }
                         case RenderMode.Verts:
                             {
-                                component.RenderVerts(gl);
+                                component.RenderVertices(gl);
                                 break;
                             }
                     }
                 }
+            }
+        }
+    }
+
+    public static IEnumerable<IRenderObject> AllRenderables(IEnumerable<Model> models)
+    {
+        foreach (Model model in models)
+        {
+            foreach(IRenderObject obj in model.GetAllOfType<IRenderObject>())
+            {
+                yield return obj;
             }
         }
     }

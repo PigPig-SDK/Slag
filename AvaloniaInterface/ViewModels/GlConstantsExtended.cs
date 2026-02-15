@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace OpenglAvaloniaTest.ViewModels;
 
+/// <summary>
+/// Pulled from:
+/// https://javagl.github.io/GLConstantsTranslator/GLConstantsTranslator.html
+/// </summary>
 public static class GlConstantsExtended
 {
     public const int GL_UNSIGNED_INT = 0x1405;
@@ -32,4 +36,9 @@ public static class GlConstantsExtended
 
     public const int GL_POLYGON_OFFSET_LINE = 0x2a02;
 
+    public const int GL_TEXTURE_WRAP_S = 10242;
+
+    public const int GL_TEXTURE_WRAP_T = 10243;
+
+    public const int GL_REPEAT = 10497;
 }

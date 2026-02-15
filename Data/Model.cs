@@ -233,6 +233,17 @@ public class Model
         return false;
     }
 
+    public IEnumerable<T> GetAllOfType<T>()
+    {
+        foreach(KeyValuePair<Type, ModelComponent> component in _Components)
+        {
+            if(component.Value is T typedValue)
+            {
+                yield return typedValue;
+            }
+        }
+    }
+
     public bool HasComponent(Type type) => _Components.ContainsKey(type);
 
     public void UpdateAllComponents(UpdateType info, object? variable)

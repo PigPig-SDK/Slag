@@ -9,7 +9,7 @@ using static OpenglAvaloniaTest.ViewModels.GlConstantsExtended;
 
 namespace OpenglAvaloniaTest.ViewModels;
 
-public class GLComponent : ModelComponent
+public class GLComponent : ModelComponent, IRenderObject
 {
     private int? _VertexBufferObject = null;
     private int? _IndiciesBuffer = null;
@@ -25,7 +25,9 @@ public class GLComponent : ModelComponent
 
     private GlInterface? glInterface = null;
 
-    private Dictionary<uint, List<uint>> _SharpIndicies = [];
+    public bool Hidden { get => Model.Hidden; set => Model.Hidden = value; }
+
+    public Matrix4 ModelMatrix { get => Model.GetModelMatrix(); }
 
     public override void OnAddedToModel(Model model)
     {
@@ -165,12 +167,11 @@ public class GLComponent : ModelComponent
 
         Vertex[] verts = [];
         List<uint> indiciesList = []; //List that will encounter lots of modification
-        _SharpIndicies.Clear();
 
         Model.GenerateTriangulatedModel(ref verts, ref indiciesList);
 
         //Recalculates the model to account for 'sharp' edges
-        ComputeSmoothing(ref indiciesList);
+        //ComputeSmoothing(ref indiciesList);
 
         uint[] indicies = indiciesList.ToArray();
 
@@ -205,14 +206,6 @@ public class GLComponent : ModelComponent
         Console.WriteLine($"{nameof(selectionData)} Upload Error: {gl.GetError()}");
     }
 
-    /// <summary>
-    /// Accounts for sharp edges in the model, creating duplicate verticies for each smoothing group.
-    /// </summary>
-    private void ComputeSmoothing(ref List<uint> indiciesList)
-    {
-        //Not implemented yet.
-    }
-
     public static bool BindComponent(Model model, GlInterface gl)
     {
         if (!model.HasComponent(typeof(GLComponent)))
@@ -224,14 +217,14 @@ public class GLComponent : ModelComponent
         return true;
     }
 
-    public unsafe void RenderModel(GlInterface gl)
+    public void RenderModel(GlInterface gl)
     {
         if (_TriangleArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_TriangleArrayObject)} while its null");
         gl.BindVertexArray(_TriangleArrayObject!.Value);
         gl.DrawElements(GL_TRIANGLES, _IndiciesCount, GL_UNSIGNED_INT, 0);
     }
 
-    internal void RenderEdges(GlInterface gl)
+    public void RenderEdges(GlInterface gl)
     {
         if (_EdgeArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_EdgeArrayObject)} while its null");
         gl.BindVertexArray(_EdgeArrayObject!.Value);
@@ -241,7 +234,7 @@ public class GLComponent : ModelComponent
         gl.BindVertexArray(0);
     }
 
-    internal void RenderVerts(GlInterface gl)
+    public void RenderVertices(GlInterface gl)
     {
         if (_TriangleArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_TriangleArrayObject)} while its null");
         gl.BindVertexArray(_TriangleArrayObject!.Value);
@@ -314,10 +307,7 @@ public class GLComponent : ModelComponent
         //Clean up the opengl resources.
         if (glInterface == null) return;
 
-        if (_VertexBufferObject != null) glInterface.DeleteBuffer(_VertexBufferObject!.Value);
-        if (_IndiciesBuffer != null) glInterface.DeleteBuffer(_IndiciesBuffer!.Value);
-        if (_TriangleArrayObject != null) glInterface.DeleteVertexArray(_TriangleArrayObject!.Value);
-        if(_SelectionBuffer != null) glInterface.DeleteBuffer(_SelectionBuffer!.Value);
+        UnloadBuffers(glInterface);
 
         _SelectionBuffer = null;
         _TriangleArrayObject = null;
@@ -325,5 +315,13 @@ public class GLComponent : ModelComponent
         _VertexBufferObject = null;
 
         glInterface = null;
+    }
+
+    public void UnloadBuffers(GlInterface gl)
+    {
+        if (_VertexBufferObject != null) gl.DeleteBuffer(_VertexBufferObject!.Value);
+        if (_IndiciesBuffer != null) gl.DeleteBuffer(_IndiciesBuffer!.Value);
+        if (_TriangleArrayObject != null) gl.DeleteVertexArray(_TriangleArrayObject!.Value);
+        if (_SelectionBuffer != null) gl.DeleteBuffer(_SelectionBuffer!.Value);
     }
 }
