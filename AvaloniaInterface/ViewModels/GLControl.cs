@@ -48,6 +48,7 @@ public class GLControl : OpenGlControlBase
 
     private int? _ShadowmapFrameBuffer = null;
     private int? _DepthMap = null;
+    Matrix4 LightSpaceMatrix = Matrix4.Identity;
 
     int _ShadowWidth = 1024, _ShadowHeight = 1024;
 
@@ -171,23 +172,21 @@ public class GLControl : OpenGlControlBase
             throw new InvalidOperationException($"{nameof(_ShadowmapFrameBuffer)} is null while calling {nameof(RenderShadowmap)}!");
 
         //World rendering
+        gl.Viewport(0, 0, _ShadowWidth, _ShadowHeight);
         gl.BindFramebuffer(GlConsts.GL_FRAMEBUFFER, _ShadowmapFrameBuffer!.Value);
-
-        gl.Viewport(0, 0, _ShadowHeight, _ShadowHeight);
         gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        gl.Clear(GlConsts.GL_COLOR_BUFFER_BIT | GlConsts.GL_DEPTH_BUFFER_BIT);
+        gl.Clear(GlConsts.GL_DEPTH_BUFFER_BIT);
 
         //Camera controls
-        Matrix4 view = _camera.CreateLookAt();
-        Aspect = (float)(Bounds.Width / (double)Bounds.Height);
-        Matrix4 proj = _camera.CreatePrespective(Aspect);
+        Matrix4 view = Matrix4.LookAt(new Vector3(0, 10, 10) , Vector3.Zero, new Vector3(0, 1, 0));
+        Aspect = (float)(_ShadowWidth / (double)_ShadowHeight);
+        float near_plane = 1.0f, far_plane = 7.5f;
+        Matrix4.CreateOrthographic(20.0f, 20.0f, near_plane, far_plane, out Matrix4 proj);
+
+        LightSpaceMatrix = proj * view;
 
         gl.Enable(GL_DEPTH_TEST);
-        RenderModels(gl, HierarchyType.Model, ref view, ref proj);
-        gl.Disable(GL_DEPTH_TEST);
-        RenderModels(gl, HierarchyType.Tool, ref view, ref proj, RenderMode.Triangles);
-        RenderUI();
-        RenderOverview(gl);
+        RenderModels(gl, HierarchyType.Model, ref view, ref proj, RenderMode.Depth);
     }
 
     private void RenderWorld(GlInterface gl, int fb)
@@ -245,7 +244,7 @@ public class GLControl : OpenGlControlBase
             if(rendermode.Value.HasFlag(mode))
             {
                 ShaderProgram activeShader = renderModeToShaderProgram[mode];
-                activeShader.UseProgram(gl, view, proj, _camera.Origin);
+                activeShader.UseProgram(gl, view, proj, _camera.Origin, LightSpaceMatrix);
 
                 foreach (IRenderObject component in AllRenderables(SceneHierarchy.Instance.GetModels(hierarchy)))
                 {
