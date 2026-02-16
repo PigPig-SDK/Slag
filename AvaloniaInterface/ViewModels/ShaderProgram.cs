@@ -16,7 +16,7 @@ public class ShaderProgram
 
     public int ModelMatrixLocation;
 
-    private int _projectionMatrixLoc, _viewMatrixLoc, _cameraLocationLoc, _envMatrix;
+    private int _projectionMatrixLoc, _viewMatrixLoc, _cameraLocationLoc, _envMatrix, _shadowMap, _sunAngle;
 
     public void GenerateShaderProgram(GlInterface gl, string vertexShader, string fragmentShader)
     {
@@ -40,15 +40,23 @@ public class ShaderProgram
         _viewMatrixLoc = gl.GetUniformLocationString(ProgramID, "view_matrix");
         _cameraLocationLoc = gl.GetUniformLocationString(ProgramID, "camera_location");
         _envMatrix = gl.GetUniformLocationString(ProgramID, "env_matrix");
+        _shadowMap = gl.GetUniformLocationString(ProgramID, "shadowMap");
+        _sunAngle = gl.GetUniformLocationString(ProgramID, "sunAngle");
     }
 
-    public unsafe void UseProgram(GlInterface gl, Matrix4 view, Matrix4 projection, Vector3 cameraLocation, Matrix4 envMatrix)
+    public unsafe void UseProgram(GlInterface gl, Matrix4 view, Matrix4 projection, Vector3 cameraLocation, Matrix4 envMatrix, int shadowmap, Vector3 sunAngle)
     {
         gl.UseProgram(ProgramID);
         gl.UniformMatrix4fv(_viewMatrixLoc, 1, false, (float*)&view);
         gl.UniformMatrix4fv(_projectionMatrixLoc, 1, false, (float*)&projection);
         gl.Uniform3f(_cameraLocationLoc, cameraLocation.X, cameraLocation.Y, cameraLocation.Z);
         gl.UniformMatrix4fv(_envMatrix, 1, false, (float*)&envMatrix);
+
+        //Shadowmap
+        gl.ActiveTexture(GL_TEXTURE0);
+        gl.BindTexture(GL_TEXTURE_2D, shadowmap);
+        gl.Uniform1i(_shadowMap, 0);
+        gl.Uniform3f(_sunAngle, sunAngle.X, sunAngle.Y, sunAngle.Z);
     }
 
     public static string LoadShaderFile(string shaderFile)

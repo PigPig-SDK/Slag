@@ -15,12 +15,14 @@ public static unsafe class GlInterfaceExtensions
     private delegate void ReadBufferDelegate(uint glenum);
     private delegate void DrawBuffersDelegate(int n, uint[] bufs);
     private delegate void BufferSubDataDelegate(int target, IntPtr offset, IntPtr size, IntPtr data);
+    private delegate void Uniform1iDelegate(int location, int value);
 
     private static Uniform3fDelegate? _uniform3f;
     private static LineWidthDelegate? _lineWidth;
     private static BufferSubDataDelegate? _bufferSubData;
     private static ReadBufferDelegate? _readBuffer;
     private static DrawBuffersDelegate? _drawBuffers;
+    private static Uniform1iDelegate? _uniform1i;
 
     public static void BufferSubData(this GlInterface gl, int target, IntPtr offset, IntPtr size, IntPtr data)
     {
@@ -78,5 +80,17 @@ public static unsafe class GlInterfaceExtensions
             _drawBuffers = Marshal.GetDelegateForFunctionPointer<DrawBuffersDelegate>(ptr);
         }
         _drawBuffers(n, bufs);
+    }
+
+    public static void Uniform1i(this GlInterface gl, int location, int value)
+    {
+        if (_uniform1i == null)
+        {
+            nint ptr = gl.GetProcAddress("glUniform1i");
+            if (ptr == IntPtr.Zero) throw new InvalidOperationException("glUniform1i not available");
+            _uniform1i = Marshal.GetDelegateForFunctionPointer<Uniform1iDelegate>(ptr);
+        }
+
+        _uniform1i(location, value);
     }
 }

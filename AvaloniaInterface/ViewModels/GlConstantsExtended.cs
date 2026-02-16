@@ -43,4 +43,10 @@ public static class GlConstantsExtended
     public const int GL_REPEAT = 10497;
 
     public const int GL_NONE = 0;
+
+    public const int GL_CLAMP_TO_EDGE = 33071;
+
+    public const int GL_DEPTH_COMPONENT24 = 33190;
+
+    public const int GL_TEXTURE_COMPARE_MODE = 34892;
 }

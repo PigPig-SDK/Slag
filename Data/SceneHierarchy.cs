@@ -13,7 +13,7 @@ public class SceneHierarchy
     public IReadOnlyDictionary<HierarchyType, List<Model>> HierarchyCategories => _HierarchyCategories;
     private Dictionary<HierarchyType, List<Model>> _HierarchyCategories = new()
     {
-        { HierarchyType.Model, [ModelPrefabs.DebugEdges()] },
+        { HierarchyType.Model, [ModelPrefabs.Cube(), ModelPrefabs.Plane(10)] },
         { HierarchyType.Tool, [ModelPrefabs.AxisTriad(), ModelPrefabs.SelectionInstance()] },
     };
 

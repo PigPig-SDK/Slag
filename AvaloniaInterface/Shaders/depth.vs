@@ -8,8 +8,9 @@ uniform vec3 camera_location;
 uniform mat4 model_matrix;
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
+uniform mat4 env_matrix;
 
 void main()
 {
-    gl_Position = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
+    gl_Position = env_matrix * model_matrix * vec4(aPos, 1.0);
 }

@@ -40,6 +40,24 @@ public static partial class ModelPrefabs
         return cube;
     }
 
+    public static Model Plane(float size)
+    {
+        Model plane = new();
+        plane.ObjectName = "Plane";
+
+        //Add verts
+        plane.AddVertex(new Vertex(new Vector3(-size, 0, -size), new Vector2(0, 0))); // 0
+        plane.AddVertex(new Vertex(new Vector3(-size, 0, size), new Vector2(0,1))); // 1
+        plane.AddVertex(new Vertex(new Vector3(size, 0, size), new Vector2(1, 1))); // 2
+        plane.AddVertex(new Vertex(new Vector3(size, 0, -size), new Vector2(1, 0))); // 3
+
+        
+
+        //AddFace
+        plane.AddFace(0, 1, 2, 3);//Left
+
+        return plane;
+    }
     public static Model BBoxVisualizer(Vector3 start, Vector3 end)
     {
         Model bboxVisualizer = new();
