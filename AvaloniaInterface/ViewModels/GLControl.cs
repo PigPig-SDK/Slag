@@ -183,7 +183,7 @@ public class GLControl : OpenGlControlBase
         Matrix4 view = Matrix4.LookAt(_camera.LookAt + (SunAngle * _SunDistance), _camera.LookAt, new Vector3(0, 1, 0));
         Aspect = (float)(_ShadowWidth / (double)_ShadowHeight);
         float near_plane = 0.1f, far_plane = 200.0f;
-        Matrix4.CreateOrthographic(20.0f, 20.0f, near_plane, far_plane, out Matrix4 proj);
+        Matrix4.CreateOrthographic(30.0f, 30.0f, near_plane, far_plane, out Matrix4 proj);
         LightSpaceMatrix = view * proj;
 
         gl.Enable(GL_DEPTH_TEST);
