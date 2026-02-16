@@ -61,7 +61,7 @@ void main()
     vec4 specular = spec * lightColor;
 
     // --- Ambient ---
-    vec4 ambient = vec4(0.556862745098039, 0.603921568627451,0.725490196078431,2.0) / 2.0;
+    vec4 ambient = (vec4(0.556862745098039, 0.603921568627451,0.725490196078431,2.0) / 2.0) * baseColor;
 
     // --- Shadow ---
     float shadow = ShadowCalculation(envSpace); // 0.0 = in shadow, 1.0 = fully lit
