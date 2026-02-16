@@ -11,6 +11,10 @@ public static class OBJFile
     private const string UvToken = "vt";
     private const string ObjectToken = "o";
     private const string FaceToken = "f";
+    private const string MaterialLibToken = "mtllib";
+    private const string MaterialToken = "usemtl";
+    private const string GroupToken = "g";
+    private const string SmoothToken = "s";
 
     private static bool StreamReaderContainsMultipleObjects(StreamReader reader)
     {
@@ -203,7 +207,12 @@ public static class OBJFile
                             list[^1].AddFace(faceData);
                             break;
                         }
+                        ///Unused tokens.
                     case NormalToken:
+                    case MaterialLibToken:
+                    case MaterialToken:
+                    case GroupToken:
+                    case SmoothToken:
                         break;
                     default:
                         {
