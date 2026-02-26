@@ -24,10 +24,10 @@ public class MoveCommand : ICommand
     private CommandState Initialize()
     {
         Model? activeModel = SelectionManager.Instance.CurrentModel;
-        if (activeModel == null) return CommandState.Finished;//Cannot execute command
+        if (activeModel == null) return CommandState.Discard;//Cannot execute command
 
         SelectionComponent? selection = activeModel.GetComponent<SelectionComponent>();
-        if(selection is null) return CommandState.Finished;
+        if(selection is null) return CommandState.Discard;
 
         if(Camera.Instance == null) throw new InvalidOperationException($"No camera in {nameof(MoveCommand)} {nameof(Initialize)}");
 

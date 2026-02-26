@@ -18,4 +18,8 @@ public enum CommandState
     /// Next command might take user input...
     /// </summary>
     Yield,
+    /// <summary>
+    /// Discard the current command, do not append to undo/redo stack.
+    /// </summary>
+    Discard,
 }

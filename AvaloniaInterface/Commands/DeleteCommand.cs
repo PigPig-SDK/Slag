@@ -1,4 +1,5 @@
 ﻿using Avalonia.Input;
+using Models;
 using OpenglAvaloniaTest.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ internal class DeleteCommand : MementoCommand
 {
     public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
+        if (SelectionManager.Instance.CurrentModel == null) return CommandState.Discard;
+
         CreateState();
         SelectionManager.Instance.DeleteCurrentSelection();
         return CommandState.Finished;

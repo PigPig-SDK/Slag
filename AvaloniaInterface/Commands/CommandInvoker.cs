@@ -35,6 +35,10 @@ public class CommandInvoker
         if(CurrentCommand == null)
             return false;
         CommandState commandState = CurrentCommand.Execute(args);
+
+        if (commandState == CommandState.Discard)
+            return true;
+
         if (commandState != CommandState.Idle)
         {
             _UndoQueue.Push(CurrentCommand);

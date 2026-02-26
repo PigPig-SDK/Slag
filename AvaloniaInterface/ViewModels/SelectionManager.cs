@@ -11,7 +11,7 @@ public class SelectionManager
 {
     public static SelectionManager Instance = new();
 
-    public SelectionMode _SelectionMode = SelectionMode.Face;
+    private SelectionMode _SelectionMode = SelectionMode.Face;
 
     public SelectionMode CurrentSelectionMode
     {
