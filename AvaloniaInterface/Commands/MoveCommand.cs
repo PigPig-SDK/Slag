@@ -14,12 +14,12 @@ public class MoveCommand : ICommand
 
     private const float _MoveDistanceScale = 0.01f;
     public (Vector3 realitiveRight, Vector3 realitiveUp) CameraMoveDirections;
-    private Vector2? _MouseStartPos = null;
-    private Vector3 _ActiveAxis = new Vector3(1, 1, 1);
+    private Vector2? _mouseStartPos = null;
+    private Vector3 _activeAxis = new Vector3(1, 1, 1);
 
-    private Dictionary<uint, Vector3> _StartingPosition = [];
-    private List<uint>? _SelectedIndicies = null;
-    private Vector2 _MoveDistance;
+    private Dictionary<uint, Vector3> _startingPosition = [];
+    private List<uint>? _selectedIndicies = null;
+    private Vector2 _moveDistance;
 
     private CommandState Initialize()
     {
@@ -32,12 +32,12 @@ public class MoveCommand : ICommand
         if(Camera.Instance == null) throw new InvalidOperationException($"No camera in {nameof(MoveCommand)} {nameof(Initialize)}");
 
         CameraMoveDirections = Camera.Instance.GetRealitiveDirections();
-        _SelectedIndicies = [..selection.SelectionIndicies()];
+        _selectedIndicies = [..selection.SelectionIndicies()];
 
-        foreach (uint index in _SelectedIndicies)
+        foreach (uint index in _selectedIndicies)
         {
             Vertex vert = activeModel.GetVertex(index);
-            _StartingPosition[index] = vert.Position;
+            _startingPosition[index] = vert.Position;
         }
 
         return CommandState.Idle;//Continue the command.
@@ -48,17 +48,17 @@ public class MoveCommand : ICommand
         Model? model = SelectionManager.Instance.CurrentModel;
         if (model == null) throw new Exception("No current model in MoveCommand.MoveSelection");
 
-        if(_SelectedIndicies == null) throw new Exception($"No selection exists {nameof(_SelectedIndicies)}!");
+        if(_selectedIndicies == null) throw new Exception($"No selection exists {nameof(_selectedIndicies)}!");
 
         Vertex[] vertices = model.GetVertexBackingField();
 
         Vector3 moveDirection = (CameraMoveDirections.realitiveRight * mouseDelta.X) + (CameraMoveDirections.realitiveUp * mouseDelta.Y);
         moveDirection *= _MoveDistanceScale;
 
-        foreach (uint index in _SelectedIndicies)
+        foreach (uint index in _selectedIndicies)
         {
 
-            vertices[index].Position = (_StartingPosition[index] + (moveDirection * _ActiveAxis));
+            vertices[index].Position = (_startingPosition[index] + (moveDirection * _activeAxis));
             
         }
         model.UpdateAllComponents(UpdateType.Locational, null);
@@ -77,10 +77,11 @@ public class MoveCommand : ICommand
         if ((args.info & CommandInfo.MouseEvent) != 0)
         {
             var mouseInfo = args.mouseEvent!.GetPosition(GLControl.Instance);
-            if (_MouseStartPos == null) _MouseStartPos = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y);
-            _MoveDistance = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y) - _MouseStartPos.Value;
+            Vector2 mousePos = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y);
+            _mouseStartPos ??= mousePos;
+            _moveDistance = mousePos - _mouseStartPos.Value;
 
-            MoveSelection(_MoveDistance);
+            MoveSelection(_moveDistance);
 
             if(args.info.HasFlag(CommandInfo.MouseDown))
                 return CommandState.Finished;
@@ -92,13 +93,13 @@ public class MoveCommand : ICommand
             case Key.G:
                 return CommandState.Finished;
             case Key.X:
-                _ActiveAxis = new Vector3(1, 0, 0);
+                _activeAxis = new Vector3(1, 0, 0);
                 return CommandState.Idle;
             case Key.Y:
-                _ActiveAxis = new Vector3(0, 1, 0);
+                _activeAxis = new Vector3(0, 1, 0);
                 return CommandState.Idle;
             case Key.Z:
-                _ActiveAxis = new Vector3(0, 0, 1);
+                _activeAxis = new Vector3(0, 0, 1);
                 return CommandState.Idle;
             case Key.Escape:
                 {
@@ -117,6 +118,6 @@ public class MoveCommand : ICommand
 
     public void Redo()
     {
-        MoveSelection(_MoveDistance);
+        MoveSelection(_moveDistance);
     }
 }
