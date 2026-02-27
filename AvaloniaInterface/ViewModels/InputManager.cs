@@ -14,7 +14,7 @@ public class InputManager
     public void OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (CommandInvoker.Singleton.ExecuteCommandStep((e, null, CommandInfo.KeyDown))) return;
-
+        (KeyEventArgs?, PointerEventArgs?, CommandInfo) cmdInfo = (e, null, CommandInfo.Initialization | CommandInfo.KeyDown);
         switch (e.Key)
         {
             case Key.LeftCtrl:
@@ -25,17 +25,22 @@ public class InputManager
                 }
             case Key.G:
                 {
-                    CommandInvoker.Singleton?.RunCommand(new MoveCommand(), (e, null, CommandInfo.Initialization | CommandInfo.KeyDown));
+                    CommandInvoker.Singleton?.RunCommand(new MoveCommand(), cmdInfo);
+                    break;
+                }
+            case Key.R:
+                {
+                    CommandInvoker.Singleton?.RunCommand(new RotateCommand(), cmdInfo);
                     break;
                 }
             case Key.S:
                 {
-                    CommandInvoker.Singleton?.RunCommand(new ScaleCommand(), (e, null, CommandInfo.Initialization | CommandInfo.KeyDown));
+                    CommandInvoker.Singleton?.RunCommand(new ScaleCommand(), cmdInfo);
                     break;
                 }
             case Key.Delete:
                 {
-                    CommandInvoker.Singleton?.RunCommand(new DeleteCommand(), (e, null, CommandInfo.Initialization | CommandInfo.KeyDown));
+                    CommandInvoker.Singleton?.RunCommand(new DeleteCommand(), cmdInfo);
                     break;
                 }
             case Key.Z:
