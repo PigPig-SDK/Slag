@@ -47,13 +47,13 @@ public class GLControl : OpenGlControlBase
 
     Dictionary<RenderMode, ShaderProgram> renderModeToShaderProgram;
 
-    private int? _ShadowmapFrameBuffer = null;
-    private int? _DepthMap = null;
+    private int? _shadowmapFrameBuffer = null;
+    private int? _depthMap = null;
     Matrix4 LightSpaceMatrix = Matrix4.Identity;
     public Vector3 SunAngle = new Vector3(50, 50, 25).Normalized();
 
-    int _ShadowWidth = 2048, _ShadowHeight = 2048;
-    private float _SunDistance = 75;
+    int _shadowWidth = 2048, _shadowHeight = 2048;
+    private float _sunDistance = 75;
 
     public GLControl()
     {
@@ -110,11 +110,11 @@ public class GLControl : OpenGlControlBase
         gl.UseProgram(_triangleShaderProgram.ProgramID);
 
         //Generate frame buffers
-        _ShadowmapFrameBuffer = gl.GenFramebuffer();
-        gl.BindFramebuffer(GL_FRAMEBUFFER, _ShadowmapFrameBuffer.Value);
-        _DepthMap = gl.GenTexture();
-        gl.BindTexture(GL_TEXTURE_2D, _DepthMap.Value);
-        gl.TexImage2D(GL_TEXTURE_2D, 0, GlConstantsExtended.GL_DEPTH_COMPONENT24, _ShadowWidth, _ShadowHeight, 0, GlConsts.GL_DEPTH_COMPONENT, GlConstantsExtended.GL_UNSIGNED_INT, IntPtr.Zero);
+        _shadowmapFrameBuffer = gl.GenFramebuffer();
+        gl.BindFramebuffer(GL_FRAMEBUFFER, _shadowmapFrameBuffer.Value);
+        _depthMap = gl.GenTexture();
+        gl.BindTexture(GL_TEXTURE_2D, _depthMap.Value);
+        gl.TexImage2D(GL_TEXTURE_2D, 0, GlConstantsExtended.GL_DEPTH_COMPONENT24, _shadowWidth, _shadowHeight, 0, GlConsts.GL_DEPTH_COMPONENT, GlConstantsExtended.GL_UNSIGNED_INT, IntPtr.Zero);
 
         gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -122,7 +122,7 @@ public class GLControl : OpenGlControlBase
         gl.TexParameteri(GL_TEXTURE_2D, GlConstantsExtended.GL_TEXTURE_WRAP_T, GlConstantsExtended.GL_CLAMP_TO_EDGE);
         gl.TexParameteri(GL_TEXTURE_2D, GlConstantsExtended.GL_TEXTURE_COMPARE_MODE, GlConstantsExtended.GL_NONE);
 
-        gl.FramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _DepthMap.Value, 0);
+        gl.FramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthMap.Value, 0);
         gl.DrawBuffers(0, [GlConstantsExtended.GL_NONE]);
         gl.ReadBuffer(GlConstantsExtended.GL_NONE);
 
@@ -170,18 +170,18 @@ public class GLControl : OpenGlControlBase
     }
     private void RenderShadowmap(GlInterface gl)
     {
-        if(_ShadowmapFrameBuffer == null)
-            throw new InvalidOperationException($"{nameof(_ShadowmapFrameBuffer)} is null while calling {nameof(RenderShadowmap)}!");
+        if(_shadowmapFrameBuffer == null)
+            throw new InvalidOperationException($"{nameof(_shadowmapFrameBuffer)} is null while calling {nameof(RenderShadowmap)}!");
 
         //World rendering
-        gl.BindFramebuffer(GlConsts.GL_FRAMEBUFFER, _ShadowmapFrameBuffer!.Value);
-        gl.Viewport(0, 0, _ShadowWidth, _ShadowHeight);
+        gl.BindFramebuffer(GlConsts.GL_FRAMEBUFFER, _shadowmapFrameBuffer!.Value);
+        gl.Viewport(0, 0, _shadowWidth, _shadowHeight);
         gl.ClearColor(0.0f,0.0f,0.0f,1.0f);
-        gl.Clear(GlConsts.GL_COLOR_BUFFER_BIT | GlConsts.GL_DEPTH_BUFFER_BIT);
+        gl.Clear(GlConsts.GL_DEPTH_BUFFER_BIT);
 
         //Camera controls
-        Matrix4 view = Matrix4.LookAt(_camera.LookAt + (SunAngle * _SunDistance), _camera.LookAt, new Vector3(0, 1, 0));
-        Aspect = (float)(_ShadowWidth / (double)_ShadowHeight);
+        Matrix4 view = Matrix4.LookAt(_camera.LookAt + (SunAngle * _sunDistance), _camera.LookAt, new Vector3(0, 1, 0));
+        Aspect = (float)(_shadowWidth / (double)_shadowHeight);
         float near_plane = 0.1f, far_plane = 200.0f;
         Matrix4.CreateOrthographic(30.0f, 30.0f, near_plane, far_plane, out Matrix4 proj);
         LightSpaceMatrix = view * proj;
@@ -245,7 +245,7 @@ public class GLControl : OpenGlControlBase
             if(rendermode.Value.HasFlag(mode))
             {
                 ShaderProgram activeShader = renderModeToShaderProgram[mode];
-                activeShader.UseProgram(gl, view, proj, _camera.Origin, LightSpaceMatrix, _DepthMap!.Value, SunAngle);
+                activeShader.UseProgram(gl, view, proj, _camera.Origin, LightSpaceMatrix, _depthMap!.Value, SunAngle);
 
                 foreach (IRenderObject component in AllRenderables(SceneHierarchy.Instance.GetModels(hierarchy)))
                 {
@@ -292,9 +292,9 @@ public class GLControl : OpenGlControlBase
     {
         SceneHierarchy.Instance.OnModelAdded -= OnModelAdded;
 
-        if(_DepthMap.HasValue) gl.DeleteTexture(_DepthMap.Value);
+        if(_depthMap.HasValue) gl.DeleteTexture(_depthMap.Value);
 
-        if(_ShadowmapFrameBuffer.HasValue) gl.DeleteFramebuffer(_ShadowmapFrameBuffer.Value);
+        if(_shadowmapFrameBuffer.HasValue) gl.DeleteFramebuffer(_shadowmapFrameBuffer.Value);
     }
 
     public override void Render(DrawingContext context)
