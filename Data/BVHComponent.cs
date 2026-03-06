@@ -1,5 +1,4 @@
-﻿using OpenglAvaloniaTest.ViewModels;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 
 namespace Models;
 

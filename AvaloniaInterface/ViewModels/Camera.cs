@@ -1,18 +1,10 @@
 ﻿using Avalonia;
-using Avalonia.Controls.Converters;
 using Avalonia.Input;
 using Avalonia.OpenGL.Controls;
 using Models;
 using OpenglAvaloniaTest.ViewModels;
 using OpenTK.Mathematics;
-using SkiaSharp;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-//using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 public class Camera
 {

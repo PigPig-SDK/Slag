@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models;
+﻿namespace Models;
 
 public class SceneHierarchy
 {
     public static SceneHierarchy Instance = new();
 
-    public IReadOnlyDictionary<HierarchyType, List<Model>> HierarchyCategories => _HierarchyCategories;
-    private Dictionary<HierarchyType, List<Model>> _HierarchyCategories = new()
+    public IReadOnlyDictionary<HierarchyType, List<Model>> HierarchyCategories => _hierarchyCategories;
+    private Dictionary<HierarchyType, List<Model>> _hierarchyCategories = new()
     {
         { HierarchyType.Model, [ModelPrefabs.Cube(), ModelPrefabs.Plane(10)] },
         { HierarchyType.Tool, [ModelPrefabs.AxisTriad(), ModelPrefabs.SelectionInstance()] },
@@ -24,24 +18,24 @@ public class SceneHierarchy
     public void AddModel(HierarchyType hierarchyType, Model model)
     {
         model.hierarchyType = hierarchyType;
-        _HierarchyCategories[hierarchyType].Add(model);
+        _hierarchyCategories[hierarchyType].Add(model);
         OnModelAdded?.Invoke(hierarchyType,model);
     }
 
     public void RemoveModel(HierarchyType hierarchyType, Model model)
     {
         model.Dispose();
-        _HierarchyCategories[hierarchyType].Remove(model);
+        _hierarchyCategories[hierarchyType].Remove(model);
         OnModelRemoved?.Invoke(hierarchyType,model);
     }
 
     public IEnumerable<Model> GetModels(HierarchyType hierarchyType)
     {
-        foreach(HierarchyType hierarchy in _HierarchyCategories.Keys)
+        foreach(HierarchyType hierarchy in _hierarchyCategories.Keys)
         {
             if(hierarchyType.HasFlag(hierarchy))
             {
-                foreach(Model model in _HierarchyCategories[hierarchy])
+                foreach(Model model in _hierarchyCategories[hierarchy])
                 {
                     yield return model;
                 }

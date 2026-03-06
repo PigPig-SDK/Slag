@@ -11,17 +11,17 @@ namespace OpenglAvaloniaTest.ViewModels;
 
 public class GLComponent : ModelComponent, IRenderObject
 {
-    private int? _VertexBufferObject = null;
-    private int? _IndiciesBuffer = null;
-    private int? _EdgeIndiciesBuffer = null;
-    private int? _SelectionBuffer = null;
+    private int? _vertexBufferObject = null;
+    private int? _indiciesBuffer = null;
+    private int? _edgeIndiciesBuffer = null;
+    private int? _selectionBuffer = null;
 
-    private int? _TriangleArrayObject;
-    private int? _EdgeArrayObject;
+    private int? _triangleArrayObject;
+    private int? _edgeArrayObject;
 
-    private int _IndiciesCount = 0;
-    private int _VertexCount = 0;
-    private int _EdgeIndiciesCount = 0;
+    private int _indiciesCount = 0;
+    private int _vertexCount = 0;
+    private int _edgeIndiciesCount = 0;
 
     private GlInterface? glInterface = null;
 
@@ -45,16 +45,16 @@ public class GLComponent : ModelComponent, IRenderObject
         }
 
         //Generate array.
-        byte[] selectionData = new byte[_VertexCount];
+        byte[] selectionData = new byte[_vertexCount];
         for (int i = 0; i < selectionData.Length; i++)
         {
             selectionData[i] = Model.GetComponent<SelectionComponent>()!.IsVertexSelected((uint)i) ? (byte)1 : (byte)0;
         }
 
-        gl.BindBuffer(GL_ARRAY_BUFFER, _SelectionBuffer!.Value);
+        gl.BindBuffer(GL_ARRAY_BUFFER, _selectionBuffer!.Value);
         fixed (byte* ptr = selectionData)
         {
-            gl!.BufferSubData(GL_ARRAY_BUFFER, (nint)0, (nint)(_VertexCount * sizeof(byte)), (IntPtr)ptr);
+            gl!.BufferSubData(GL_ARRAY_BUFFER, (nint)0, (nint)(_vertexCount * sizeof(byte)), (IntPtr)ptr);
         }
     }
 
@@ -67,13 +67,13 @@ public class GLComponent : ModelComponent, IRenderObject
         }
 
         Vertex[] verts = Model.GetVertexBackingField();
-        _VertexCount = Model.Verticies.Count;
+        _vertexCount = Model.Verticies.Count;
         ComputeNormals(verts, Model.Indicies);
 
-        gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
+        gl.BindBuffer(GL_ARRAY_BUFFER, _vertexBufferObject!.Value);
         fixed (Vertex* ptr = verts)
         {
-            gl.BufferSubData(GL_ARRAY_BUFFER, (nint)0, Vertex.GetSize() * _VertexCount, (IntPtr)ptr);
+            gl.BufferSubData(GL_ARRAY_BUFFER, (nint)0, Vertex.GetSize() * _vertexCount, (IntPtr)ptr);
         }
     }
 
@@ -98,8 +98,8 @@ public class GLComponent : ModelComponent, IRenderObject
     {
         Console.WriteLine("Opengl Reset");
         //Clear buffers
-        _IndiciesBuffer = null;
-        _VertexBufferObject = null;
+        _indiciesBuffer = null;
+        _vertexBufferObject = null;
         GenerateBuffers(gl);
     }
 
@@ -108,21 +108,21 @@ public class GLComponent : ModelComponent, IRenderObject
         glInterface = gl;
 
         //Setup Buffers
-        _TriangleArrayObject = gl.GenVertexArray();
-        _VertexBufferObject = gl.GenBuffer();
-        _IndiciesBuffer = gl.GenBuffer();
-        _SelectionBuffer = gl.GenBuffer();
-        _EdgeArrayObject = gl.GenVertexArray();
-        _EdgeIndiciesBuffer = gl.GenBuffer();
+        _triangleArrayObject = gl.GenVertexArray();
+        _vertexBufferObject = gl.GenBuffer();
+        _indiciesBuffer = gl.GenBuffer();
+        _selectionBuffer = gl.GenBuffer();
+        _edgeArrayObject = gl.GenVertexArray();
+        _edgeIndiciesBuffer = gl.GenBuffer();
 
         //TRIANGLE
-        gl.BindVertexArray(_TriangleArrayObject!.Value);
+        gl.BindVertexArray(_triangleArrayObject!.Value);
         InitializeTrangleBuffers(gl);
         SetLocationsInsideVAO(gl);
 
         //EDGE
-        gl.BindVertexArray(_EdgeArrayObject!.Value);
-        gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _EdgeIndiciesBuffer!.Value);
+        gl.BindVertexArray(_edgeArrayObject!.Value);
+        gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _edgeIndiciesBuffer!.Value);
         SetLocationsInsideVAO(gl);
         UpdateEdgeBuffers(gl);
     }
@@ -130,7 +130,7 @@ public class GLComponent : ModelComponent, IRenderObject
     private void SetLocationsInsideVAO(GlInterface gl)
     {
         //Vertex Data
-        gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
+        gl.BindBuffer(GL_ARRAY_BUFFER, _vertexBufferObject!.Value);
 
         gl.VertexAttribPointer(0, 3, GL_FLOAT, 0, Vertex.GetSize(), 0);
         gl.EnableVertexAttribArray(0);
@@ -142,28 +142,28 @@ public class GLComponent : ModelComponent, IRenderObject
         gl.EnableVertexAttribArray(2);
 
         //Selection Related data
-        gl.BindBuffer(GL_ARRAY_BUFFER, _SelectionBuffer!.Value);
+        gl.BindBuffer(GL_ARRAY_BUFFER, _selectionBuffer!.Value);
         gl.VertexAttribPointer(3, 1, GL_UNSIGNED_BYTE, 0, sizeof(byte), 0);
         gl.EnableVertexAttribArray(3);
     }
 
     public unsafe void UpdateEdgeBuffers(GlInterface gl)
     {
-        gl.BindVertexArray(_EdgeArrayObject!.Value);
+        gl.BindVertexArray(_edgeArrayObject!.Value);
         uint[] edgeIndicies = Model.GetEdgeIndicies();
 
-        gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _EdgeIndiciesBuffer!.Value);
+        gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _edgeIndiciesBuffer!.Value);
         fixed (uint* ptr = edgeIndicies)
         {
             gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * edgeIndicies.Length, (nint)ptr, GL_STATIC_DRAW);
         }
         Console.WriteLine($"{nameof(edgeIndicies)} Upload Error: {gl.GetError()}");
-        _EdgeIndiciesCount = edgeIndicies.Length;
+        _edgeIndiciesCount = edgeIndicies.Length;
     }
 
     public unsafe void InitializeTrangleBuffers(GlInterface gl)
     {
-        gl.BindVertexArray(_TriangleArrayObject!.Value);
+        gl.BindVertexArray(_triangleArrayObject!.Value);
 
         Vertex[] verts = [];
         List<uint> indiciesList = []; //List that will encounter lots of modification
@@ -177,19 +177,19 @@ public class GLComponent : ModelComponent, IRenderObject
 
         //Manage edges
         ComputeNormals(verts, indicies);
-        _IndiciesCount = indicies.Length;
-        _VertexCount = Model.Verticies.Count;
+        _indiciesCount = indicies.Length;
+        _vertexCount = Model.Verticies.Count;
 
         //Inform of vert data
-        gl.BindBuffer(GL_ARRAY_BUFFER, _VertexBufferObject!.Value);
+        gl.BindBuffer(GL_ARRAY_BUFFER, _vertexBufferObject!.Value);
         fixed (Vertex* ptr = verts)
         {
-            gl.BufferData(GL_ARRAY_BUFFER, Vertex.GetSize() * _VertexCount, (nint)ptr, GL_STATIC_DRAW);
+            gl.BufferData(GL_ARRAY_BUFFER, Vertex.GetSize() * _vertexCount, (nint)ptr, GL_STATIC_DRAW);
         }
         Console.WriteLine($"{nameof(verts)} Upload Error: {gl.GetError()}");
 
         //Inform of indicies
-        gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _IndiciesBuffer!.Value);
+        gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indiciesBuffer!.Value);
         fixed (uint* ptr = indicies)
         {
             gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * indicies.Length, (nint)ptr, GL_STATIC_DRAW);
@@ -198,7 +198,7 @@ public class GLComponent : ModelComponent, IRenderObject
 
         //Buffer selection
         byte[] selectionData = new byte[verts.Length];
-        gl.BindBuffer(GL_ARRAY_BUFFER, _SelectionBuffer!.Value);
+        gl.BindBuffer(GL_ARRAY_BUFFER, _selectionBuffer!.Value);
         fixed (byte* ptr = selectionData)
         {
             gl.BufferData(GL_ARRAY_BUFFER, sizeof(byte) * verts.Length, (nint)ptr, GL_STATIC_DRAW);
@@ -219,26 +219,26 @@ public class GLComponent : ModelComponent, IRenderObject
 
     public void RenderModel(GlInterface gl)
     {
-        if (_TriangleArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_TriangleArrayObject)} while its null");
-        gl.BindVertexArray(_TriangleArrayObject!.Value);
-        gl.DrawElements(GL_TRIANGLES, _IndiciesCount, GL_UNSIGNED_INT, 0);
+        if (_triangleArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_triangleArrayObject)} while its null");
+        gl.BindVertexArray(_triangleArrayObject!.Value);
+        gl.DrawElements(GL_TRIANGLES, _indiciesCount, GL_UNSIGNED_INT, 0);
     }
 
     public void RenderEdges(GlInterface gl)
     {
-        if (_EdgeArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_EdgeArrayObject)} while its null");
-        gl.BindVertexArray(_EdgeArrayObject!.Value);
+        if (_edgeArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_edgeArrayObject)} while its null");
+        gl.BindVertexArray(_edgeArrayObject!.Value);
         //TODO: Find alternative to GL_LINES for better edge rendering.
         //For now, this will do.
-        gl.DrawElements(GL_LINES, _EdgeIndiciesCount, GL_UNSIGNED_INT, 0);
+        gl.DrawElements(GL_LINES, _edgeIndiciesCount, GL_UNSIGNED_INT, 0);
         gl.BindVertexArray(0);
     }
 
     public void RenderVertices(GlInterface gl)
     {
-        if (_TriangleArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_TriangleArrayObject)} while its null");
-        gl.BindVertexArray(_TriangleArrayObject!.Value);
-        gl.DrawArrays(GL_POINTS, 0, _VertexCount);
+        if (_triangleArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_triangleArrayObject)} while its null");
+        gl.BindVertexArray(_triangleArrayObject!.Value);
+        gl.DrawArrays(GL_POINTS, 0, _vertexCount);
         gl.BindVertexArray(0);
     }
 
@@ -309,19 +309,19 @@ public class GLComponent : ModelComponent, IRenderObject
 
         UnloadBuffers(glInterface);
 
-        _SelectionBuffer = null;
-        _TriangleArrayObject = null;
-        _IndiciesBuffer = null;
-        _VertexBufferObject = null;
+        _selectionBuffer = null;
+        _triangleArrayObject = null;
+        _indiciesBuffer = null;
+        _vertexBufferObject = null;
 
         glInterface = null;
     }
 
     public void UnloadBuffers(GlInterface gl)
     {
-        if (_VertexBufferObject != null) gl.DeleteBuffer(_VertexBufferObject!.Value);
-        if (_IndiciesBuffer != null) gl.DeleteBuffer(_IndiciesBuffer!.Value);
-        if (_TriangleArrayObject != null) gl.DeleteVertexArray(_TriangleArrayObject!.Value);
-        if (_SelectionBuffer != null) gl.DeleteBuffer(_SelectionBuffer!.Value);
+        if (_vertexBufferObject != null) gl.DeleteBuffer(_vertexBufferObject!.Value);
+        if (_indiciesBuffer != null) gl.DeleteBuffer(_indiciesBuffer!.Value);
+        if (_triangleArrayObject != null) gl.DeleteVertexArray(_triangleArrayObject!.Value);
+        if (_selectionBuffer != null) gl.DeleteBuffer(_selectionBuffer!.Value);
     }
 }

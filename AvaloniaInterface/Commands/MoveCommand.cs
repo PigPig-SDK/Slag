@@ -12,7 +12,7 @@ public class MoveCommand : ICommand
 {
     public ICommand? Next { get; set; }
 
-    private const float _MoveDistanceScale = 0.01f;
+    private const float _moveDistanceScale = 0.01f;
     public (Vector3 realitiveRight, Vector3 realitiveUp) CameraMoveDirections;
     private Vector2? _mouseStartPos = null;
     private Vector3 _activeAxis = new Vector3(1, 1, 1);
@@ -53,7 +53,7 @@ public class MoveCommand : ICommand
         Vertex[] vertices = model.GetVertexBackingField();
 
         Vector3 moveDirection = (CameraMoveDirections.realitiveRight * mouseDelta.X) + (CameraMoveDirections.realitiveUp * mouseDelta.Y);
-        moveDirection *= _MoveDistanceScale;
+        moveDirection *= _moveDistanceScale;
 
         foreach (uint index in _selectedIndicies)
         {

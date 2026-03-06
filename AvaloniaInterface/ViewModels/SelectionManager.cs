@@ -1,5 +1,4 @@
-﻿using Avalonia.Rendering.Composition;
-using Models;
+﻿using Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -11,14 +10,14 @@ public class SelectionManager
 {
     public static SelectionManager Instance = new();
 
-    private SelectionMode _SelectionMode = SelectionMode.Face;
+    private SelectionMode _selectionMode = SelectionMode.Face;
 
     public SelectionMode CurrentSelectionMode
     {
-        get => _SelectionMode;
+        get => _selectionMode;
         set {
-            SelectionMode oldValue = _SelectionMode;
-            _SelectionMode = value;
+            SelectionMode oldValue = _selectionMode;
+            _selectionMode = value;
             AdjustSelection(oldValue);
         }
     }
@@ -74,7 +73,7 @@ public class SelectionManager
 
     public void CheckForSelection(Vector2 screenPosition, bool isDrag)
     {
-        switch (_SelectionMode)
+        switch (_selectionMode)
         {
             case SelectionMode.Face:
                 CheckForFaceSelection(screenPosition, isDrag);

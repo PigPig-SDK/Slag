@@ -11,11 +11,11 @@ public class ScaleCommand : ICommand
 {
     public ICommand? Next { get; set; }
 
-    private const float _MoveDistanceScale = 0.005f;
+    private const float _moveDistanceScale = 0.005f;
     public Vector3 SelectionCenter = new Vector3(0, 0, 0);
-    private Vector3 _ActiveAxis = new Vector3(1, 1, 1);
-    private Vector2 _MouseScreenCenter = Vector2.Zero;
-    private List<uint>? _SelectedIndicies = null;
+    private Vector3 _activeAxis = new Vector3(1, 1, 1);
+    private Vector2 _mouseScreenCenter = Vector2.Zero;
+    private List<uint>? _selectedIndicies = null;
 
     private Dictionary<uint, (Vector3 position, Vector3 moveNormal)> _StartingPosition = [];
     private float _ScaleValue;
@@ -31,11 +31,11 @@ public class ScaleCommand : ICommand
         SelectionComponent? selection = activeModel.GetComponent<SelectionComponent>();
         if (selection is null) return CommandState.Discard;
 
-        _SelectedIndicies = [.. selection.SelectionIndicies()];
+        _selectedIndicies = [.. selection.SelectionIndicies()];
 
         SelectionCenter = selection.GetCenter();
         //Compute center.
-        _MouseScreenCenter = Camera.Instance.WorldToScreen(selection.GetWorldCenter());
+        _mouseScreenCenter = Camera.Instance.WorldToScreen(selection.GetWorldCenter());
         int selectedCount = 0;
         foreach (uint index in selection.SelectionIndicies())
         {
@@ -51,13 +51,13 @@ public class ScaleCommand : ICommand
         Model? model = SelectionManager.Instance.CurrentModel;
         if (model == null) throw new Exception("No current model in MoveCommand.MoveSelection");
 
-        if (_SelectedIndicies == null) throw new Exception($"No selection set {nameof(_SelectedIndicies)}!");
+        if (_selectedIndicies == null) throw new Exception($"No selection set {nameof(_selectedIndicies)}!");
 
         Vertex[] vertices = model.GetVertexBackingField();
 
-        foreach (uint index in _SelectedIndicies)
+        foreach (uint index in _selectedIndicies)
         {
-            vertices[index].Position = _StartingPosition[index].position + ((_StartingPosition[index].moveNormal* ammount) * _ActiveAxis);
+            vertices[index].Position = _StartingPosition[index].position + ((_StartingPosition[index].moveNormal* ammount) * _activeAxis);
         }
         model.UpdateAllComponents(UpdateType.Locational, null);
     }
@@ -75,8 +75,8 @@ public class ScaleCommand : ICommand
         if ((args.info & CommandInfo.MouseEvent) != 0)
         {
             var mouseInfo = args.mouseEvent!.GetPosition(GLControl.Instance);
-            Vector2 mouseDelta = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y) - _MouseScreenCenter;
-            _ScaleValue = (250 - mouseDelta.Length) * _MoveDistanceScale;
+            Vector2 mouseDelta = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y) - _mouseScreenCenter;
+            _ScaleValue = (250 - mouseDelta.Length) * _moveDistanceScale;
             Scale(_ScaleValue);
             if (args.info.HasFlag(CommandInfo.MouseDown))//Accept.
                 return CommandState.Finished;
@@ -88,13 +88,13 @@ public class ScaleCommand : ICommand
             case Key.S://Accept.
                 return CommandState.Finished;
             case Key.X:
-                _ActiveAxis = new Vector3(1, 0, 0);
+                _activeAxis = new Vector3(1, 0, 0);
                 return CommandState.Idle;
             case Key.Y:
-                _ActiveAxis = new Vector3(0, 1, 0);
+                _activeAxis = new Vector3(0, 1, 0);
                 return CommandState.Idle;
             case Key.Z:
-                _ActiveAxis = new Vector3(0, 0, 1);
+                _activeAxis = new Vector3(0, 0, 1);
                 return CommandState.Idle;
             case Key.Escape:
                 {

@@ -5,12 +5,12 @@ namespace Models;
 public class Model
 {
     public string ObjectName = "Model";
-    private List<Vertex> _Verticies = [];
-    public IReadOnlyList<Vertex> Verticies => _Verticies;
-    protected List<Face> _Faces = [];
-    public IReadOnlyList<Face> Faces => _Faces;
-    protected HashSet<Edge> _Edges = [];
-    public IReadOnlySet<Edge> Edges => _Edges;
+    private List<Vertex> _verticies = [];
+    public IReadOnlyList<Vertex> Verticies => _verticies;
+    protected List<Face> _faces = [];
+    public IReadOnlyList<Face> Faces => _faces;
+    protected HashSet<Edge> _edges = [];
+    public IReadOnlySet<Edge> Edges => _edges;
     protected bool IsDisposed = false;
     public uint[] Indicies = [];
     public bool Hidden = false;
@@ -51,32 +51,32 @@ public class Model
 
     public Vertex[] GetVertexBackingField()
     {
-        return _Verticies.BackingField<Vertex>();
+        return _verticies.BackingField<Vertex>();
     }
 
     public Vertex GetVertex(uint index)
     {
-        if(index < 0 || index > _Verticies.Count -1)
+        if(index < 0 || index > _verticies.Count -1)
         {
             throw new ArgumentOutOfRangeException($"{nameof(index)} is out of range");
         }
-        return _Verticies[(int)index];
+        return _verticies[(int)index];
     }
 
     public void AddVertex(Vertex vertex)
     {
-        _Verticies.Add(vertex);
+        _verticies.Add(vertex);
         UpdateAllComponents(UpdateType.Membership, vertex);
     }
 
     public void AddEdge(Edge edge, UpdateType info = UpdateType.None)
     {
-        if (_Edges.TryGetValue(edge, out Edge? hashEdge) && hashEdge != null)
+        if (_edges.TryGetValue(edge, out Edge? hashEdge) && hashEdge != null)
         {
            hashEdge.Faces.AddRange(edge.Faces);
         }
         else
-            _Edges.Add(edge);
+            _edges.Add(edge);
 
         UpdateAllComponents(UpdateType.Membership | info, edge);
     }
@@ -87,14 +87,14 @@ public class Model
     {
         foreach(uint i in face.Indicies)
         {
-            if( i < 0 || i > _Verticies.Count -1)
+            if( i < 0 || i > _verticies.Count -1)
             {
                 throw new ArgumentException($"{nameof(face)} has an index out of range");
             }
         }
 
         face.ParentModel = this;
-        _Faces.Add(face);
+        _faces.Add(face);
 
         for(int i = 0; i < face.Indicies.Count - 1; i++) {
             uint start = (uint)face.Indicies[i];
@@ -109,27 +109,27 @@ public class Model
     {
 
         //Manage faces
-        int editCount = _Faces.RemoveAll(x => x.Contains((uint)index));
-        _Faces.ForEach(face => face.DecrementForIndex(index));
+        int editCount = _faces.RemoveAll(x => x.Contains((uint)index));
+        _faces.ForEach(face => face.DecrementForIndex(index));
 
         //Manage edges
-        editCount += _Edges.RemoveWhere(x => x.Contains(index));
+        editCount += _edges.RemoveWhere(x => x.Contains(index));
 
         //Remap old edges by replacing them with new ones.
-        foreach (Edge e in _Edges.Where(x => x.RequiresDecrement(index)).Select(x => x).ToArray())
+        foreach (Edge e in _edges.Where(x => x.RequiresDecrement(index)).Select(x => x).ToArray())
         {
-            _Edges.Remove(e);
+            _edges.Remove(e);
             e.DecrementForIndex(index);
-            _Edges.Add(e);
+            _edges.Add(e);
         }
 
-        _Verticies.RemoveAt(index);
+        _verticies.RemoveAt(index);
         UpdateAllComponents(info, index);
     }
 
     public void RemoveFace(Face face, UpdateType info = UpdateType.Membership)
     {
-        _Faces.Remove(face);
+        _faces.Remove(face);
         UpdateAllComponents(info, face);
     }
 
@@ -140,7 +140,7 @@ public class Model
             RemoveFace(f, info);
         }
 
-        _Edges.Remove(edge);
+        _edges.Remove(edge);
         UpdateAllComponents(info, edge);
     }
 
@@ -148,7 +148,7 @@ public class Model
     {
         TriangleToFaceMapping.Clear();
         List<uint> indicies = [];
-        foreach (Face face in _Faces)
+        foreach (Face face in _faces)
         {
             face.Triangulate(ref indicies);
         }
@@ -157,9 +157,9 @@ public class Model
 
     public uint[] GetEdgeIndicies()
     {
-        uint[] indicies = new uint[_Edges.Count * 2];
+        uint[] indicies = new uint[_edges.Count * 2];
         int index = 0;
-        foreach (Edge edge in _Edges)
+        foreach (Edge edge in _edges)
         {
             indicies[index++] = edge.Vertex1;
             indicies[index++] = edge.Vertex2;
@@ -261,7 +261,7 @@ public class Model
 
     public void GenerateTriangulatedModel(ref Vertex[] verts, ref List<uint> indicies)
     {
-        verts = _Verticies.BackingField();
+        verts = _verticies.BackingField();
         GenerateIndicies();
         indicies = new (Indicies);
     }
@@ -291,11 +291,11 @@ public class Model
         if(modelState == null)
             throw new ArgumentNullException(nameof(modelState));
 
-        _Verticies.Clear();
-        _Faces.Clear();
-        _Edges.Clear();
+        _verticies.Clear();
+        _faces.Clear();
+        _edges.Clear();
 
-        _Verticies = [.. modelState._Verticies];
+        _verticies = [.. modelState._verticies];
         foreach (Face face in modelState.Faces)
             AddFace((Face)face.Clone(), UpdateType.Ignore);
 
