@@ -79,9 +79,9 @@ public class RotateCommand : ICommand
     {
         if(_model == null) return;
 
-        Vector3 normal = Vector3.Cross(_rotationUp, _rotationRight);
+        Vector3 normal = Vector3.Cross(_rotationRight, _rotationUp);
 
-        Matrix4 rotationMatrix =  Matrix4.CreateFromAxisAngle(normal, -rotationAmmount);
+        Matrix4 rotationMatrix =  Matrix4.CreateFromAxisAngle(normal, rotationAmmount);
         Vertex[] vertices = _model.GetVertexBackingField();
 
         foreach (var pair in _startingPosition)
