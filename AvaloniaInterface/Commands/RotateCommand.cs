@@ -17,8 +17,11 @@ public class RotateCommand : ICommand
     private float _totalRotation;
     private float? _initialRotation = null;
     private Model? _model;
-    private Vector3 _cameraRotationVector = Vector3.Zero;
-    private Vector3 _rotationVector = Vector3.Zero;
+    
+    private Vector3 _cameraRotationRight = Vector3.Zero;
+    private Vector3 _cameraRotationUp = Vector3.Zero;
+    private Vector3 _rotationUp;
+    private Vector3 _rotationRight;
 
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
@@ -38,6 +41,8 @@ public class RotateCommand : ICommand
             _initialRotation ??= angle;
             _totalRotation = angle - _initialRotation.Value;
             Rotate(_totalRotation);
+            if (args.info.HasFlag(CommandInfo.MouseDown))
+                return CommandState.Finished;
         }
         if(args.info.HasFlag(CommandInfo.KeyDown))
         {
@@ -45,18 +50,25 @@ public class RotateCommand : ICommand
             {
                 case Key.X:
                     {
-                        _rotationVector = new Vector3(1, 0, 0);
+                        _rotationRight = new Vector3(0, 1, 0);
+                        _rotationUp = new Vector3(0, 0, 1);
                         break;
                     }
                 case Key.Y:
                     {
-                        _rotationVector = new Vector3(0, 1, 0);
+                        _rotationRight = new Vector3(1, 0, 0);
+                        _rotationUp = new Vector3(0, 0, 1);
                         break;
                     }
                 case Key.Z:
                     {
-                        _rotationVector = new Vector3(0, 0, 1);
+                        _rotationRight = new Vector3(1, 0, 0);
+                        _rotationUp = new Vector3(0, 1, 0);
                         break;
+                    }
+                case Key.R:
+                    {
+                        return CommandState.Finished;
                     }
             }
         }
@@ -67,14 +79,9 @@ public class RotateCommand : ICommand
     {
         if(_model == null) return;
 
-        float radius = _rotationVector.Length;
-        float polar = MathF.Acos(_rotationVector.Z / radius);
-        float azmith = MathF.Atan2(_rotationVector.Y,_rotationVector.X);
+        Vector3 normal = Vector3.Cross(_rotationUp, _rotationRight);
 
-        Matrix4 rotationMatrix = 
-            Matrix4.CreateRotationX(polar*rotationAmmount) * 
-            Matrix4.CreateRotationZ(azmith);
-        
+        Matrix4 rotationMatrix =  Matrix4.CreateFromAxisAngle(normal, -rotationAmmount);
         Vertex[] vertices = _model.GetVertexBackingField();
 
         foreach (var pair in _startingPosition)
@@ -107,8 +114,9 @@ public class RotateCommand : ICommand
 
         //Read camera rotation vector
         var directions = Camera.Instance.GetRealitiveDirections();
-        _cameraRotationVector = (directions.realitiveRight + directions.realitiveUp).Normalized();
-        _rotationVector = _cameraRotationVector;
+        _rotationRight = _cameraRotationRight = directions.realitiveRight.Normalized();
+        _rotationUp = _cameraRotationUp = directions.realitiveUp.Normalized();
+
         return CommandState.Idle;//Continue the command.
     }
 
