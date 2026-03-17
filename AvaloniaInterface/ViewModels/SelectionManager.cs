@@ -2,6 +2,7 @@
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace OpenglAvaloniaTest.ViewModels;
 
@@ -24,6 +25,11 @@ public class SelectionManager
 
     public Model? CurrentModel { get; private set; } = null;
 
+    /// <summary>
+    /// Object can be:
+    /// uint -> The index ID
+    /// Face -> 
+    /// </summary>
     private HashSet<object> _CurrentSelection = new();
 
     private SelectionManager()
@@ -69,6 +75,74 @@ public class SelectionManager
         if (CurrentModel == null) return;//Cannot do anything.
         CurrentModel.GetComponent<SelectionComponent>()?.DeselectAll();
         _CurrentSelection.Clear();
+    }
+
+    /// <summary>
+    /// Returns a selection of your desired type. Will translate between selection modes automatically.
+    /// </summary>
+    /// <typeparam name="T"> This will be either a Face, Vertex or Edge.</typeparam>
+    /// <remarks> Face -> Edge-> Vertex!  If you desire faces and only edges are selected. Then you get nothing!</remarks>
+    /// <returns>A list of <typeparamref name="T"/> which is <see cref="Face"/>, <see cref="uint"/>, or <see cref="Edge"/> depending on what your generic desires.</returns>
+    public IEnumerable<T> GetSelection<T>()
+    {
+        if(typeof(T) == typeof(Face))
+        {
+            foreach (object selectedObject in _CurrentSelection)
+            {
+                if(selectedObject is Face face) yield return (T)(object)face;
+            }
+        }
+        else if(typeof(T) == typeof(Edge))
+        {
+            //Search for edges
+            HashSet<Edge> edges = [];
+            foreach (object selectedObject in _CurrentSelection)
+            {
+                if (selectedObject is Edge edge)
+                    edges.Add(edge);
+                else if(selectedObject is Face face)
+                {
+                    foreach(Edge faceEdge in face.Edges)
+                    {
+                        edges.Add(faceEdge);
+                    }
+                }
+            }
+            //yield those found from search
+            foreach(Edge edge in edges)
+            {
+                yield return (T)(object)edge;
+            }
+        }
+        else if (typeof(T) == typeof(uint))//index
+        {
+            //Search for verts
+            HashSet<uint> verts = [];
+            foreach (object selectedObject in _CurrentSelection)
+            {
+                if (selectedObject is uint vertex)
+                {
+                    verts.Add(vertex);
+                }
+                else if (selectedObject is Face face)
+                {
+                    foreach (uint index in face.Indicies)
+                    {
+                        verts.Add(index);
+                    }
+                }
+                else if(selectedObject is  Edge edge)
+                {
+                    verts.Add(edge.Vertex1);
+                    verts.Add(edge.Vertex2);
+                }
+            }
+            //yield those found from search
+            foreach (uint index in verts)
+            {
+                yield return (T)(object)index;
+            }
+        }
     }
 
     public void CheckForSelection(Vector2 screenPosition, bool isDrag)
@@ -125,7 +199,6 @@ public class SelectionManager
             ClearSelectedModel();
         }
     }
-
     private void CheckForEdgeSelection(Vector2 screenPosition, bool isDrag)
     {
         if (Camera.Instance == null)
