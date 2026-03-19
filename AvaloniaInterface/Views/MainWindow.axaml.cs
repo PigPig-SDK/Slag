@@ -139,7 +139,17 @@ public partial class MainWindow : Window
         });
 
         if (file == null) return;//User didnt make a selection
-        Console.WriteLine("SelectionMade");
+
+        Stream stream = await file.OpenWriteAsync();
+        try
+        {
+            using StreamWriter streamWriter = new StreamWriter(stream);
+            OBJFile.SaveOBJ(streamWriter);
+        }
+        catch (InvalidDataException exception)
+        {
+            Console.WriteLine(exception.Message);
+        }
     }
 
     private void OnScale(object? sender, RoutedEventArgs e)

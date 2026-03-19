@@ -36,7 +36,7 @@ public static class OBJFile
     public static void SaveOBJ(StreamWriter writer)
     {
         if(SceneHierarchy.Instance is null) throw new InvalidOperationException("SceneHierarchy not initialized.");
-
+        int objVertCount = 0;
         //TODO: OPTIMIZE TO REMOVE DUPLICATES!
         foreach(Model model in SceneHierarchy.Instance.GetModels(HierarchyType.Model))
         {
@@ -53,8 +53,9 @@ public static class OBJFile
             //Write faces
             foreach(Face face in model.Faces)
             {
-                writer.WriteLine($"{FaceToken} {string.Join(" ", face.Indicies.Select(i => $"{i + 1}/{i + 1}/{i + 1}").ToArray())}");
+                writer.WriteLine($"{FaceToken} {string.Join(" ", face.Indicies.Select(i => $"{i + 1 + objVertCount}/{i + 1 + objVertCount}/{i + 1 + objVertCount}").ToArray())}");
             }
+            objVertCount += model.Verticies.Count();
         }
     }
 
