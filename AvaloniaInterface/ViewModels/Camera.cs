@@ -133,13 +133,12 @@ public class Camera
         p4.W = 1.0f;
         p4 = (p4 * matrix);//translate to clip space
         p4 /= p4.W;
-        Vector2 worldToScreen = p4.Xy; 
+        Vector2 worldToScreen = p4.Xy;
 
         //To resolution
         worldToScreen.X = (float)((worldToScreen.X + 1.0) / 2.0 * GLControl.Instance.Bounds.Width);
         worldToScreen.Y = (float)((worldToScreen.Y + 1.0) / 2.0 * GLControl.Instance.Bounds.Height);
-
-        Console.WriteLine(worldToScreen);
+        worldToScreen.Y = (float)GLControl.Instance.Bounds.Height - worldToScreen.Y; // flip Y
 
         return worldToScreen;
     }
