@@ -1,4 +1,5 @@
-﻿using Models;
+﻿using Avalonia.Media;
+using Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ public class SelectionManager
     public static SelectionManager Instance = new();
 
     private SelectionMode _selectionMode = SelectionMode.Face;
+
+    public static SolidColorBrush SelectionColor = new (new Color(255, 255, 165, 0));
 
     public SelectionMode CurrentSelectionMode
     {

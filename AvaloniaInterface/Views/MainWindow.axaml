@@ -53,6 +53,7 @@
 
             <!-- OpenGL view -->
             <local:GLControl Grid.Column="2"/>
+            <Canvas Name="OverlayCanvas" ClipToBounds="True" IsHitTestVisible="False" Grid.Column="2"/>
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>

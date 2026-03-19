@@ -1,6 +1,10 @@
-﻿using Avalonia.Input;
+﻿using Avalonia.Collections;
+using Avalonia.Controls.Shapes;
+using Avalonia.Input;
+using Avalonia.Media;
 using Models;
 using OpenglAvaloniaTest.ViewModels;
+using OpenglAvaloniaTest.Views;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -20,6 +24,8 @@ public class ScaleCommand : ICommand
     private Dictionary<uint, (Vector3 position, Vector3 moveNormal)> _StartingPosition = [];
     private float _ScaleValue;
 
+    //UI stuff..
+    Line? _uiLine;
     private CommandState Initialize()
     {
         if (Camera.Instance == null) throw new InvalidOperationException($"No camera in {nameof(MoveCommand)} {nameof(Initialize)}");
@@ -43,6 +49,20 @@ public class ScaleCommand : ICommand
             _StartingPosition[index] = (vert.Position, (SelectionCenter - vert.Position).Normalized());
             selectedCount++;
         }
+        //UI
+        if (MainWindow.Instance != null)
+        {
+            _uiLine = new()
+            {
+                StartPoint = new(_mouseScreenCenter.X, _mouseScreenCenter.Y),
+                EndPoint = new(_mouseScreenCenter.X, _mouseScreenCenter.Y),
+                Stroke = SelectionManager.SelectionColor,
+                StrokeThickness = 2,
+                StrokeDashArray = new AvaloniaList<double> { 4, 4 }
+            };
+            MainWindow.Instance.OverlayCanvas.Children.Add( _uiLine );
+        }
+
         return CommandState.Idle;//Continue the command.
     }
 
@@ -65,7 +85,7 @@ public class ScaleCommand : ICommand
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
         //No model, no command.
-        if (SelectionManager.Instance.CurrentModel == null) return CommandState.Finished;
+        if (SelectionManager.Instance.CurrentModel == null) return CommandState.Discard;
         //Initialization
         if (args.info.HasFlag(CommandInfo.Initialization)) return Initialize();
         //Block keyup inputs
@@ -75,17 +95,25 @@ public class ScaleCommand : ICommand
         if ((args.info & CommandInfo.MouseEvent) != 0)
         {
             var mouseInfo = args.mouseEvent!.GetPosition(GLControl.Instance);
+
+            if(_uiLine is not null)
+                _uiLine.EndPoint = new(mouseInfo.X, mouseInfo.Y);
+
             Vector2 mouseDelta = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y) - _mouseScreenCenter;
             _ScaleValue = (250 - mouseDelta.Length) * _moveDistanceScale;
             Scale(_ScaleValue);
             if (args.info.HasFlag(CommandInfo.MouseDown))//Accept.
+            {
+                CleanUpUi();
                 return CommandState.Finished;
+            }
         }
 
         //Keyboard input
         switch (args.keyEvent?.Key)
         {
             case Key.S://Accept.
+                CleanUpUi();
                 return CommandState.Finished;
             case Key.X:
                 _activeAxis = new Vector3(1, 0, 0);
@@ -99,6 +127,7 @@ public class ScaleCommand : ICommand
             case Key.Escape:
                 {
                     Scale(0.0f);
+                    CleanUpUi();
                     return CommandState.Finished;
                 }
 
@@ -106,6 +135,13 @@ public class ScaleCommand : ICommand
 
         return CommandState.Idle;
     }
+    private void CleanUpUi()
+    {
+        if (MainWindow.Instance == null || _uiLine == null) return;
+
+        MainWindow.Instance.OverlayCanvas.Children.Remove(_uiLine);
+    }
+
     public void Undo()
     {
         Scale(0);
