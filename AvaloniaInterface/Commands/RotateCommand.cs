@@ -33,6 +33,7 @@ public class RotateCommand : ICommand
     private Line? _initialLine;
     private Line? _dynamicLine;
     private Ellipse? _outlineElipse;
+    private TextBlock? _textblock;
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
         if (SelectionManager.Instance.CurrentModel == null) return CommandState.Discard;
@@ -53,16 +54,19 @@ public class RotateCommand : ICommand
             Vector2 distanceVector = mousePos - _mouseStart.Value;
             if(distanceVector.LengthSquared == 0) return CommandState.Idle;//Cannot compute right now.
             float angle = MathF.Atan2(distanceVector.Y, distanceVector.X);
-            if(_initialRotation is null)
+            if (_initialRotation is null)
             {
                 _initialRotation = angle;
                 Vector2 anglePos = _mouseStart.Value + (distanceVector.Normalized() * _uiRadius/2);
 
+                _textblock!.RenderTransform = new TranslateTransform(_mouseStart.Value.X, (_mouseStart.Value.Y - _uiRadius / 2) - 30);
                 _initialLine!.EndPoint = new(anglePos.X, anglePos.Y);
                 _outlineElipse!.RenderTransform = new TranslateTransform(_mouseStart.Value.X - _uiRadius/2, _mouseStart.Value.Y - _uiRadius/2);
+                
                 //Make UI appear...
                 _outlineElipse.IsVisible = true;
                 _initialLine.IsVisible = true;
+                _textblock.IsVisible = true;
             }
 
             //Dynamic UI compute
@@ -71,6 +75,8 @@ public class RotateCommand : ICommand
             _dynamicLine!.IsVisible = true;
 
             _totalRotation = angle - _initialRotation.Value;
+            _textblock!.Text = (_totalRotation * (180.0 / MathF.PI)).ToString("F1");
+
             Rotate(_totalRotation);
             if (args.info.HasFlag(CommandInfo.MouseDown))
             {
@@ -121,6 +127,8 @@ public class RotateCommand : ICommand
             canvas.Children.Remove(_outlineElipse);
         if(_dynamicLine is not null)
             canvas.Children.Remove(_dynamicLine);
+        if(_textblock is not null)
+            canvas.Children.Remove(_textblock);
     }
     private void Rotate(float rotationAmmount)
     {
@@ -194,10 +202,20 @@ public class RotateCommand : ICommand
                 StrokeDashArray = new AvaloniaList<double> { 4, 4 },
                 IsVisible = false,
             };
+
+            _textblock = new()
+            {
+                Text = "",
+                Foreground = SelectionManager.SelectionColor,
+                FontSize = 14,
+                IsVisible=false,
+            };
+
             Canvas canvas = MainWindow.Instance.OverlayCanvas;
             canvas.Children.Add(_initialLine);
             canvas.Children.Add(_outlineElipse);
             canvas.Children.Add(_dynamicLine);
+            canvas.Children.Add(_textblock);
         }
         return CommandState.Idle;//Continue the command.
     }

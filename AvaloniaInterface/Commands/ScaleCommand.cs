@@ -1,4 +1,5 @@
 ﻿using Avalonia.Collections;
+using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -25,7 +26,9 @@ public class ScaleCommand : ICommand
     private float _ScaleValue;
 
     //UI stuff..
-    Line? _uiLine;
+    private Line? _uiLine;
+    private TextBlock? _textblock;
+
     private CommandState Initialize()
     {
         if (Camera.Instance == null) throw new InvalidOperationException($"No camera in {nameof(MoveCommand)} {nameof(Initialize)}");
@@ -60,7 +63,17 @@ public class ScaleCommand : ICommand
                 StrokeThickness = 2,
                 StrokeDashArray = new AvaloniaList<double> { 4, 4 }
             };
-            MainWindow.Instance.OverlayCanvas.Children.Add( _uiLine );
+
+            _textblock = new()
+            {
+                Text = "",
+                Foreground = SelectionManager.SelectionColor,
+                FontSize = 14,
+                IsVisible = false,
+            };
+
+            MainWindow.Instance.OverlayCanvas.Children.Add(_uiLine);
+            MainWindow.Instance.OverlayCanvas.Children.Add(_textblock);
         }
 
         return CommandState.Idle;//Continue the command.
@@ -101,6 +114,15 @@ public class ScaleCommand : ICommand
 
             Vector2 mouseDelta = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y) - _mouseScreenCenter;
             _ScaleValue = (250 - mouseDelta.Length) * _moveDistanceScale;
+
+            if(_textblock is not null)
+            {
+                Vector2 textPosition = _mouseScreenCenter + mouseDelta/2;
+                _textblock.IsVisible = true;
+                _textblock!.RenderTransform = new TranslateTransform(textPosition.X, textPosition.Y);
+                _textblock.Text = (_ScaleValue*-1).ToString("F2");
+            }    
+
             Scale(_ScaleValue);
             if (args.info.HasFlag(CommandInfo.MouseDown))//Accept.
             {
@@ -137,9 +159,13 @@ public class ScaleCommand : ICommand
     }
     private void CleanUpUi()
     {
-        if (MainWindow.Instance == null || _uiLine == null) return;
+        if (MainWindow.Instance == null) return;
+        Canvas canvas = MainWindow.Instance.OverlayCanvas;
 
-        MainWindow.Instance.OverlayCanvas.Children.Remove(_uiLine);
+        if(_uiLine is not null)
+            canvas.Children.Remove(_uiLine);
+        if (_textblock is not null)
+            canvas.Children.Remove(_textblock);
     }
 
     public void Undo()
