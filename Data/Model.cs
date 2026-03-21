@@ -1,12 +1,18 @@
 ﻿using OpenTK.Mathematics;
+using System.Collections.ObjectModel;
 
 namespace Models;
 
 public class Model
 {
     public string ObjectName = "Model";
+    //Verts
     private List<Vertex> _verticies = [];
     public IReadOnlyList<Vertex> Verticies => _verticies;
+
+    private Dictionary<uint, List<uint>> _vertexEdgeMap = [];
+    public IReadOnlyDictionary<uint, List<uint>> VertexEdgeMap => _vertexEdgeMap;
+
     protected List<Face> _faces = [];
     public IReadOnlyList<Face> Faces => _faces;
     protected HashSet<Edge> _edges = [];
@@ -63,20 +69,27 @@ public class Model
         return _verticies[(int)index];
     }
 
-    public void AddVertex(Vertex vertex)
+    public uint AddVertex(Vertex vertex)
     {
+        uint index = (uint)_verticies.Count();
         _verticies.Add(vertex);
+        _vertexEdgeMap.Add(index, new());
         UpdateAllComponents(UpdateType.Membership, vertex);
+        return index;
     }
 
     public void AddEdge(Edge edge, UpdateType info = UpdateType.None)
     {
         if (_edges.TryGetValue(edge, out Edge? hashEdge) && hashEdge != null)
         {
-           hashEdge.Faces.AddRange(edge.Faces);
+            hashEdge.Faces.AddRange(edge.Faces);
         }
         else
+        {
             _edges.Add(edge);
+            _vertexEdgeMap[edge.Vertex1].Add(edge.Vertex2);
+            _vertexEdgeMap[edge.Vertex2].Add(edge.Vertex1);
+        }
 
         UpdateAllComponents(UpdateType.Membership | info, edge);
     }
@@ -107,9 +120,22 @@ public class Model
 
     public void RemoveVertex(int index, UpdateType info = UpdateType.Membership)
     {
+        //Clear out edgemap
+        uint uIndex = (uint)index;
+        if (_vertexEdgeMap.ContainsKey(uIndex))
+        {
+            foreach (uint neighbor in _vertexEdgeMap[uIndex])
+            {
+                if(_vertexEdgeMap.TryGetValue(neighbor, out var neighborList))
+                {
+                    neighborList.Remove(uIndex);//Clear index out of it's neighbors.
+                }
+            }
+            _vertexEdgeMap.Remove(uIndex);//Clear index
+        }
 
         //Manage faces
-        int editCount = _faces.RemoveAll(x => x.Contains((uint)index));
+        int editCount = _faces.RemoveAll(x => x.Contains(uIndex));
         _faces.ForEach(face => face.DecrementForIndex(index));
 
         //Manage edges
@@ -139,6 +165,8 @@ public class Model
         {
             RemoveFace(f, info);
         }
+        _vertexEdgeMap[edge.Vertex1].Remove(edge.Vertex2);
+        _vertexEdgeMap[edge.Vertex2].Remove(edge.Vertex1);
 
         _edges.Remove(edge);
         UpdateAllComponents(info, edge);
