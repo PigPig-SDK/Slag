@@ -1,5 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 
 namespace Models;
 
@@ -78,8 +79,15 @@ public class Model
         return index;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool VertexExists(uint index) => index < Verticies.Count();
+
     public void AddEdge(Edge edge, UpdateType info = UpdateType.None)
     {
+        if (!VertexExists(edge.Vertex1) || !VertexExists(edge.Vertex2))
+            throw new InvalidOperationException("Edge added with verts out of range.");
+
+
         if (_edges.TryGetValue(edge, out Edge? hashEdge) && hashEdge != null)
         {
             hashEdge.Faces.AddRange(edge.Faces);
@@ -100,7 +108,7 @@ public class Model
     {
         foreach(uint i in face.Indicies)
         {
-            if( i < 0 || i > _verticies.Count -1)
+            if(!VertexExists(i))
             {
                 throw new ArgumentException($"{nameof(face)} has an index out of range");
             }
