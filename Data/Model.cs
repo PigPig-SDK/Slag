@@ -11,8 +11,8 @@ public class Model
     private List<Vertex> _verticies = [];
     public IReadOnlyList<Vertex> Verticies => _verticies;
 
-    private Dictionary<uint, List<uint>> _vertexEdgeMap = [];
-    public IReadOnlyDictionary<uint, List<uint>> VertexEdgeMap => _vertexEdgeMap;
+    private Dictionary<uint, HashSet<uint>> _vertexEdgeMap = [];
+    public IReadOnlyDictionary<uint, HashSet<uint>> VertexEdgeMap => _vertexEdgeMap;
 
     protected List<Face> _faces = [];
     public IReadOnlyList<Face> Faces => _faces;
@@ -70,19 +70,19 @@ public class Model
         return _verticies[(int)index];
     }
 
-    public uint AddVertex(Vertex vertex)
+    public uint AddVertex(Vertex vertex, UpdateType updateType = UpdateType.Membership)
     {
         uint index = (uint)_verticies.Count();
         _verticies.Add(vertex);
         _vertexEdgeMap.Add(index, new());
-        UpdateAllComponents(UpdateType.Membership, vertex);
+        UpdateAllComponents(updateType, vertex);
         return index;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool VertexExists(uint index) => index < Verticies.Count();
 
-    public void AddEdge(Edge edge, UpdateType info = UpdateType.None)
+    public void AddEdge(Edge edge, UpdateType updateType = UpdateType.Membership)
     {
         if (!VertexExists(edge.Vertex1) || !VertexExists(edge.Vertex2))
             throw new InvalidOperationException("Edge added with verts out of range.");
@@ -99,10 +99,12 @@ public class Model
             _vertexEdgeMap[edge.Vertex2].Add(edge.Vertex1);
         }
 
-        UpdateAllComponents(UpdateType.Membership | info, edge);
+        UpdateAllComponents(updateType, edge);
     }
 
-    public void AddFace(params uint[] indicies) => AddFace(new List<uint>(indicies), UpdateType.Membership);
+
+    public void AddFace(params uint[] indicies) => AddFaceUpdate(UpdateType.Membership, indicies);
+    public void AddFaceUpdate(UpdateType updateType, params uint[] indicies) => AddFace([.. indicies], updateType);
     public void AddFace(List<uint> indicies, UpdateType info = UpdateType.Membership) => AddFace(new Face(indicies));
     public void AddFace(Face face, UpdateType info = UpdateType.Membership)
     {
@@ -332,6 +334,12 @@ public class Model
         _edges.Clear();
 
         _verticies = [.. modelState._verticies];
+        _vertexEdgeMap.Clear();
+        foreach (var pair in modelState.VertexEdgeMap)
+        {
+            _vertexEdgeMap.Add(pair.Key, pair.Value);
+        }
+
         foreach (Face face in modelState.Faces)
             AddFace((Face)face.Clone(), UpdateType.Ignore);
 

@@ -3,6 +3,7 @@ using Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenglAvaloniaTest.ViewModels;
@@ -31,9 +32,10 @@ public class SelectionManager
     /// <summary>
     /// Object can be:
     /// uint -> The index ID
-    /// Face -> 
+    /// Face,
+    /// Edge.
     /// </summary>
-    private HashSet<object> _CurrentSelection = new();
+    private HashSet<object> _currentSelection = new();
 
     private SelectionManager()
     {
@@ -57,6 +59,25 @@ public class SelectionManager
         {
             ClearSelection();
         }
+
+        switch(oldValue)
+        {
+            case SelectionMode.Face:
+                HashSet<object> newSelection = [];
+                foreach (object obj in _currentSelection)
+                {
+                    if (obj is not Face face) throw new InvalidOperationException("Current selection contains invalid type.");
+
+                    if (CurrentSelectionMode == SelectionMode.Edge)
+                        newSelection.Add(face.Edges);
+                    else if (CurrentSelectionMode == SelectionMode.Vertex)
+                        newSelection.Add(face.Indicies);
+                }
+
+                _currentSelection.Clear();
+                _currentSelection = newSelection;
+                break;
+        }
     }
 
     public void SelectModel(Model model)
@@ -73,11 +94,11 @@ public class SelectionManager
         CurrentModel = null;
     }
 
-    private void ClearSelection()
+    public void ClearSelection()
     {
         if (CurrentModel == null) return;//Cannot do anything.
         CurrentModel.GetComponent<SelectionComponent>()?.DeselectAll();
-        _CurrentSelection.Clear();
+        _currentSelection.Clear();
     }
 
     /// <summary>
@@ -90,7 +111,7 @@ public class SelectionManager
     {
         if(typeof(T) == typeof(Face))
         {
-            foreach (object selectedObject in _CurrentSelection)
+            foreach (object selectedObject in _currentSelection)
             {
                 if(selectedObject is Face face) yield return (T)(object)face;
             }
@@ -99,7 +120,7 @@ public class SelectionManager
         {
             //Search for edges
             HashSet<Edge> edges = [];
-            foreach (object selectedObject in _CurrentSelection)
+            foreach (object selectedObject in _currentSelection)
             {
                 if (selectedObject is Edge edge)
                     edges.Add(edge);
@@ -121,7 +142,7 @@ public class SelectionManager
         {
             //Search for verts
             HashSet<uint> verts = [];
-            foreach (object selectedObject in _CurrentSelection)
+            foreach (object selectedObject in _currentSelection)
             {
                 if (selectedObject is uint vertex)
                 {
@@ -188,13 +209,13 @@ public class SelectionManager
             {
                 ms.SelectIndex(hit.VertexIndex, UpdateType.Ignore);
                 ms.BroadcastMassUpdate(UpdateType.Selection);
-                _CurrentSelection.Add(hit.VertexIndex);
+                _currentSelection.Add(hit.VertexIndex);
             }
             else if (!isDrag)//Deselect
             {
                 ms.DeselectIndex(hit.VertexIndex, UpdateType.Ignore);
                 ms.BroadcastMassUpdate(UpdateType.Selection);
-                _CurrentSelection.Remove(hit.VertexIndex);
+                _currentSelection.Remove(hit.VertexIndex);
             }
         }
         else if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))
@@ -224,18 +245,18 @@ public class SelectionManager
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
 
-            if(!_CurrentSelection.Contains(hit.Edge))
+            if(!_currentSelection.Contains(hit.Edge))
             {
                 ms.SelectIndex(hit.Edge.Vertex1, UpdateType.Ignore);
                 ms.SelectIndex(hit.Edge.Vertex2, UpdateType.Ignore);
-                _CurrentSelection.Add(hit.Edge);
+                _currentSelection.Add(hit.Edge);
                 ms.BroadcastMassUpdate(UpdateType.Selection);
             }
             else if(!isDrag)
             {
                 ms.DeselectIndex(hit.Edge.Vertex1, UpdateType.Ignore);
                 ms.DeselectIndex(hit.Edge.Vertex2, UpdateType.Ignore);
-                _CurrentSelection.Remove(hit.Edge);
+                _currentSelection.Remove(hit.Edge);
                 ms.BroadcastMassUpdate(UpdateType.Selection);
             }
             
@@ -266,7 +287,7 @@ public class SelectionManager
                 ClearSelection();
             }
 
-            if (!_CurrentSelection.Contains(hit.Face))
+            if (!_currentSelection.Contains(hit.Face))
             {
                 foreach (uint index in hit!.Face.Indicies)
                 {
@@ -274,7 +295,7 @@ public class SelectionManager
                 }
 
                 ms.BroadcastMassUpdate(UpdateType.Selection);
-                _CurrentSelection.Add(hit.Face);
+                _currentSelection.Add(hit.Face);
                 SelectionMeshInstance.Instance.SelectFace(hit.Face);
             }
             else if (!isDrag)
@@ -284,7 +305,7 @@ public class SelectionManager
                     ms.DeselectIndex(index, UpdateType.Ignore);
                 }
                 ms.BroadcastMassUpdate(UpdateType.Selection);
-                _CurrentSelection.Remove(hit.Face);
+                _currentSelection.Remove(hit.Face);
                 SelectionMeshInstance.Instance.DeselectFace(hit.Face);
             }
         }
@@ -293,12 +314,14 @@ public class SelectionManager
             ClearSelectedModel();
         }
     }
-
+    /// <summary>
+    /// Removes the current selection.
+    /// </summary>
     public void DeleteCurrentSelection()
     {
         if(CurrentModel == null) return;
 
-        foreach (object obj in _CurrentSelection)
+        foreach (object obj in _currentSelection)
         {
             if (obj is uint index)
             {  
@@ -318,6 +341,11 @@ public class SelectionManager
         }
 
         CurrentModel.UpdateAllComponents(UpdateType.Membership, null);
-        _CurrentSelection.Clear();
+        _currentSelection.Clear();
+    }
+
+    internal void SetSelection(HashSet<object> indicies)
+    {
+        _currentSelection = indicies;
     }
 }

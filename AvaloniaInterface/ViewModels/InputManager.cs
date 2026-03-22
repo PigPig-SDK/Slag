@@ -11,6 +11,7 @@ public class InputManager
 
     public UserControlMode UserControlMode { get; private set; } = UserControlMode.None;
 
+    //TOTO: REFACTOR THIS.
     public void OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (CommandInvoker.Singleton.ExecuteCommandStep((e, null, CommandInfo.KeyDown))) return;
@@ -36,6 +37,11 @@ public class InputManager
             case Key.S:
                 {
                     CommandInvoker.Singleton?.RunCommand(new ScaleCommand(), cmdInfo);
+                    break;
+                }
+            case Key.E:
+                {
+                    CommandInvoker.Singleton?.RunCommand(new ExtrudeCommand(), cmdInfo);
                     break;
                 }
             case Key.Delete:

@@ -10,6 +10,13 @@ public struct Vertex
     public Vector2 UV = Vector2.Zero;
     public Vector3 Normal = Vector3.Zero;//On the model to generate normals.
 
+    public Vertex(Vertex vertex) : this()
+    {
+        Position = vertex.Position;
+        UV = vertex.UV;
+        Normal = vertex.Normal;
+    }
+
     public Vertex(Vector3 position, Vector2 uv) 
     { 
         Position = position;
