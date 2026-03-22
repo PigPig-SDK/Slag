@@ -328,5 +328,13 @@ public class SelectionManager
     public void SetSelection(HashSet<object> indicies)
     {
         _currentSelection = indicies;
+        SelectionComponent? ms = CurrentModel?.GetComponent<SelectionComponent>();
+        if (ms == null) return;
+        ms.DeselectAll(UpdateType.Ignore);
+        foreach(object obj in _currentSelection)
+        {
+            if (obj is uint index) ms.SelectIndex(index, UpdateType.Ignore);
+        }
+        ms.BroadcastMassUpdate(UpdateType.Selection);
     }
 }
