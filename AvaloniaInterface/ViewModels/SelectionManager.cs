@@ -59,25 +59,6 @@ public class SelectionManager
         {
             ClearSelection();
         }
-
-        switch(oldValue)
-        {
-            case SelectionMode.Face:
-                HashSet<object> newSelection = [];
-                foreach (object obj in _currentSelection)
-                {
-                    if (obj is not Face face) throw new InvalidOperationException("Current selection contains invalid type.");
-
-                    if (CurrentSelectionMode == SelectionMode.Edge)
-                        newSelection.Add(face.Edges);
-                    else if (CurrentSelectionMode == SelectionMode.Vertex)
-                        newSelection.Add(face.Indicies);
-                }
-
-                _currentSelection.Clear();
-                _currentSelection = newSelection;
-                break;
-        }
     }
 
     public void SelectModel(Model model)
@@ -344,7 +325,7 @@ public class SelectionManager
         _currentSelection.Clear();
     }
 
-    internal void SetSelection(HashSet<object> indicies)
+    public void SetSelection(HashSet<object> indicies)
     {
         _currentSelection = indicies;
     }
