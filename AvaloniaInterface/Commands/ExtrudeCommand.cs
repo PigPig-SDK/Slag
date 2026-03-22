@@ -12,10 +12,12 @@ public class ExtrudeCommand : MementoCommand
     {
         SelectionManager sm = SelectionManager.Instance;
         if (sm.CurrentModel is null) return CommandState.Discard;
+        SelectionComponent? component = sm.CurrentModel.GetComponent<SelectionComponent>();
+        if(component is null) return CommandState.Discard;
 
         CreateState();
         
-        Extrude(sm.CurrentModel, [.. sm.GetSelection<uint>()]);
+        Extrude(sm.CurrentModel, [.. component.GetSelection<uint>()]); 
 
         return CommandState.Finished;
     }

@@ -44,11 +44,13 @@ public class GLComponent : ModelComponent, IRenderObject
             return;
         }
 
+        HashSet<uint> selectedVerts = [.. Model.GetComponent<SelectionComponent>()!.GetSelection<uint>()];
+
         //Generate array.
         byte[] selectionData = new byte[_vertexCount];
-        for (int i = 0; i < selectionData.Length; i++)
+        for (uint i = 0; i < selectionData.Length; i++)
         {
-            selectionData[i] = Model.GetComponent<SelectionComponent>()!.IsVertexSelected((uint)i) ? (byte)1 : (byte)0;
+            selectionData[i] = selectedVerts.Contains(i) ? (byte)1 : (byte)0;
         }
 
         gl.BindBuffer(GL_ARRAY_BUFFER, _selectionBuffer!.Value);
@@ -87,7 +89,7 @@ public class GLComponent : ModelComponent, IRenderObject
         }
     }
 
-    private void OnSelectionChanged(uint index, bool isSelected, UpdateType update)
+    private void OnSelectionChanged(bool isSelected, UpdateType update)
     {
         if (update.HasFlag(UpdateType.Ignore)) return;
 

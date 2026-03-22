@@ -29,14 +29,6 @@ public class SelectionManager
 
     public Model? CurrentModel { get; private set; } = null;
 
-    /// <summary>
-    /// Object can be:
-    /// uint -> The index ID
-    /// Face,
-    /// Edge.
-    /// </summary>
-    private HashSet<object> _currentSelection = new();
-
     private SelectionManager()
     {
         SceneHierarchy.Instance.OnModelRemoved += OnModelDeleted;
@@ -79,75 +71,6 @@ public class SelectionManager
     {
         if (CurrentModel == null) return;//Cannot do anything.
         CurrentModel.GetComponent<SelectionComponent>()?.DeselectAll();
-        _currentSelection.Clear();
-    }
-
-    /// <summary>
-    /// Returns a selection of your desired type. Will translate between selection modes automatically.
-    /// </summary>
-    /// <typeparam name="T"> This will be either a Face, Vertex or Edge.</typeparam>
-    /// <remarks> Face -> Edge-> Vertex!  If you desire faces and only edges are selected. Then you get nothing!</remarks>
-    /// <returns>A list of <typeparamref name="T"/> which is <see cref="Face"/>, <see cref="uint"/>, or <see cref="Edge"/> depending on what your generic desires.</returns>
-    public IEnumerable<T> GetSelection<T>()
-    {
-        if(typeof(T) == typeof(Face))
-        {
-            foreach (object selectedObject in _currentSelection)
-            {
-                if(selectedObject is Face face) yield return (T)(object)face;
-            }
-        }
-        else if(typeof(T) == typeof(Edge))
-        {
-            //Search for edges
-            HashSet<Edge> edges = [];
-            foreach (object selectedObject in _currentSelection)
-            {
-                if (selectedObject is Edge edge)
-                    edges.Add(edge);
-                else if(selectedObject is Face face)
-                {
-                    foreach(Edge faceEdge in face.Edges)
-                    {
-                        edges.Add(faceEdge);
-                    }
-                }
-            }
-            //yield those found from search
-            foreach(Edge edge in edges)
-            {
-                yield return (T)(object)edge;
-            }
-        }
-        else if (typeof(T) == typeof(uint))//index
-        {
-            //Search for verts
-            HashSet<uint> verts = [];
-            foreach (object selectedObject in _currentSelection)
-            {
-                if (selectedObject is uint vertex)
-                {
-                    verts.Add(vertex);
-                }
-                else if (selectedObject is Face face)
-                {
-                    foreach (uint index in face.Indicies)
-                    {
-                        verts.Add(index);
-                    }
-                }
-                else if(selectedObject is  Edge edge)
-                {
-                    verts.Add(edge.Vertex1);
-                    verts.Add(edge.Vertex2);
-                }
-            }
-            //yield those found from search
-            foreach (uint index in verts)
-            {
-                yield return (T)(object)index;
-            }
-        }
     }
 
     public void CheckForSelection(Vector2 screenPosition, bool isDrag)
@@ -188,15 +111,11 @@ public class SelectionManager
             //Select
             if (!ms.IsVertexSelected(hit.VertexIndex))
             {
-                ms.SelectIndex(hit.VertexIndex, UpdateType.Ignore);
-                ms.BroadcastMassUpdate(UpdateType.Selection);
-                _currentSelection.Add(hit.VertexIndex);
+                ms.SelectIndex(hit.VertexIndex, UpdateType.Selection);
             }
             else if (!isDrag)//Deselect
             {
-                ms.DeselectIndex(hit.VertexIndex, UpdateType.Ignore);
-                ms.BroadcastMassUpdate(UpdateType.Selection);
-                _currentSelection.Remove(hit.VertexIndex);
+                ms.DeselectIndex(hit.VertexIndex, UpdateType.Selection);
             }
         }
         else if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))
@@ -226,20 +145,10 @@ public class SelectionManager
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
 
-            if(!_currentSelection.Contains(hit.Edge))
-            {
-                ms.SelectIndex(hit.Edge.Vertex1, UpdateType.Ignore);
-                ms.SelectIndex(hit.Edge.Vertex2, UpdateType.Ignore);
-                _currentSelection.Add(hit.Edge);
-                ms.BroadcastMassUpdate(UpdateType.Selection);
-            }
+            if(!ms.IsEdgeSelected(hit.Edge))
+                ms.SelectEdge(hit.Edge, UpdateType.Selection);
             else if(!isDrag)
-            {
-                ms.DeselectIndex(hit.Edge.Vertex1, UpdateType.Ignore);
-                ms.DeselectIndex(hit.Edge.Vertex2, UpdateType.Ignore);
-                _currentSelection.Remove(hit.Edge);
-                ms.BroadcastMassUpdate(UpdateType.Selection);
-            }
+                ms.DeselectEdge(hit.Edge, UpdateType.Selection);
             
         }
         else if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))
@@ -268,7 +177,7 @@ public class SelectionManager
                 ClearSelection();
             }
 
-            if (!_currentSelection.Contains(hit.Face))
+            if (!ms.IsFaceSelected(hit.Face))
             {
                 foreach (uint index in hit!.Face.Indicies)
                 {
@@ -276,17 +185,13 @@ public class SelectionManager
                 }
 
                 ms.BroadcastMassUpdate(UpdateType.Selection);
-                _currentSelection.Add(hit.Face);
                 SelectionMeshInstance.Instance.SelectFace(hit.Face);
             }
             else if (!isDrag)
             {
-                foreach (uint index in hit!.Face.Indicies)
-                {
-                    ms.DeselectIndex(index, UpdateType.Ignore);
-                }
+                ms.DeselectFace(hit!.Face);
+
                 ms.BroadcastMassUpdate(UpdateType.Selection);
-                _currentSelection.Remove(hit.Face);
                 SelectionMeshInstance.Instance.DeselectFace(hit.Face);
             }
         }
@@ -302,38 +207,42 @@ public class SelectionManager
     {
         if(CurrentModel == null) return;
 
-        foreach (object obj in _currentSelection)
+        SelectionComponent? component = CurrentModel.GetComponent<SelectionComponent>();
+        if (component != null) return;
+
+        foreach (object obj in component!.SelectionBucket())
         {
             if (obj is uint index)
             {  
                 CurrentModel.RemoveVertex((int)index, UpdateType.Ignore);
-                //Console.WriteLine($"Delete vert {index}");
             }
             else if (obj is Edge edge)
             {
                 CurrentModel.RemoveEdge(edge, UpdateType.Ignore);
-                //Console.WriteLine($"Delete edge {edge}");
             }
             else if (obj is Face face)
             {
                 CurrentModel.RemoveFace(face, UpdateType.Ignore);
-                //Console.WriteLine($"Delete face {face}");
             }
         }
 
         CurrentModel.UpdateAllComponents(UpdateType.Membership);
-        _currentSelection.Clear();
     }
 
-    public void SetSelection(HashSet<object> indicies)
+    /// <summary>
+    /// Set the selection to a hashset
+    /// </summary>
+    /// <typeparam name="T">Face, uint or edge.</typeparam>
+    public void SetSelection<T>(HashSet<T> items)
     {
-        _currentSelection = indicies;
         SelectionComponent? ms = CurrentModel?.GetComponent<SelectionComponent>();
         if (ms == null) return;
         ms.DeselectAll(UpdateType.Ignore);
-        foreach(object obj in _currentSelection)
+        foreach(T obj in items)
         {
             if (obj is uint index) ms.SelectIndex(index, UpdateType.Ignore);
+            else if (obj is Edge edge) ms.SelectEdge(edge, UpdateType.Ignore);
+            else if (obj is Face face) ms.SelectFace(face, UpdateType.Ignore);
         }
         ms.BroadcastMassUpdate(UpdateType.Selection);
     }
