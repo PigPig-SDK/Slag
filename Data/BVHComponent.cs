@@ -102,7 +102,7 @@ public class BVHComponent : ModelComponent
         ComputeTree();
     }
 
-    public override void OnModelUpdate(Model model, UpdateType info, object? data)
+    public override void OnModelUpdate(Model model, UpdateType info)
     {
 
     }

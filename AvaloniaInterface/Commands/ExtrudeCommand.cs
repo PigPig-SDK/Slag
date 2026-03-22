@@ -72,7 +72,7 @@ public class ExtrudeCommand : MementoCommand
             selectionEnd.Add(indexOut);
         }
         SelectionManager.Instance.SetSelection(selectionEnd);
-        model.UpdateAllComponents(UpdateType.Membership, null);
-        model.UpdateAllComponents(UpdateType.Selection, null);
+        model.UpdateAllComponents(UpdateType.Membership);
+        model.UpdateAllComponents(UpdateType.Selection);
     }
 }

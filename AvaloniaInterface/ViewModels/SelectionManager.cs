@@ -321,7 +321,7 @@ public class SelectionManager
             }
         }
 
-        CurrentModel.UpdateAllComponents(UpdateType.Membership, null);
+        CurrentModel.UpdateAllComponents(UpdateType.Membership);
         _currentSelection.Clear();
     }
 

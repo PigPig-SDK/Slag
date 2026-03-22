@@ -16,7 +16,7 @@ public class SelectionMeshInstance : ModelComponent
 
     public override void Dispose() { }
     public override void OnAddedToModel(Model model) { }
-    public override void OnModelUpdate(Model model, UpdateType info, object? data) { }
+    public override void OnModelUpdate(Model model, UpdateType info) { }
 
     public void SelectFace(Face face)
     {

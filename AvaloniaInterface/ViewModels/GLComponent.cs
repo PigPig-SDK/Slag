@@ -274,7 +274,7 @@ public class GLComponent : ModelComponent, IRenderObject
         }
     }
 
-    public override void OnModelUpdate(Model model, UpdateType info, object? data)
+    public override void OnModelUpdate(Model model, UpdateType info)
     {
         if((info & (UpdateType.Locational)) != 0)
         {

@@ -61,7 +61,7 @@ public class MoveCommand : ICommand
             vertices[index].Position = (_startingPosition[index] + (moveDirection * _activeAxis));
             
         }
-        model.UpdateAllComponents(UpdateType.Locational, null);
+        model.UpdateAllComponents(UpdateType.Locational);
     }
 
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)

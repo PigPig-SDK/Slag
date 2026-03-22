@@ -75,7 +75,7 @@ public class Model
         uint index = (uint)_verticies.Count();
         _verticies.Add(vertex);
         _vertexEdgeMap.Add(index, new());
-        UpdateAllComponents(updateType, vertex);
+        UpdateAllComponents(updateType);
         return index;
     }
 
@@ -99,7 +99,7 @@ public class Model
             _vertexEdgeMap[edge.Vertex2].Add(edge.Vertex1);
         }
 
-        UpdateAllComponents(updateType, edge);
+        UpdateAllComponents(updateType);
     }
 
 
@@ -125,7 +125,7 @@ public class Model
             AddEdge(new Edge(start, end, face), UpdateType.Ignore);
         }
         AddEdge(new Edge(face.Indicies[0], face.Indicies[^1], face), UpdateType.Ignore);
-        UpdateAllComponents(info, face);
+        UpdateAllComponents(info);
     }
 
     public void RemoveVertex(int index, UpdateType info = UpdateType.Membership)
@@ -160,13 +160,13 @@ public class Model
         }
 
         _verticies.RemoveAt(index);
-        UpdateAllComponents(info, index);
+        UpdateAllComponents(info);
     }
 
     public void RemoveFace(Face face, UpdateType info = UpdateType.Membership)
     {
         _faces.Remove(face);
-        UpdateAllComponents(info, face);
+        UpdateAllComponents(info);
     }
 
     public void RemoveEdge(Edge edge, UpdateType info = UpdateType.Membership)
@@ -179,7 +179,7 @@ public class Model
         _vertexEdgeMap[edge.Vertex2].Remove(edge.Vertex1);
 
         _edges.Remove(edge);
-        UpdateAllComponents(info, edge);
+        UpdateAllComponents(info);
     }
 
     private void GenerateIndicies()
@@ -284,9 +284,9 @@ public class Model
 
     public bool HasComponent(Type type) => _Components.ContainsKey(type);
 
-    public void UpdateAllComponents(UpdateType info, object? variable)
+    public void UpdateAllComponents(UpdateType info)
     {
-        foreach (var component in _Components.Values) component.OnModelUpdate(this, info, variable);
+        foreach (var component in _Components.Values) component.OnModelUpdate(this, info);
     }
 
     public IEnumerable<(uint v1,uint v2,uint v3)> AllTrianglesAsIndicies()
@@ -347,6 +347,6 @@ public class Model
             AddEdge((Edge)edge.Clone(), UpdateType.Ignore);
 
         GenerateIndicies();
-        UpdateAllComponents(UpdateType.Membership, null);
+        UpdateAllComponents(UpdateType.Membership);
     }
 }

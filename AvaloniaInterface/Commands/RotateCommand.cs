@@ -143,7 +143,7 @@ public class RotateCommand : ICommand
         {
             vertices[pair.Key].Position = _selectionCenter + (pair.Value * rotationMatrix).Xyz;
         }
-        _model.UpdateAllComponents(UpdateType.Locational,null);
+        _model.UpdateAllComponents(UpdateType.Locational);
     }
 
     private CommandState Initialize()

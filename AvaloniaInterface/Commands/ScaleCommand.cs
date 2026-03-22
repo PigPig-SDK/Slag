@@ -92,7 +92,7 @@ public class ScaleCommand : ICommand
         {
             vertices[index].Position = _StartingPosition[index].position + ((_StartingPosition[index].moveNormal* ammount) * _activeAxis);
         }
-        model.UpdateAllComponents(UpdateType.Locational, null);
+        model.UpdateAllComponents(UpdateType.Locational);
     }
 
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)

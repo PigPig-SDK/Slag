@@ -36,7 +36,7 @@ public class SelectionComponent : ModelComponent
 
     public override void Dispose() { }
 
-    public override void OnModelUpdate(Model model, UpdateType info, object? data)
+    public override void OnModelUpdate(Model model, UpdateType info)
     {
 
     }
