@@ -3,6 +3,7 @@ using Models;
 using OpenglAvaloniaTest.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenglAvaloniaTest.Commands;
 public class ExtrudeCommand : MementoCommand
@@ -18,14 +19,23 @@ public class ExtrudeCommand : MementoCommand
 
         return CommandState.Finished;
     }
+    private static (uint, uint, uint, uint) SortFour(uint a, uint b, uint c, uint d)
+    {
+        if (a > b) (a, b) = (b, a);
+        if (c > d) (c, d) = (d, c);
+        if (a > c) (a, c) = (c, a);
+        if (b > d) (b, d) = (d, b);
+        if (b > c) (b, c) = (c, b);
 
-    public void Extrude(Model model, HashSet<uint> indicies) 
+        return (a, b, c, d);
+    }
+    public void Extrude(Model model, HashSet<uint> selectedIndicies) 
     {
         Dictionary<uint, uint> cloneMapping = [];
+        HashSet<(uint, uint, uint, uint)> faceMap = [];
 
-        foreach (uint index in indicies)
+        foreach (uint index in selectedIndicies)
         {
-            Console.WriteLine("primary" + index);
             //Add clone if possible
             if (!cloneMapping.TryGetValue(index, out uint cloneIndex))
             {
@@ -34,25 +44,34 @@ public class ExtrudeCommand : MementoCommand
                 cloneMapping.Add(index, cloneIndex);
             }
             model.AddEdge(new(index, cloneIndex), UpdateType.None);//Discards diplicates automatically
-            Console.WriteLine("Length : " + model.VertexEdgeMap[index].Count);
-            foreach(uint neighbor in model.VertexEdgeMap[index])
+            foreach(uint neighbor in model.VertexEdgeMap[index].ToArray())
             {
-                Console.WriteLine("neighbor" + neighbor);
-                if (!indicies.Contains(neighbor)) continue;
+                if (!selectedIndicies.Contains(neighbor)) continue;
 
                 //Add clone if possible
-                if(!cloneMapping.TryGetValue(index, out uint neighborCloneIndex))
+                if(!cloneMapping.TryGetValue(neighbor, out uint neighborCloneIndex))
                 {
                     Vertex neighborVertex = model.GetVertex(neighbor);
                     neighborCloneIndex = model.AddVertex(new(neighborVertex), UpdateType.None);
                     cloneMapping.Add(neighbor, neighborCloneIndex);
-                    //Generate face
                 }
-                model.AddFaceUpdate(UpdateType.None, neighborCloneIndex, index, neighbor, cloneIndex);//Adds edges automatically.
+
+                var sorted = SortFour(index, neighbor, neighborCloneIndex, cloneIndex);
+                //Double check if face data exists before adding it.
+                if (!faceMap.Contains(sorted))
+                {
+                    faceMap.Add(sorted);
+                    model.AddFaceUpdate(UpdateType.None, index, neighbor, neighborCloneIndex, cloneIndex);//Adds edges automatically.
+                }
             }
         }
         SelectionManager.Instance.ClearSelection();
-        SelectionManager.Instance.SetSelection([..cloneMapping.Values]);
+        HashSet<object> selectionEnd = [];
+        foreach(uint indexOut in cloneMapping.Values)
+        {
+            selectionEnd.Add(indexOut);
+        }
+        SelectionManager.Instance.SetSelection(selectionEnd);
         model.UpdateAllComponents(UpdateType.Membership, null);
         model.UpdateAllComponents(UpdateType.Selection, null);
     }
