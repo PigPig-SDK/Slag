@@ -67,12 +67,8 @@ public class SelectionManager
         CurrentModel = null;
     }
 
-    public void ClearSelection()
-    {
-        if (CurrentModel == null) return;//Cannot do anything.
-        CurrentModel.GetComponent<SelectionComponent>()?.DeselectAll();
-    }
-
+    public void ClearSelection() => GetSelectionComponent()?.DeselectAll();
+    public SelectionComponent? GetSelectionComponent() => CurrentModel?.GetComponent<SelectionComponent>();
     public void CheckForSelection(Vector2 screenPosition, bool isDrag)
     {
         switch (_selectionMode)
