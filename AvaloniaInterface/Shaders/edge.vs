@@ -14,7 +14,7 @@ out vec4 color;
 void main()
 {
     vec4 pos = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
-    pos.z -= 0.0001;//Improper fix for making edges appear ontop of models (lol)
+    pos.z -= 0.0001 + metadata;//Improper fix for making edges appear ontop of models (lol)
     gl_Position = pos;
 
     if(metadata == 1.0)

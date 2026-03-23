@@ -15,7 +15,7 @@ void main()
 {
     gl_PointSize = 10.0;
     vec4 pos = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
-    pos.z -= 0.0001;
+    pos.z -= 0.0001 + metadata;
     gl_Position = pos;
 
     if(metadata == 1.0)
