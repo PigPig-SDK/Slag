@@ -106,13 +106,9 @@ public class SelectionManager
 
             //Select
             if (!ms.IsVertexSelected(hit.VertexIndex))
-            {
                 ms.SelectIndex(hit.VertexIndex, UpdateType.Selection);
-            }
             else if (!isDrag)//Deselect
-            {
                 ms.DeselectIndex(hit.VertexIndex, UpdateType.Selection);
-            }
         }
         else if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))
         {
@@ -175,19 +171,12 @@ public class SelectionManager
 
             if (!ms.IsFaceSelected(hit.Face))
             {
-                foreach (uint index in hit!.Face.Indicies)
-                {
-                    ms.SelectIndex(index, UpdateType.Ignore);
-                }
-
-                ms.BroadcastMassUpdate(UpdateType.Selection);
+                ms.SelectFace(hit!.Face, UpdateType.Selection);
                 SelectionMeshInstance.Instance.SelectFace(hit.Face);
             }
             else if (!isDrag)
             {
-                ms.DeselectFace(hit!.Face);
-
-                ms.BroadcastMassUpdate(UpdateType.Selection);
+                ms.DeselectFace(hit!.Face, UpdateType.Selection);
                 SelectionMeshInstance.Instance.DeselectFace(hit.Face);
             }
         }
@@ -202,22 +191,24 @@ public class SelectionManager
     public void DeleteCurrentSelection()
     {
         if(CurrentModel == null) return;
-
         SelectionComponent? component = CurrentModel.GetComponent<SelectionComponent>();
-        if (component != null) return;
+        if (component is null) return;
 
         foreach (object obj in component!.SelectionBucket())
         {
             if (obj is uint index)
-            {  
+            {
+                Console.WriteLine("index : " + index);
                 CurrentModel.RemoveVertex((int)index, UpdateType.Ignore);
             }
             else if (obj is Edge edge)
             {
+                Console.WriteLine("edge : " + edge);
                 CurrentModel.RemoveEdge(edge, UpdateType.Ignore);
             }
             else if (obj is Face face)
             {
+                Console.WriteLine("face : " + face);
                 CurrentModel.RemoveFace(face, UpdateType.Ignore);
             }
         }
