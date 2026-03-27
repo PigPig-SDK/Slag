@@ -72,18 +72,20 @@ public class SelectionComponent : ModelComponent
 
     public Vector3 GetCenter()
     {
-        if(_selectedIndicies.Count == 0)
+        var vertSelection = GetSelection<uint>().ToArray();
+
+        if (vertSelection.Count() == 0)
             return Vector3.Zero;
 
         Vector3 sum = Vector3.Zero;
 
-        foreach (uint ind in _selectedIndicies)
+        foreach (uint ind in vertSelection)
         {
             Vertex v = Model.GetVertex(ind);
             sum += v.Position;
         }
 
-        return sum/_selectedIndicies.Count;
+        return sum / vertSelection.Count();
     }
 
     public void SelectEdge(Edge edge, UpdateType updateType = UpdateType.Selection)
@@ -156,7 +158,7 @@ public class SelectionComponent : ModelComponent
             {
                 foreach(uint index in face.Indicies) verts.Add(index);
             }
-
+            
             foreach (uint index in verts)
             {
                 yield return (T)(object)index;

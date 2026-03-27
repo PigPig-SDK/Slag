@@ -160,7 +160,7 @@ public class RotateCommand : ICommand
         _selectionCenter = selection.GetCenter();
         
         int selectedCount = 0;
-        foreach (uint index in selection.SelectionIndicies())
+        foreach (uint index in selection.GetSelection<uint>())
         {
             Vertex vert = _model.GetVertex(index);
             _startingPosition[index] = new Vector4(vert.Position.X - _selectionCenter.X, vert.Position.Y - _selectionCenter.Y, vert.Position.Z - _selectionCenter.Z, 1.0f);

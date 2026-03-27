@@ -32,7 +32,7 @@ public class MoveCommand : ICommand
         if(Camera.Instance == null) throw new InvalidOperationException($"No camera in {nameof(MoveCommand)} {nameof(Initialize)}");
 
         CameraMoveDirections = Camera.Instance.GetRealitiveDirections();
-        _selectedIndicies = [..selection.SelectionIndicies()];
+        _selectedIndicies = [..selection.GetSelection<uint>()];
 
         foreach (uint index in _selectedIndicies)
         {

@@ -40,13 +40,13 @@ public class ScaleCommand : ICommand
         SelectionComponent? selection = activeModel.GetComponent<SelectionComponent>();
         if (selection is null) return CommandState.Discard;
 
-        _selectedIndicies = [.. selection.SelectionIndicies()];
+        _selectedIndicies = [.. selection.GetSelection<uint>()];
 
         SelectionCenter = selection.GetCenter();
         //Compute center.
         _mouseScreenCenter = Camera.Instance.WorldToScreen(selection.GetWorldCenter());
         int selectedCount = 0;
-        foreach (uint index in selection.SelectionIndicies())
+        foreach (uint index in selection.GetSelection<uint>())
         {
             Vertex vert = activeModel.GetVertex(index);
             _StartingPosition[index] = (vert.Position, (SelectionCenter - vert.Position).Normalized());
