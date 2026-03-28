@@ -16,6 +16,7 @@ internal class DeleteCommand : MementoCommand
         if (SelectionManager.Instance.CurrentModel == null) return CommandState.Discard;
 
         CreateState();
+        
         SelectionManager.Instance.DeleteCurrentSelection();
         return CommandState.Finished;
     }

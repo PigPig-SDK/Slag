@@ -145,7 +145,8 @@ public class Model
         uint uIndex = (uint)index;
         foreach (uint neighbor in _vertexEdgeMap[index])
         {
-            _vertexEdgeMap[(int)neighbor].Remove(uIndex);
+            if (neighbor < _vertexEdgeMap.Count())
+                _vertexEdgeMap[(int)neighbor].Remove(uIndex);
         }
         _vertexEdgeMap.RemoveAt(index);
 

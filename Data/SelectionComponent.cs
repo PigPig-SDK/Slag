@@ -1,12 +1,14 @@
 ﻿using Models;
 using OpenTK.Mathematics;
-using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace OpenglAvaloniaTest.ViewModels;
 
 public class SelectionComponent : ModelComponent
 {
-    private HashSet<uint> _selectedIndicies = [];
+    //Sorted because deletion chaos!
+    private SortedSet<uint> _selectedIndicies = [];
     public IReadOnlySet<uint> SelectedIndicies => _selectedIndicies; 
 
     private HashSet<Face> _selectedFaces = [];
@@ -65,10 +67,9 @@ public class SelectionComponent : ModelComponent
             model.AddComponent<SelectionComponent>(new SelectionComponent());
         return true;
     }
-
     public IEnumerable<uint> SelectionIndicies()
     {
-        foreach(uint item in _selectedIndicies) yield return item;
+        foreach(uint item in _selectedIndicies.Reverse()) yield return item;
     }
 
     public Vector3 GetWorldCenter()
@@ -152,7 +153,7 @@ public class SelectionComponent : ModelComponent
             //Search for verts
             HashSet<uint> verts = [];
 
-            foreach (uint index in _selectedIndicies) verts.Add(index);
+            foreach (uint index in _selectedIndicies.Reverse()) verts.Add(index);
 
             foreach(Edge edge in _selectedEdges)
             {
@@ -182,6 +183,6 @@ public class SelectionComponent : ModelComponent
 
         foreach (Edge edge in _selectedEdges) yield return edge;
 
-        foreach(uint index in  _selectedIndicies) yield return index;
+        foreach(uint index in  _selectedIndicies.Reverse()) yield return index;
     }
 }
