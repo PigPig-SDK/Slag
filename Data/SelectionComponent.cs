@@ -7,10 +7,13 @@ namespace OpenglAvaloniaTest.ViewModels;
 public class SelectionComponent : ModelComponent
 {
     private HashSet<uint> _selectedIndicies = [];
+    public IReadOnlySet<uint> SelectedIndicies => _selectedIndicies; 
 
     private HashSet<Face> _selectedFaces = [];
+    public IReadOnlySet<Face> SelectedFaces => _selectedFaces;
 
     private HashSet<Edge> _selectedEdges = [];
+    public IReadOnlySet<Edge> SelectedEdges => _selectedEdges;
 
 
     /// <summary>
@@ -22,12 +25,15 @@ public class SelectionComponent : ModelComponent
 
     public void SelectIndex(uint index, UpdateType updateInfo = UpdateType.Selection)
     {
+        if(index >= Model.Indicies.Count()) throw new ArgumentOutOfRangeException($"The index {index} exceeds the possible selection range!");
+
         _selectedIndicies.Add(index);
         OnSelectionChanged?.Invoke(true, updateInfo);
     }
 
     public void DeselectAll(UpdateType updateInfo = UpdateType.Selection)
     {
+        Console.WriteLine("selection cleared!");
         _selectedFaces.Clear();
         _selectedEdges.Clear();
         _selectedIndicies.Clear();

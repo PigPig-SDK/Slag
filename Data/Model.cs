@@ -11,7 +11,7 @@ public class Model
     private List<Vertex> _verticies = [];
     public IReadOnlyList<Vertex> Verticies => _verticies;
 
-    private Dictionary<uint, HashSet<uint>> _vertexEdgeMap = [];
+    internal Dictionary<uint, HashSet<uint>> _vertexEdgeMap = [];
     public IReadOnlyDictionary<uint, HashSet<uint>> VertexEdgeMap => _vertexEdgeMap;
 
     protected List<Face> _faces = [];
@@ -82,24 +82,29 @@ public class Model
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool VertexExists(uint index) => index < Verticies.Count();
 
-    public void AddEdge(Edge edge, UpdateType updateType = UpdateType.Membership)
+    public Edge AddEdge(Edge edge, UpdateType updateType = UpdateType.Membership)
     {
         if (!VertexExists(edge.Vertex1) || !VertexExists(edge.Vertex2))
             throw new InvalidOperationException("Edge added with verts out of range.");
 
-
+        Edge retEdge;
         if (_edges.TryGetValue(edge, out Edge? hashEdge) && hashEdge != null)
         {
             hashEdge.Faces.AddRange(edge.Faces);
+            retEdge = hashEdge;
         }
         else
         {
             _edges.Add(edge);
             _vertexEdgeMap[edge.Vertex1].Add(edge.Vertex2);
             _vertexEdgeMap[edge.Vertex2].Add(edge.Vertex1);
+            retEdge = edge;
         }
 
         UpdateAllComponents(updateType);
+        return retEdge;
+
+
     }
 
 
@@ -122,15 +127,21 @@ public class Model
         for(int i = 0; i < face.Indicies.Count - 1; i++) {
             uint start = (uint)face.Indicies[i];
             uint end = (uint)face.Indicies[i + 1];
-            AddEdge(new Edge(start, end, face), UpdateType.Ignore);
+            Edge edge = AddEdge(new Edge(start, end, face), UpdateType.Ignore);
+
+            face.Edges.Add(edge);
         }
-        AddEdge(new Edge(face.Indicies[0], face.Indicies[^1], face), UpdateType.Ignore);
+        Edge edgeOverlap = AddEdge(new Edge(face.Indicies[0], face.Indicies[^1], face), UpdateType.Ignore);
+        face.Edges.Add(edgeOverlap);
         UpdateAllComponents(info);
     }
 
     public void RemoveVertex(int index, UpdateType info = UpdateType.Membership)
     {
-        //Clear out edgemap
+        if (index >= _verticies.Count)
+            throw new InvalidOperationException("Trying to delete a index that DNE");
+
+        //Clear out edgemap and our neighbors
         uint uIndex = (uint)index;
         if (_vertexEdgeMap.ContainsKey(uIndex))
         {
