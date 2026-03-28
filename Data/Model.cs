@@ -183,10 +183,14 @@ public class Model
         UpdateAllComponents(info);
     }
 
-    public void RemoveFace(Face face, UpdateType info = UpdateType.Membership)
+    public void RemoveFace(Face face, UpdateType info = UpdateType.Membership, Edge? ignoreEdge = null)
     {
         //Tell our children we don't exist. Ready for GC.
-        foreach (Edge edge in face.Edges) edge.Faces.Remove(face);
+        foreach (Edge edge in face.Edges)
+        {
+            if(edge != ignoreEdge)//Ignore edge if required
+                edge.Faces.Remove(face);
+        }
 
         _faces.Remove(face);
         
@@ -197,7 +201,7 @@ public class Model
     {
         foreach(Face f in edge.Faces)
         {
-            RemoveFace(f, info);
+            RemoveFace(f, info, edge);
         }
         _vertexEdgeMap[(int)edge.Vertex1].Remove(edge.Vertex2);
         _vertexEdgeMap[(int)edge.Vertex2].Remove(edge.Vertex1);
