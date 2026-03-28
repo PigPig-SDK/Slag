@@ -26,7 +26,21 @@ public class ExtrudeCommand : MementoCommand
 
         selectedIndicies.AddRange(selection.SelectedIndicies);
 
-        Extrude(sm.CurrentModel, selectedIndicies, edgeWhiteList); 
+        Extrude(sm.CurrentModel, selectedIndicies, edgeWhiteList, out Dictionary<uint, uint> cloneMap);
+
+        AdjustConnectedFaces(selection, sm.CurrentModel, cloneMap);
+
+        //Finalize
+
+        SelectionManager.Instance.ClearSelection();
+        HashSet<object> selectionEnd = [];
+        foreach (uint indexOut in cloneMap.Values)
+        {
+            selectionEnd.Add(indexOut);
+        }
+        SelectionManager.Instance.SetSelection(selectionEnd);
+        sm.CurrentModel.UpdateAllComponents(UpdateType.Membership);
+        sm.CurrentModel.UpdateAllComponents(UpdateType.Selection);
 
         return CommandState.Finished;
     }
@@ -39,9 +53,7 @@ public class ExtrudeCommand : MementoCommand
     /// <param name="selectedIndicies"> The selected indicies that will be modified</param>
     private void AddFaceBorders(SelectionComponent selection, ref HashSet<uint> selectedIndicies, ref HashSet<Edge> edgeWhiteList)
     {
-
         int total = selection.GetSelection<Edge>().Count();
-        Console.WriteLine($"Count: {total}");
 
         foreach(Edge edge in selection.GetSelection<Edge>())//All edges in our selection
         {
@@ -51,7 +63,6 @@ public class ExtrudeCommand : MementoCommand
                 if (selection.SelectedFaces.Contains(face))
                     count++;
             }
-            Console.WriteLine($"{count}");
             //Edge is only seen once in face set or never.
             if(count <= 1)
             {
@@ -59,6 +70,36 @@ public class ExtrudeCommand : MementoCommand
                 selectedIndicies.Add(edge.Vertex2);
                 edgeWhiteList.Add(edge);
             }
+        }
+    }
+    private void AdjustConnectedFaces(SelectionComponent selection, Model model, Dictionary<uint, uint> cloneMap)
+    {
+        foreach(Face face in selection.SelectedFaces.ToArray())//Will be modified. ToArray required
+        {
+            bool containsClones = false;
+            foreach(uint index in face.Indicies)
+            {
+                if(cloneMap.ContainsKey(index))
+                {
+                    containsClones = true;
+                    break;
+                }
+            }
+            if (!containsClones) break;
+
+            // Reuse allocation of old face.
+            var newFaceIndicies = face.Indicies;
+
+            //Delete existing polygon
+            model.RemoveFace(face);
+
+            for(int i = 0; i < newFaceIndicies.Count; i++)
+            {
+                if(cloneMap.ContainsKey((uint)newFaceIndicies[i]))
+                    newFaceIndicies[i] = cloneMap[newFaceIndicies[i]];//Remap to new index.
+            }
+            //Throw back into mesh
+            model.AddFace(new Face(newFaceIndicies));
         }
     }
 
@@ -72,9 +113,9 @@ public class ExtrudeCommand : MementoCommand
 
         return (a, b, c, d);
     }
-    public void Extrude(Model model, HashSet<uint> selectedIndicies, HashSet<Edge> edgeWhiteList) 
+    public void Extrude(Model model, HashSet<uint> selectedIndicies, HashSet<Edge> edgeWhiteList, out Dictionary<uint, uint> cloneMapping) 
     {
-        Dictionary<uint, uint> cloneMapping = [];
+        cloneMapping = [];
         HashSet<(uint, uint, uint, uint)> faceMap = [];
 
         foreach (uint index in selectedIndicies)
@@ -111,14 +152,5 @@ public class ExtrudeCommand : MementoCommand
                 }
             }
         }
-        SelectionManager.Instance.ClearSelection();
-        HashSet<object> selectionEnd = [];
-        foreach(uint indexOut in cloneMapping.Values)
-        {
-            selectionEnd.Add(indexOut);
-        }
-        SelectionManager.Instance.SetSelection(selectionEnd);
-        model.UpdateAllComponents(UpdateType.Membership);
-        model.UpdateAllComponents(UpdateType.Selection);
     }
 }
