@@ -185,7 +185,11 @@ public class Model
 
     public void RemoveFace(Face face, UpdateType info = UpdateType.Membership)
     {
+        //Tell our children we don't exist. Ready for GC.
+        foreach (Edge edge in face.Edges) edge.Faces.Remove(face);
+
         _faces.Remove(face);
+        
         UpdateAllComponents(info);
     }
 
