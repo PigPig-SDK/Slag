@@ -87,7 +87,7 @@ public class ExtrudeCommand : MementoCommand
                 cloneMapping.Add(index, cloneIndex);
             }
             model.AddEdge(new(index, cloneIndex), UpdateType.None);//Discards diplicates automatically
-            foreach(uint neighbor in model.VertexEdgeMap[index].ToArray())
+            foreach(uint neighbor in model.VertexEdgeMap[(int)index].ToArray())
             {
                 //Ignore non selected edges
                 if (!selectedIndicies.Contains(neighbor)) continue;

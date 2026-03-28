@@ -11,8 +11,8 @@ public class Model
     private List<Vertex> _verticies = [];
     public IReadOnlyList<Vertex> Verticies => _verticies;
 
-    internal Dictionary<uint, HashSet<uint>> _vertexEdgeMap = [];
-    public IReadOnlyDictionary<uint, HashSet<uint>> VertexEdgeMap => _vertexEdgeMap;
+    private List<HashSet<uint>> _vertexEdgeMap = [];
+    public IReadOnlyList<HashSet<uint>> VertexEdgeMap => _vertexEdgeMap;
 
     protected List<Face> _faces = [];
     public IReadOnlyList<Face> Faces => _faces;
@@ -74,7 +74,7 @@ public class Model
     {
         uint index = (uint)_verticies.Count();
         _verticies.Add(vertex);
-        _vertexEdgeMap.Add(index, new());
+        _vertexEdgeMap.Add(new());
         UpdateAllComponents(updateType);
         return index;
     }
@@ -96,8 +96,8 @@ public class Model
         else
         {
             _edges.Add(edge);
-            _vertexEdgeMap[edge.Vertex1].Add(edge.Vertex2);
-            _vertexEdgeMap[edge.Vertex2].Add(edge.Vertex1);
+            _vertexEdgeMap[(int)edge.Vertex1].Add(edge.Vertex2);
+            _vertexEdgeMap[(int)edge.Vertex2].Add(edge.Vertex1);
             retEdge = edge;
         }
 
@@ -143,16 +143,24 @@ public class Model
 
         //Clear out edgemap and our neighbors
         uint uIndex = (uint)index;
-        if (_vertexEdgeMap.ContainsKey(uIndex))
+        foreach (uint neighbor in _vertexEdgeMap[index])
         {
-            foreach (uint neighbor in _vertexEdgeMap[uIndex])
+            _vertexEdgeMap[(int)neighbor].Remove(uIndex);
+        }
+        _vertexEdgeMap.RemoveAt(index);
+
+        //Decrement edgemap set
+        foreach (HashSet<uint> edgeIndicies in _vertexEdgeMap)
+        {
+            foreach (uint neighbor in edgeIndicies.ToArray())
             {
-                if(_vertexEdgeMap.TryGetValue(neighbor, out var neighborList))
+                if(neighbor > index)
                 {
-                    neighborList.Remove(uIndex);//Clear index out of it's neighbors.
+                    //Decrement!
+                    edgeIndicies.Remove(neighbor);
+                    edgeIndicies.Add(neighbor - 1);
                 }
             }
-            _vertexEdgeMap.Remove(uIndex);//Clear index
         }
 
         //Manage faces
@@ -186,8 +194,8 @@ public class Model
         {
             RemoveFace(f, info);
         }
-        _vertexEdgeMap[edge.Vertex1].Remove(edge.Vertex2);
-        _vertexEdgeMap[edge.Vertex2].Remove(edge.Vertex1);
+        _vertexEdgeMap[(int)edge.Vertex1].Remove(edge.Vertex2);
+        _vertexEdgeMap[(int)edge.Vertex2].Remove(edge.Vertex1);
 
         _edges.Remove(edge);
         UpdateAllComponents(info);
@@ -346,9 +354,9 @@ public class Model
 
         _verticies = [.. modelState._verticies];
         _vertexEdgeMap.Clear();
-        foreach (var pair in modelState.VertexEdgeMap)
+        foreach (HashSet<uint> edgeSet in modelState.VertexEdgeMap)
         {
-            _vertexEdgeMap.Add(pair.Key, pair.Value);
+            _vertexEdgeMap.Add([.. edgeSet]);
         }
 
         foreach (Face face in modelState.Faces)
