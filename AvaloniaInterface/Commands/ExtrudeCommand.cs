@@ -28,17 +28,19 @@ public class ExtrudeCommand : MementoCommand
 
         Extrude(sm.CurrentModel, selectedIndicies, edgeWhiteList, out Dictionary<uint, uint> cloneMap);
 
-        AdjustConnectedFaces(selection, sm.CurrentModel, cloneMap);
+        AdjustConnectedFaces(selection, sm.CurrentModel, cloneMap, edgeWhiteList);
 
         //Finalize
-
         SelectionManager.Instance.ClearSelection();
+
         HashSet<object> selectionEnd = [];
         foreach (uint indexOut in cloneMap.Values)
         {
             selectionEnd.Add(indexOut);
         }
         SelectionManager.Instance.SetSelection(selectionEnd);
+
+        //Redisplay.
         sm.CurrentModel.UpdateAllComponents(UpdateType.Membership);
         sm.CurrentModel.UpdateAllComponents(UpdateType.Selection);
 
@@ -72,8 +74,22 @@ public class ExtrudeCommand : MementoCommand
             }
         }
     }
-    private void AdjustConnectedFaces(SelectionComponent selection, Model model, Dictionary<uint, uint> cloneMap)
+    private void AdjustConnectedFaces(SelectionComponent selection, Model model, Dictionary<uint, uint> cloneMap, HashSet<Edge> edgeWhiteList)
     {
+        HashSet<Edge> edgesToRemove = [];
+
+        foreach(Face face in selection.SelectedFaces)
+        {
+            //Remove any edges which are entirely contained by the clone set
+            foreach (Edge edge in face.Edges)
+            {
+                if (edgeWhiteList.Contains(edge)) continue;//Ignore side edges.
+
+                if (cloneMap.ContainsKey(edge.Vertex1) && cloneMap.ContainsKey(edge.Vertex2))
+                    edgesToRemove.Add(edge);
+            }
+        }
+
         foreach(Face face in selection.SelectedFaces.ToArray())//Will be modified. ToArray required
         {
             bool containsClones = false;
@@ -90,6 +106,8 @@ public class ExtrudeCommand : MementoCommand
             // Reuse allocation of old face.
             var newFaceIndicies = face.Indicies;
 
+
+
             //Delete existing polygon
             model.RemoveFace(face);
 
@@ -99,8 +117,11 @@ public class ExtrudeCommand : MementoCommand
                     newFaceIndicies[i] = cloneMap[newFaceIndicies[i]];//Remap to new index.
             }
             //Throw back into mesh
-            model.AddFace(new Face(newFaceIndicies));
+            model.AddFace(new Face(newFaceIndicies), UpdateType.Ignore);
         }
+
+        //Remove 'floating' undesirable edges.
+        foreach (Edge edge in edgesToRemove) model.RemoveEdge(edge, UpdateType.Ignore);
     }
 
     private static (uint, uint, uint, uint) SortFour(uint a, uint b, uint c, uint d)
