@@ -67,6 +67,11 @@ public class SelectionComponent : ModelComponent
             model.AddComponent<SelectionComponent>(new SelectionComponent());
         return true;
     }
+    /// <summary>
+    /// Yields all indicies ordered from largest to smallest
+    /// This functionality is to help with deletion operations, which might re-shuffle your selected set.
+    /// Keep this in mind, as it might become part of your nightmares.
+    /// </summary>
     public IEnumerable<uint> SelectionIndicies()
     {
         foreach(uint item in _selectedIndicies.Reverse()) yield return item;
@@ -177,12 +182,21 @@ public class SelectionComponent : ModelComponent
 
     public bool IsFaceSelected(Face face) => _selectedFaces.Contains(face);
 
+    ///<summary>
+    /// Only yields Face, Edge and uints
+    /// Use this function if you are expecting to deal with all of these at once.
+    ///</summary>
+    ///<returns>Faces, then Edges, then sorted indicies (descending)</returns>
+    /// <remarks> uints are returned sorted from largest to smallest. (Descending order)</remarks>
     public IEnumerable<object> SelectionBucket()
     {
         foreach (Face face in _selectedFaces) yield return face;
 
         foreach (Edge edge in _selectedEdges) yield return edge;
 
+        ///IMPORTANT NOTE: We feed the indicies through in reverse!
+        ///This is to simplify deletion, deleting indicies from largest to smallest keeps the
+        ///indicies in tact! (Deletion causes mass re-shuffling, this mitigates it's affect on most logic)
         foreach(uint index in  _selectedIndicies.Reverse()) yield return index;
     }
 }

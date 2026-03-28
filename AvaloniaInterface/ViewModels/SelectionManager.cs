@@ -194,8 +194,6 @@ public class SelectionManager
         SelectionComponent? component = CurrentModel.GetComponent<SelectionComponent>();
         if (component is null) return;
 
-        
-
         var selectionBucket = component!.SelectionBucket().ToArray();
         component.DeselectAll();
         foreach (object obj in selectionBucket)
