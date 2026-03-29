@@ -21,6 +21,7 @@ public class RotateCommand : ICommand
 
     public string Description => 
         "[X, Y, Z] : Specify a rotation axis\n" +
+        "[HOLD CTRL] : Lock to a unit of 11.25°\n" +
         "[R, Click] : Accept changes\n" +
         "[ESC] : Decline changes";
 
@@ -84,6 +85,13 @@ public class RotateCommand : ICommand
             _dynamicLine!.IsVisible = true;
 
             _totalRotation = angle - _initialRotation.Value;
+
+            if (args.mouseEvent.KeyModifiers == KeyModifiers.Control)
+            {
+                float clampFactor = _totalRotation % (MathF.PI / 16);//Snap to 11.25 degree increments when ctrl is held.
+                _totalRotation -= clampFactor;
+            }
+
             _textblock!.Text = (_totalRotation * (180.0 / MathF.PI)).ToString("F1");
 
             Rotate(_totalRotation);
