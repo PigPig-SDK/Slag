@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 
-namespace Models;
+namespace Core;
 
 public class Model
 {

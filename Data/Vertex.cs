@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using OpenTK.Mathematics;
 
-namespace Models;
+namespace Core;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct Vertex

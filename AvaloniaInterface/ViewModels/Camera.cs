@@ -1,8 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Input;
 using Avalonia.OpenGL.Controls;
-using Models;
-using OpenglAvaloniaTest.ViewModels;
+using Core;
+using UI.ViewModels;
 using OpenTK.Mathematics;
 using System;
 

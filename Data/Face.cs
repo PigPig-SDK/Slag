@@ -1,4 +1,4 @@
-﻿namespace Models;
+﻿namespace Core;
 
 /// <summary>
 /// The ParentModel property is ignored in hashcode and Equals

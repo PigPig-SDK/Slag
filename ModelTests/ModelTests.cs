@@ -1,4 +1,4 @@
-﻿using Models;
+﻿using Core;
 
 namespace ModelTests;
 

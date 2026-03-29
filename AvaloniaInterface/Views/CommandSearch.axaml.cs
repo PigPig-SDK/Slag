@@ -2,12 +2,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
-using OpenglAvaloniaTest.Commands;
-using OpenglAvaloniaTest.ViewModels;
+using UI.Commands;
+using UI.ViewModels;
 using System;
 using System.Collections.Generic;
 
-namespace OpenglAvaloniaTest;
+namespace UI;
 
 public partial class CommandSearch : UserControl
 {

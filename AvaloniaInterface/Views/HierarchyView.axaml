@@ -1,6 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="OpenglAvaloniaTest.ViewModels.HierarchyView">
+             x:Class="UI.ViewModels.HierarchyView">
         <Grid RowDefinitions="Auto,Auto,*">
             <Button Grid.Row="0" Content="AddObject" CornerRadius="0" HorizontalAlignment="Stretch" Focusable="False" Click="OnAddObjectButtonClick">
                 <Button.ContextMenu>

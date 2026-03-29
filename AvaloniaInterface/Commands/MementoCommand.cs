@@ -1,9 +1,9 @@
 ﻿using Avalonia.Input;
-using Models;
-using OpenglAvaloniaTest.ViewModels;
+using Core;
+using UI.ViewModels;
 using System;
 
-namespace OpenglAvaloniaTest.Commands;
+namespace UI.Commands;
 
 public abstract class MementoCommand : ICommand
 {

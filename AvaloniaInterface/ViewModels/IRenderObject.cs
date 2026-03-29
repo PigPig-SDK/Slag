@@ -1,7 +1,7 @@
 ﻿using Avalonia.OpenGL;
 using OpenTK.Mathematics;
 
-namespace OpenglAvaloniaTest.ViewModels;
+namespace UI.ViewModels;
 
 public interface IRenderObject
 {

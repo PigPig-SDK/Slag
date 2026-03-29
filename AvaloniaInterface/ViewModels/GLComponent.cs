@@ -1,13 +1,13 @@
 ﻿using Avalonia.OpenGL;
-using Models;
+using Core;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using static Avalonia.OpenGL.GlConsts;
-using static OpenglAvaloniaTest.ViewModels.GlConstantsExtended;
+using static UI.ViewModels.GlConstantsExtended;
 
-namespace OpenglAvaloniaTest.ViewModels;
+namespace UI.ViewModels;
 
 public class GLComponent : ModelComponent, IRenderObject
 {

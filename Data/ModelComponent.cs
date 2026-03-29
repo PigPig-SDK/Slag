@@ -1,5 +1,5 @@
 ﻿
-namespace Models;
+namespace Core;
 
 public abstract class ModelComponent : IDisposable
 {

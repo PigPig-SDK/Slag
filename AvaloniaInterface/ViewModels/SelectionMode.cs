@@ -1,4 +1,4 @@
-﻿namespace OpenglAvaloniaTest.ViewModels;
+﻿namespace UI.ViewModels;
 
 public enum SelectionMode
 {

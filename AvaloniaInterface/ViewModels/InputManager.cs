@@ -1,9 +1,9 @@
 ﻿using Avalonia.Input;
-using OpenglAvaloniaTest.Commands;
+using UI.Commands;
 using OpenTK.Mathematics;
 
 
-namespace OpenglAvaloniaTest.ViewModels;
+namespace UI.ViewModels;
 
 public class InputManager
 {

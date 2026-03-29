@@ -2,9 +2,9 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
-using Models;
-using OpenglAvaloniaTest.Commands;
-using OpenglAvaloniaTest.ViewModels;
+using Core;
+using UI.Commands;
+using UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +12,7 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 
-namespace OpenglAvaloniaTest.Views;
+namespace UI.Views;
 
 public partial class MainWindow : Window
 {

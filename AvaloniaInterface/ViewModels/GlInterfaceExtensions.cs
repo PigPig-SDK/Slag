@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenglAvaloniaTest.ViewModels;
+namespace UI.ViewModels;
 
 public static unsafe class GlInterfaceExtensions
 {

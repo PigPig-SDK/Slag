@@ -1,12 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Models;
+using Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace OpenglAvaloniaTest.ViewModels;
+namespace UI.ViewModels;
 
 public partial class HierarchyView : UserControl
 {

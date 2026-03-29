@@ -1,13 +1,13 @@
 ﻿using Avalonia.Input;
-using Models;
-using OpenglAvaloniaTest.ViewModels;
+using Core;
+using UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenglAvaloniaTest.Commands;
+namespace UI.Commands;
 
 internal class DeleteCommand : MementoCommand
 {

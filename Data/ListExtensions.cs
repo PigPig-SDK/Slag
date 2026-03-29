@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Models;
+namespace Core;
 
 public static class ListExtensions
 {

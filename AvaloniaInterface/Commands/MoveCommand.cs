@@ -1,12 +1,12 @@
 ﻿using Avalonia.Input;
-using Models;
-using OpenglAvaloniaTest.ViewModels;
+using UI.ViewModels;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Core;
 
-namespace OpenglAvaloniaTest.Commands;
+namespace UI.Commands;
 
 public class MoveCommand : ICommand
 {

@@ -1,4 +1,4 @@
-﻿namespace OpenglAvaloniaTest.ViewModels;
+﻿namespace UI.ViewModels;
 
 [System.Flags]
 public enum RenderMode

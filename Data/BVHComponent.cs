@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace Models;
+namespace Core;
 
 /// <summary>
 /// TODO: Implement

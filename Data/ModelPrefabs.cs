@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace Models;
+namespace Core;
 
 public static partial class ModelPrefabs
 {

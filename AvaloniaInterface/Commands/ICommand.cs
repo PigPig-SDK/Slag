@@ -1,6 +1,6 @@
 ﻿using Avalonia.Input;
 
-namespace OpenglAvaloniaTest.Commands;
+namespace UI.Commands;
 
 public interface ICommand
 {

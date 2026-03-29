@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenglAvaloniaTest.ViewModels;
+namespace UI.ViewModels;
 
 [Flags]
 public enum UserControlMode

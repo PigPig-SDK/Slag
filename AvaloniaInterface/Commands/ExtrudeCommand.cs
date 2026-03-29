@@ -1,13 +1,13 @@
 ﻿using Avalonia.Input;
-using Avalonia.Platform;
 using AvaloniaEdit.Utils;
-using Models;
-using OpenglAvaloniaTest.ViewModels;
+using UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core;
 
-namespace OpenglAvaloniaTest.Commands;
+
+namespace UI.Commands;
 public class ExtrudeCommand : MementoCommand
 {
     public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)

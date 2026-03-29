@@ -1,4 +1,4 @@
-﻿namespace OpenglAvaloniaTest.Commands;
+﻿namespace UI.Commands;
 
 [System.Flags]
 public enum CommandInfo

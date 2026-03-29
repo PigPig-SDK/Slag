@@ -1,7 +1,7 @@
 ﻿using System;
 using Avalonia;
 
-namespace OpenglAvaloniaTest
+namespace UI
 {
     internal sealed class Program
     {

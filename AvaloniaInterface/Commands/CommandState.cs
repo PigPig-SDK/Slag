@@ -1,4 +1,4 @@
-﻿namespace OpenglAvaloniaTest.Commands;
+﻿namespace UI.Commands;
 
 public enum CommandState
 {

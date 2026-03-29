@@ -3,14 +3,14 @@ using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Media;
-using Models;
-using OpenglAvaloniaTest.ViewModels;
-using OpenglAvaloniaTest.Views;
+using Core;
+using UI.ViewModels;
+using UI.Views;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 
-namespace OpenglAvaloniaTest.Commands;
+namespace UI.Commands;
 
 public class ScaleCommand : ICommand
 {

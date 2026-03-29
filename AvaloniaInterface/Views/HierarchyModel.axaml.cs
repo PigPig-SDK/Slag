@@ -3,12 +3,12 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using Models;
+using Core;
 using System;
 using System.Runtime.Intrinsics.Arm;
 
 
-namespace OpenglAvaloniaTest;
+namespace UI;
 
 public partial class HierarchyModel : UserControl
 {

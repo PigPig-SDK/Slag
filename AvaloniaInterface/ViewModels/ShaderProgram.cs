@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using static Avalonia.OpenGL.GlConsts;
 
-namespace OpenglAvaloniaTest.ViewModels;
+namespace UI.ViewModels;
 
 public class ShaderProgram
 {

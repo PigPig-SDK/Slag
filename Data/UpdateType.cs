@@ -1,4 +1,4 @@
-﻿namespace Models;
+﻿namespace Core;
 [System.Flags]
 public enum UpdateType
 {

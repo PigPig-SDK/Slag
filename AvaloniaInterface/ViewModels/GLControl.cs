@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-namespace OpenglAvaloniaTest.ViewModels;
+namespace UI.ViewModels;
 
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
-using Models;
+using Core;
 using OpenTK.Mathematics;
 using System;
 using System.Security.Cryptography.X509Certificates;

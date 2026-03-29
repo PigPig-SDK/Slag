@@ -1,9 +1,9 @@
-﻿using Models;
+﻿using Core;
 using OpenTK.Mathematics;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace OpenglAvaloniaTest.ViewModels;
+namespace UI.ViewModels;
 
 public class SelectionComponent : ModelComponent
 {

@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             x:Class="OpenglAvaloniaTest.HierarchyModel">
+             x:Class="UI.HierarchyModel">
     <Grid Background="Gray">
         <Expander HorizontalAlignment="Stretch" Focusable="False" ExpandDirection="Down" IsExpanded="False" x:Name="BodyExpander">
             <Expander.Header>
