@@ -33,12 +33,12 @@ public class ExtrudeCommand : MementoCommand
         //Finalize
         SelectionManager.Instance.ClearSelection();
 
-        HashSet<object> selectionEnd = [];
-        foreach (uint indexOut in cloneMap.Values)
-        {
-            selectionEnd.Add(indexOut);
-        }
-        SelectionManager.Instance.SetSelection(selectionEnd);
+        //HashSet<object> selectionEnd = [];
+        //foreach (uint indexOut in cloneMap.Values)
+        //{
+        //    selectionEnd.Add(indexOut);
+        //}
+        //SelectionManager.Instance.SetSelection(selectionEnd);
 
         //Redisplay.
         sm.CurrentModel.UpdateAllComponents(UpdateType.Membership);
@@ -85,7 +85,7 @@ public class ExtrudeCommand : MementoCommand
             {
                 if (edgeWhiteList.Contains(edge)) continue;//Ignore side edges.
 
-                if (cloneMap.ContainsKey(edge.Vertex1) && cloneMap.ContainsKey(edge.Vertex2))
+                if (cloneMap.ContainsKey(edge.Vertex1) || cloneMap.ContainsKey(edge.Vertex2))
                     edgesToRemove.Add(edge);
             }
         }
