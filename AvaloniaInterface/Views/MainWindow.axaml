@@ -11,21 +11,81 @@
         Icon="/Assets/slagIcon.ico"
         TransparencyLevelHint="AcrylicBlur" 
         Background="Transparent" 
+        ExtendClientAreaTitleBarHeightHint="{OnPlatform Default=-1, Windows=38}"
+        ExtendClientAreaToDecorationsHint="{OnPlatform Default=False, Windows=True}"
         Title="Slag">
+    <!-- Styles -->
+    <Window.Styles>
+
+        <Style Selector="Button.selected">
+            <Setter Property="Background" Value="#A5C882"/>
+        </Style>
+        <Style Selector="Button.deselected">
+            <Setter Property="Background" Value="#33000000"/>
+        </Style>
+        <!--
+            This style is based on the default Fluent theme
+            (https://github.com/AvaloniaUI/Avalonia/blob/master/src/Avalonia.Themes.Fluent/Controls/Menu.xaml),
+            but allows menu items to wrap in multiple rows.
+            You can remove this part if you prefer the default behavior (single row menu).
+        -->
+        <Style Selector="Menu">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Height" Value="NaN" />
+            <!--
+                Height=NaN is required because Avalonia fluent theme uses 32 as default menu height,
+                and this would cause the wrapped rows to be hidden when using WrapPanel as ItemsPanel.
+            -->
+            <Setter Property="ItemContainerTheme" Value="{StaticResource FluentTopLevelMenuItem}" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        HorizontalAlignment="Stretch"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                        <ItemsPresenter
+                            Name="PART_ItemsPresenter"
+                            VerticalAlignment="Stretch"
+                            KeyboardNavigation.TabNavigation="Continue">
+                            <ItemsPresenter.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsPresenter.ItemsPanel>
+                        </ItemsPresenter>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+    </Window.Styles>
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
 
-        <!-- Top menu -->
-        <Menu Grid.Row="0" Background="#1a1a1a">
-            <MenuItem Header="_File" Focusable="False">
+    <!-- TOP BARR -->
+    <Grid RowDefinitions="Auto,*">
+        <Border Padding="0,10" IsHitTestVisible="False" Background="#1A1A1A"/>
+      <Grid x:Name="titleBar"
+          Grid.Row="0"
+          HorizontalAlignment="Stretch"
+          ColumnDefinitions="Auto,Auto,*,Auto">
+
+        <Image x:Name="icon"
+               Grid.Column="0"
+               Width="36" Height="36"
+               Margin="4,0"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               IsVisible="{OnPlatform Default=False, Windows=True}"
+               RenderOptions.BitmapInterpolationMode="HighQuality"
+               Source="/Assets/slagIcon.ico"/>
+        <Menu Grid.Column="1" Background="#1a1a1a" >
+            <MenuItem Header="_File" Focusable="False" Height="36">
                 <MenuItem Header="_Open" Click="OnFileOpen"/>
                 <MenuItem Header="Save" Click="OnFileSave"/>
             </MenuItem>
@@ -38,8 +98,43 @@
             </MenuItem>
         </Menu>
 
+        <!-- SearchBox -->
+        <Panel Grid.Column="2"
+               MaxWidth="400"
+               HorizontalAlignment="Stretch"
+               x:Name="SearchBoxPanel"
+               Margin="50,0,-30,0">
+
+            <AutoCompleteBox HorizontalAlignment="Stretch"
+                     VerticalAlignment="Center"
+                     Watermark="Search..."
+                     MinWidth="0"
+                     x:Name="SearchBoxInput"
+                     FilterMode="Contains"
+                     Padding="32,0,8,0" Height="20">
+                    <AutoCompleteBox.Styles>
+                        <Style Selector="AutoCompleteBox TextBox">
+                            <Setter Property="TextAlignment" Value="Left"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                        </Style>
+                    </AutoCompleteBox.Styles>
+                </AutoCompleteBox>
+
+            <PathIcon Data="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
+                      Width="14" Height="14"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Center"
+                      Margin="10,0,0,0"
+                      Foreground="{DynamicResource TextControlPlaceholderForeground}"/>
+        </Panel>
+
+        <Grid x:Name="dragRegion"
+              Grid.Column="3"
+              MinWidth="175"
+              IsVisible="{OnPlatform Default=False, Windows=True}"/>
+        </Grid>
         <!-- Body -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" VerticalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="Auto"/>
@@ -47,50 +142,53 @@
             </Grid.ColumnDefinitions>
 
             <!-- Side area as a UserControl -->
-            <local:HierarchyView Grid.Column="0" Background="#1a1a1a"/>
+            <local:HierarchyView Grid.Column="0" Background="#1a1a1a" VerticalAlignment="Stretch"/>
 
-            <GridSplitter Grid.Column="1" Width="4" Focusable="False" HorizontalAlignment="Stretch" Background="#0D324D"/>
+            <GridSplitter Grid.Column="1" Width="4" Focusable="False" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="#0D324D"/>
 
             <!-- OpenGL view -->
-            <local:GLControl Grid.Column="2"/>
-            <Canvas Name="OverlayCanvas" ClipToBounds="True" IsHitTestVisible="False" Grid.Column="2"/>
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+            <local:GLControl Grid.Column="2" VerticalAlignment="Stretch"/>
+            <Canvas Name="OverlayCanvas" ClipToBounds="True" IsHitTestVisible="False" Grid.Column="2" VerticalAlignment="Stretch"/>
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                <ComboBox Grid.Row="0" Grid.Column="0" Width="120"
-                          SelectedIndex="0"
-                          CornerRadius="0"
-                          SelectionChanged="OnRendermodeChanged"
-                          Focusable="False">
-                    <ComboBoxItem Content="All"/>
-                    <ComboBoxItem Content="Solid"/>
-                    <ComboBoxItem Content="Wireframe"/>
-                    <ComboBoxItem Content="Points"/>
-                </ComboBox>
+                    <ComboBox Grid.Row="0" Grid.Column="0" Width="120"
+                              SelectedIndex="0"
+                              CornerRadius="0"
+                              SelectionChanged="OnRendermodeChanged"
+                              Focusable="False">
+                        <ComboBoxItem Content="All"/>
+                        <ComboBoxItem Content="Solid"/>
+                        <ComboBoxItem Content="Wireframe"/>
+                        <ComboBoxItem Content="Points"/>
+                    </ComboBox>
 
-                <Button Grid.Row="0" Grid.Column="1" Width="30" Height="30" CornerRadius="0" Background="Transparent" x:Name="vertexButton" Click="OnVertexPressed">
-                    <Image Width="25" MinWidth="0" Source="../Assets/vertex.png"/>
-                </Button>
-                <Button Grid.Row="0" Grid.Column="2" Width="30" Height="30" CornerRadius="0" Background="Transparent" x:Name="edgeButton" Click="OnEdgePressed">
-                    <Image Width="25" MinWidth="0" Source="../Assets/edge.png"/>
-                </Button>
-                <Button Grid.Row="0" Grid.Column="3" Width="30" Height="30" CornerRadius="0" Background="Transparent" x:Name="faceButton" Click="OnFacePressed">
-                    <Image Width="25" MinWidth="0" Source="../Assets/face.png"/>
-                </Button>
-                <Button Grid.Row="0" Grid.Column="4" Width="30" Height="30" CornerRadius="0" Background="Orange" x:Name="objectButton" Click="OnShapePressed">
-                    <Image Width="25" MinWidth="0" Source="../Assets/object.png"/>
-                </Button>
+                    <Button Grid.Row="0" Grid.Column="1" Width="30" Height="30" CornerRadius="0" Background="Transparent" x:Name="vertexButton" Click="OnVertexPressed">
+                        <Image Width="25" MinWidth="0" Source="../Assets/vertex.png"/>
+                    </Button>
+                    <Button Grid.Row="0" Grid.Column="2" Width="30" Height="30" CornerRadius="0" Background="Transparent" x:Name="edgeButton" Click="OnEdgePressed">
+                        <Image Width="25" MinWidth="0" Source="../Assets/edge.png"/>
+                    </Button>
+                    <Button Grid.Row="0" Grid.Column="3" Width="30" Height="30" CornerRadius="0" Background="Transparent" x:Name="faceButton" Click="OnFacePressed">
+                        <Image Width="25" MinWidth="0" Source="../Assets/face.png"/>
+                    </Button>
+                    <Button Grid.Row="0" Grid.Column="4" Width="30" Height="30" CornerRadius="0" Background="Orange" x:Name="objectButton" Click="OnShapePressed">
+                        <Image Width="25" MinWidth="0" Source="../Assets/object.png"/>
+                    </Button>
+                </Grid>
             </Grid>
         </Grid>
-    </Grid>
+
+
+
 </Window>
