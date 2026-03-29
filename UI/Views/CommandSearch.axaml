@@ -13,7 +13,7 @@
 
               <AutoCompleteBox HorizontalAlignment="Stretch"
                      VerticalAlignment="Center"
-                     Watermark="Search..."
+                     Watermark="Modifier..."
                      MinWidth="0"
                      x:Name="SearchBoxInput"
                      FilterMode="Contains"
@@ -41,6 +41,7 @@
                       HorizontalAlignment="Left"
                       VerticalAlignment="Center"
                       Margin="10,0,0,0"
+                      ToolTip.Tip="Search for a modifier"
                       Foreground="{DynamicResource TextControlPlaceholderForeground}"/>
         </Panel>
 

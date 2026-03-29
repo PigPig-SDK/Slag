@@ -11,6 +11,12 @@ namespace UI.Commands;
 
 internal class DeleteCommand : MementoCommand
 {
+    public override string Name => throw new InvalidProgramException("Cannot read information about this command");
+
+    public override string Description => throw new InvalidProgramException("Cannot read information about this command");
+
+    public override bool ShowUpOToolbar => false;
+
     public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
         if (SelectionManager.Instance.CurrentModel == null) return CommandState.Discard;

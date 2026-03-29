@@ -14,6 +14,12 @@ public interface ICommand
     /// <returns>The command state after execution</returns>
     CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args);
 
+    public string Name { get; }
+
+    public string Description { get; }
+
+    public bool ShowUpOToolbar { get; }
+
     public void Undo();
 
     public void Redo();

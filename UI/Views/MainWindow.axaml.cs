@@ -7,10 +7,7 @@ using UI.Commands;
 using UI.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 
 namespace UI.Views;
 
@@ -21,6 +18,31 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Instance = this;
+        CommandInvoker.Singleton.CommandExecuted += Singleton_CommandExecuted;
+    }
+
+    private void Singleton_CommandExecuted(ICommand? obj)
+    {
+        if (obj == null || !obj!.ShowUpOToolbar)
+        {
+            CommandTitle.Content = string.Empty;
+            CommandTitle.IsVisible = false;
+
+            CommandDescription.Content = string.Empty;
+            CommandDescription.IsVisible = false;
+
+            CommandSeparator.IsVisible = false;
+        }
+        else
+        {
+            CommandTitle.Content = obj.Name;
+            CommandTitle.IsVisible = true;
+
+            CommandDescription.Content = obj.Description;
+            CommandDescription.IsVisible = true;
+
+            CommandSeparator.IsVisible = true;
+        }
     }
 
     private void OnRendermodeChanged(object? sender, SelectionChangedEventArgs e)
@@ -150,21 +172,6 @@ public partial class MainWindow : Window
         {
             Console.WriteLine(exception.Message);
         }
-    }
-
-    private void OnScale(object? sender, RoutedEventArgs e)
-    {
-        CommandInvoker.Singleton?.RunCommand(new ScaleCommand(), (null, null, CommandInfo.Initialization | CommandInfo.KeyDown));
-    }
-
-    private void OnMove(object? sender, RoutedEventArgs e)
-    {
-        CommandInvoker.Singleton?.RunCommand(new MoveCommand(), (null, null, CommandInfo.Initialization | CommandInfo.KeyDown));
-    }
-
-    private void OnDelete(object? sender, RoutedEventArgs e)
-    {
-        CommandInvoker.Singleton?.RunCommand(new DeleteCommand(), (null, null, CommandInfo.Initialization | CommandInfo.KeyDown));
     }
 
     private void OnUndoPressed(object? sender, RoutedEventArgs e)

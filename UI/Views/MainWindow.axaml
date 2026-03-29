@@ -1,4 +1,4 @@
-<Window                 
+﻿<Window                 
         xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:UI.ViewModels"
@@ -90,13 +90,8 @@
                 <MenuItem Header="_Open" Click="OnFileOpen"/>
                 <MenuItem Header="Save" Click="OnFileSave"/>
             </MenuItem>
-            <MenuItem Header="Edit" Focusable="False">
-                <MenuItem Header="Scale (S)" Click="OnScale"/>
-                <MenuItem Header="Move (G)" Click="OnMove"/>
-                <MenuItem Header="Delete (DEL)" Click="OnDelete"/>
-                <MenuItem Header="Undo (CTRL+Z)" Click="OnUndoPressed"/>
-                <MenuItem Header="Redo (CTRL+R)" Click="OnRedoPressed"/>
-            </MenuItem>
+            <MenuItem Header="↩" Click="OnUndoPressed" ToolTip.Tip="Undo"/>
+            <MenuItem Header="↪" Click="OnRedoPressed" ToolTip.Tip="Redo"/>
         </Menu>
 
         <!-- SearchBox -->
@@ -138,7 +133,7 @@
 
                     <ComboBox Grid.Row="0" Grid.Column="0" Width="120"
                               SelectedIndex="0"
-                              CornerRadius="0"
+                              CornerRadius="10"
                               SelectionChanged="OnRendermodeChanged"
                               Focusable="False">
                         <ComboBoxItem Content="All"/>
@@ -147,18 +142,26 @@
                         <ComboBoxItem Content="Points"/>
                     </ComboBox>
 
-                    <Button Grid.Row="0" Grid.Column="1" Width="30" Height="30" CornerRadius="0" Background="Transparent" x:Name="vertexButton" Click="OnVertexPressed">
+                    <Button Grid.Row="0" Grid.Column="1" Width="30" Height="30" CornerRadius="10" Background="Transparent" x:Name="vertexButton" Click="OnVertexPressed">
                         <Image Width="25" MinWidth="0" Source="../Assets/vertex.png"/>
                     </Button>
-                    <Button Grid.Row="0" Grid.Column="2" Width="30" Height="30" CornerRadius="0" Background="Transparent" x:Name="edgeButton" Click="OnEdgePressed">
+                    <Button Grid.Row="0" Grid.Column="2" Width="30" Height="30" CornerRadius="10" Background="Transparent" x:Name="edgeButton" Click="OnEdgePressed">
                         <Image Width="25" MinWidth="0" Source="../Assets/edge.png"/>
                     </Button>
-                    <Button Grid.Row="0" Grid.Column="3" Width="30" Height="30" CornerRadius="0" Background="Transparent" x:Name="faceButton" Click="OnFacePressed">
+                    <Button Grid.Row="0" Grid.Column="3" Width="30" Height="30" CornerRadius="10" Background="Transparent" x:Name="faceButton" Click="OnFacePressed">
                         <Image Width="25" MinWidth="0" Source="../Assets/face.png"/>
                     </Button>
-                    <Button Grid.Row="0" Grid.Column="4" Width="30" Height="30" CornerRadius="0" Background="Orange" x:Name="objectButton" Click="OnShapePressed">
+                    <Button Grid.Row="0" Grid.Column="4" Width="30" Height="30" CornerRadius="10" Background="Orange" x:Name="objectButton" Click="OnShapePressed">
                         <Image Width="25" MinWidth="0" Source="../Assets/object.png"/>
                     </Button>
+                    <Canvas Grid.Row="1">
+                        <Grid RowDefinitions="auto,auto,auto">
+                            <Label x:Name="CommandTitle" FontFamily="Verdana" Grid.Row="0" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="#80FFA500" FontSize="30" IsVisible="False">Nothing</Label>
+                            <Separator x:Name="CommandSeparator" Grid.Row="1" Background="#80FFA500" IsVisible="False"/>
+                            <Label x:Name="CommandDescription" FontFamily="Verdana" Grid.Row="2" HorizontalAlignment="Left" Margin="10,0,0,0" FontSize="15" Foreground="#80FFA500" IsVisible="False"></Label>
+                        </Grid>
+                    </Canvas>
+                    
                 </Grid>
             </Grid>
         </Grid>

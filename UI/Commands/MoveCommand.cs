@@ -12,6 +12,15 @@ public class MoveCommand : ICommand
 {
     public ICommand? Next { get; set; }
 
+    public string Name => "Move";
+
+    public string Description =>
+        "[X, Y, Z] : Specify a move axis\n" +
+        "[G, Click] : Accept changes\n" +
+        "[ESC] : Decline changes";
+
+    public bool ShowUpOToolbar => true;
+
     private const float _moveDistanceScale = 0.01f;
     public (Vector3 realitiveRight, Vector3 realitiveUp) CameraMoveDirections;
     private Vector2? _mouseStartPos = null;

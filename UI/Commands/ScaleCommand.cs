@@ -16,6 +16,15 @@ public class ScaleCommand : ICommand
 {
     public ICommand? Next { get; set; }
 
+    public string Name => "Scale";
+
+    public string Description =>
+    "[X, Y, Z] : Specify a scale axis\n" +
+    "[S, Click] : Accept changes\n" +
+    "[ESC] : Decline changes";
+
+    public bool ShowUpOToolbar => true;
+
     private const float _moveDistanceScale = 0.005f;
     public Vector3 SelectionCenter = new Vector3(0, 0, 0);
     private Vector3 _activeAxis = new Vector3(1, 1, 1);

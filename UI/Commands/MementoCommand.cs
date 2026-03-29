@@ -9,6 +9,12 @@ public abstract class MementoCommand : ICommand
 {
     public ICommand? Next { get; set; }
 
+    public abstract string Name { get; }
+
+    public abstract string Description { get; }
+
+    public abstract bool ShowUpOToolbar { get; }
+
     public abstract CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args);
 
     public Model? ModelState;

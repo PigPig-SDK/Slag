@@ -10,6 +10,12 @@ using Core;
 namespace UI.Commands;
 public class ExtrudeCommand : MementoCommand
 {
+    public override string Name => throw new InvalidProgramException("Cannot read information about this command");
+
+    public override string Description => throw new InvalidProgramException("Cannot read information about this command");
+
+    public override bool ShowUpOToolbar => false;
+
     public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
         SelectionManager sm = SelectionManager.Instance;

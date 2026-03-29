@@ -16,6 +16,16 @@ public class RotateCommand : ICommand
 {
     public ICommand? Next { get; set; }
     private Vector3 _selectionCenter { get; set; }
+
+    public string Name => "Rotate";
+
+    public string Description => 
+        "[X, Y, Z] : Specify a rotation axis\n" +
+        "[R, Click] : Accept changes\n" +
+        "[ESC] : Decline changes";
+
+    public bool ShowUpOToolbar => true;
+
     private Vector2? _mouseStart;
     private Dictionary<uint, Vector4> _startingPosition = [];
     private float _totalRotation;
@@ -83,6 +93,7 @@ public class RotateCommand : ICommand
                 return CommandState.Finished;
             }
         }
+
         if(args.info.HasFlag(CommandInfo.KeyDown))
         {
             switch(args.keyEvent!.Key)
@@ -107,6 +118,12 @@ public class RotateCommand : ICommand
                     }
                 case Key.R:
                     {
+                        CleanUpUi();
+                        return CommandState.Finished;
+                    }
+                case Key.Escape:
+                    {
+                        Rotate(0.0f);
                         CleanUpUi();
                         return CommandState.Finished;
                     }
