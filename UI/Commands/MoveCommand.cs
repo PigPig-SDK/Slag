@@ -15,6 +15,7 @@ public class MoveCommand : ICommand
     private const float _moveDistanceScale = 0.01f;
     public (Vector3 realitiveRight, Vector3 realitiveUp) CameraMoveDirections;
     private Vector2? _mouseStartPos = null;
+    private bool ActiveAxisOverride = false;
     private Vector3 _activeAxis = new Vector3(1, 1, 1);
 
     private Dictionary<uint, Vector3> _startingPosition = [];
@@ -93,13 +94,40 @@ public class MoveCommand : ICommand
             case Key.G:
                 return CommandState.Finished;
             case Key.X:
-                _activeAxis = new Vector3(1, 0, 0);
+                if (ActiveAxisOverride == false)
+                {
+                    ActiveAxisOverride = true;
+                    _activeAxis = new Vector3(1, 0, 0);
+                }
+                else
+                {
+                    _activeAxis = new Vector3(_activeAxis.X == 0 ? 1 : 0, _activeAxis.Y, _activeAxis.Z);
+                }
+                ActiveAxisZeroCheck();
                 return CommandState.Idle;
             case Key.Y:
-                _activeAxis = new Vector3(0, 1, 0);
+                if (ActiveAxisOverride == false)
+                {
+                    ActiveAxisOverride = true;
+                    _activeAxis = new Vector3(0, 1, 0);
+                }
+                else
+                {
+                    _activeAxis = new Vector3(_activeAxis.X, _activeAxis.Y == 0 ? 1 : 0, _activeAxis.Z);
+                }
+                ActiveAxisZeroCheck();
                 return CommandState.Idle;
             case Key.Z:
-                _activeAxis = new Vector3(0, 0, 1);
+                if (ActiveAxisOverride == false)
+                {
+                    ActiveAxisOverride = true;
+                    _activeAxis = new Vector3(0, 0, 1);
+                }
+                else
+                {
+                    _activeAxis = new Vector3(_activeAxis.X, _activeAxis.Y, _activeAxis.Z == 0 ? 1 : 0);
+                }
+                ActiveAxisZeroCheck();
                 return CommandState.Idle;
             case Key.Escape:
                 {
@@ -110,7 +138,14 @@ public class MoveCommand : ICommand
         
         return CommandState.Idle;
     }
-
+    void ActiveAxisZeroCheck()
+    {
+        if (_activeAxis == Vector3.Zero)
+        {
+            ActiveAxisOverride = false;
+            _activeAxis = new Vector3(1, 1, 1);
+        }
+    }
     public void Undo()
     {
         MoveSelection(Vector2.Zero);
