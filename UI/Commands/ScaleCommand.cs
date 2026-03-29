@@ -28,6 +28,7 @@ public class ScaleCommand : ICommand
     //UI stuff..
     private Line? _uiLine;
     private TextBlock? _textblock;
+    public bool ActiveAxisOverride = false;
 
     private CommandState Initialize()
     {
@@ -79,6 +80,14 @@ public class ScaleCommand : ICommand
         return CommandState.Idle;//Continue the command.
     }
 
+    void ActiveAxisZeroCheck()
+    {
+        if (_activeAxis == Vector3.Zero)
+        {
+            ActiveAxisOverride = false;
+            _activeAxis = new Vector3(1, 1, 1);
+        }
+    }
     private void Scale(float ammount)
     {
         Model? model = SelectionManager.Instance.CurrentModel;
@@ -138,13 +147,40 @@ public class ScaleCommand : ICommand
                 CleanUpUi();
                 return CommandState.Finished;
             case Key.X:
-                _activeAxis = new Vector3(1, 0, 0);
+                if (ActiveAxisOverride == false)
+                {
+                    ActiveAxisOverride = true;
+                    _activeAxis = new Vector3(1, 0, 0);
+                }
+                else
+                {
+                    _activeAxis = new Vector3(_activeAxis.X == 0 ? 1 : 0, _activeAxis.Y, _activeAxis.Z);
+                }
+                ActiveAxisZeroCheck();
                 return CommandState.Idle;
             case Key.Y:
-                _activeAxis = new Vector3(0, 1, 0);
+                if (ActiveAxisOverride == false)
+                {
+                    ActiveAxisOverride = true;
+                    _activeAxis = new Vector3(0, 1, 0);
+                }
+                else
+                {
+                    _activeAxis = new Vector3(_activeAxis.X, _activeAxis.Y == 0 ? 1 : 0, _activeAxis.Z);
+                }
+                ActiveAxisZeroCheck();
                 return CommandState.Idle;
             case Key.Z:
-                _activeAxis = new Vector3(0, 0, 1);
+                if (ActiveAxisOverride == false)
+                {
+                    ActiveAxisOverride = true;
+                    _activeAxis = new Vector3(0, 0, 1);
+                }
+                else
+                {
+                    _activeAxis = new Vector3(_activeAxis.X, _activeAxis.Y, _activeAxis.Z == 0 ? 1 : 0);
+                }
+                ActiveAxisZeroCheck();
                 return CommandState.Idle;
             case Key.Escape:
                 {
