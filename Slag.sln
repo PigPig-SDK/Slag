@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36203.30
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "UI.csproj", "{8A1DDA8E-E66A-42C9-ABF5-90BBCAD65FC5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "UI\UI.csproj", "{8A1DDA8E-E66A-42C9-ABF5-90BBCAD65FC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "..\Data\Core.csproj", "{7A3132F9-A5B3-6A88-5644-F1487933B6C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{7A3132F9-A5B3-6A88-5644-F1487933B6C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelTests", "..\ModelTests\ModelTests.csproj", "{508BFF6D-783C-4B7A-B84A-C0E5BC2BC127}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{508BFF6D-783C-4B7A-B84A-C0E5BC2BC127}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
