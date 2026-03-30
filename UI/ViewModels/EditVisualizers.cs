@@ -32,14 +32,14 @@ public class EditVisualizers
             {
                 case SceneHierarchy.XPlaneName:
                     AxisVisualizerX = model;
-                    AxisVisualizerX.Rotation = new OpenTK.Mathematics.Vector3(0, 0, MathF.PI/2);
+                    AxisVisualizerX.Rotation = new OpenTK.Mathematics.Vector3(MathF.PI / 2, 0, 0);
                     break;
                 case SceneHierarchy.YPlaneName:
                     AxisVisualizerY = model;
                     break;
                  case SceneHierarchy.ZPlaneName:
                     AxisVisualizerZ = model;
-                    AxisVisualizerZ.Rotation = new OpenTK.Mathematics.Vector3(MathF.PI / 2, 0, 0);
+                    AxisVisualizerZ.Rotation = new OpenTK.Mathematics.Vector3(0, 0, MathF.PI / 2);
                     break;
 
             }

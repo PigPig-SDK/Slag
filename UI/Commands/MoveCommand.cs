@@ -53,6 +53,13 @@ public class MoveCommand : ICommand
         return CommandState.Idle;//Continue the command.
     }
 
+    void CleanUp()
+    {
+        EditVisualizers.Instance.AxisVisualizerZ.Hidden = true;
+        EditVisualizers.Instance.AxisVisualizerY.Hidden = true;
+        EditVisualizers.Instance.AxisVisualizerX.Hidden = true;
+    }
+
     private void MoveSelection(Vector2 mouseDelta)
     {
         Model? model = SelectionManager.Instance.CurrentModel;
@@ -93,15 +100,21 @@ public class MoveCommand : ICommand
 
             MoveSelection(_moveDistance);
 
-            if(args.info.HasFlag(CommandInfo.MouseDown))
+            if (args.info.HasFlag(CommandInfo.MouseDown))
+            {
+                CleanUp();
                 return CommandState.Finished;
+            }
         }
 
         //Keyboard input
         switch(args.keyEvent?.Key)
         {
             case Key.G:
-                return CommandState.Finished;
+                {
+                    CleanUp();
+                    return CommandState.Finished;
+                }
             case Key.X:
                 if (ActiveAxisOverride == false)
                 {
@@ -141,6 +154,7 @@ public class MoveCommand : ICommand
             case Key.Escape:
                 {
                     MoveSelection(Vector2.Zero);
+                    CleanUp();
                     return CommandState.Finished;
                 }
         }
@@ -149,6 +163,10 @@ public class MoveCommand : ICommand
     }
     void ActiveAxisZeroCheck()
     {
+        EditVisualizers.Instance.AxisVisualizerZ.Hidden = _activeAxis.Z == 0;
+        EditVisualizers.Instance.AxisVisualizerY.Hidden = _activeAxis.Y == 0;
+        EditVisualizers.Instance.AxisVisualizerX.Hidden = _activeAxis.X == 0;
+
         if (_activeAxis == Vector3.Zero)
         {
             ActiveAxisOverride = false;
