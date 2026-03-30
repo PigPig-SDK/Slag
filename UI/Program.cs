@@ -1,5 +1,6 @@
 ﻿using System;
 using Avalonia;
+using UI.ViewModels;
 
 namespace UI
 {
@@ -9,8 +10,13 @@ namespace UI
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
         // yet and stuff might break.
         [STAThread]
-        public static void Main(string[] args) => BuildAvaloniaApp()
+        public static void Main(string[] args)
+        {
+            EditVisualizers.SetupInstance();
+
+            BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime(args);
+        }
 
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp()

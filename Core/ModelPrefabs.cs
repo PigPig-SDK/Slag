@@ -34,10 +34,10 @@ public static partial class ModelPrefabs
         return cube;
     }
 
-    public static Model Plane(float size)
+    public static Model Plane(float size, string name = "Plane")
     {
         Model plane = new();
-        plane.ObjectName = "Plane";
+        plane.ObjectName = name;
 
         //Add verts
         plane.AddVertex(new Vertex(new Vector3(-size, 0, -size), new Vector2(0, 0))); // 0

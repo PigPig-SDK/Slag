@@ -11,10 +11,11 @@ uniform bool isFullbright;
 uniform bool useTilemap;
 
 in vec3 normal;
-in vec3 posistion;
+in vec4 posistion;
 in vec4 desiredColor;
 in vec4 envSpace;
 in vec2 uv;
+in vec3 posistionLocal;
 
 out vec4 FragColor;
 
@@ -45,36 +46,62 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 void main() 
 {
-    if(isFullbright) {
+    //Lighting stage
+    if(isFullbright) 
+    {
         FragColor = desiredColor;
-        return;
+    }
+    else
+    {
+        float shininess = 10000.0;
+        vec4 baseColor = (desiredColor * 0.5 + 0.5);
+
+        vec3 N = normalize(normal);
+        vec3 L = normalize(sunAngle);  // make sure L is normalized
+        vec3 V = normalize(camera_location - posistion.xyz);
+
+        // --- Diffuse ---
+        float diff = max(dot(N, L), 0.0);
+        vec4 lightColor = vec4(0.972549019607843, 0.772549019607843, 0.545098039215686, 1.0);
+        vec4 diffuse = diff * lightColor * baseColor; // apply base color
+
+        // --- Specular ---
+        vec3 R = reflect(-L, N);
+        float spec = pow(max(dot(R, V), 0.0), shininess);
+        vec4 specular = spec * lightColor;
+
+        // --- Ambient ---
+        vec4 ambient = (vec4(0.556862745098039, 0.603921568627451,0.725490196078431,2.0) / 2.0) * baseColor;
+
+        // --- Shadow ---
+        float shadow = ShadowCalculation(envSpace); // 0.0 = in shadow, 1.0 = fully lit
+
+        // --- Combine lighting ---
+        FragColor = ambient + (diffuse + specular) * shadow;
+        FragColor.a = 1.0;
     }
 
+    if(useTilemap) 
+    {
+        float gridSize = 1.0;
+        float lineWidth = 0.01;
+        float halfLineWidth = (lineWidth / 2.0);
+        float threshold = 1.0 - lineWidth / gridSize;
 
-    float shininess = 10000.0;
-    vec4 baseColor = (desiredColor * 0.5 + 0.5);
+        vec2 grid = fract(posistionLocal.xz / gridSize - halfLineWidth);
 
-    vec3 N = normalize(normal);
-    vec3 L = normalize(sunAngle);  // make sure L is normalized
-    vec3 V = normalize(camera_location - posistion);
+        bool onLine = grid.x > threshold || grid.y > threshold;
 
-    // --- Diffuse ---
-    float diff = max(dot(N, L), 0.0);
-    vec4 lightColor = vec4(0.972549019607843, 0.772549019607843, 0.545098039215686, 1.0);
-    vec4 diffuse = diff * lightColor * baseColor; // apply base color
+        if (!onLine) discard;
 
-    // --- Specular ---
-    vec3 R = reflect(-L, N);
-    float spec = pow(max(dot(R, V), 0.0), shininess);
-    vec4 specular = spec * lightColor;
+        //Fog
+        float distanceToCamera = length(camera_location - posistion.xyz);
+        float fogStart = 1.0;
+        float fogEnd = 10.0;
+        float fog = 1.0 - clamp((distanceToCamera - fogStart) / (fogEnd - fogStart), 0.0, 1.0);
 
-    // --- Ambient ---
-    vec4 ambient = (vec4(0.556862745098039, 0.603921568627451,0.725490196078431,2.0) / 2.0) * baseColor;
+        vec4 fogColor = vec4(0.1f, 0.1f, 0.1f, 0.85f);
+        FragColor = mix(fogColor, FragColor, fog);
 
-    // --- Shadow ---
-    float shadow = ShadowCalculation(envSpace); // 0.0 = in shadow, 1.0 = fully lit
-
-    // --- Combine lighting ---
-    FragColor = ambient + (diffuse + specular) * shadow;
-    FragColor.a = 1.0;
+    }
 }

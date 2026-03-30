@@ -4,5 +4,6 @@ public enum HierarchyType
 {
     Model = 1 << 0,
     Tool = 1 << 1,
-    All = Tool | Model,
+    EditVisualizer = 1 << 2,
+    All = Tool | Model |  EditVisualizer,
 }

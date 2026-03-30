@@ -26,14 +26,15 @@ public class GLComponent : ModelComponent, IRenderObject
     private GlInterface? glInterface = null;
 
     //Used for tools and such...
-    private Color4? color = null;
+    public Color4? color = null;
     public bool IsFullbright = false;
-    public float TilemapScale = 0.0f;
-    public bool UseTilemap = true;
+    public bool UseTilemapRendering = false;
 
     public bool Hidden { get => Model.Hidden; set => Model.Hidden = value; }
 
     public Matrix4 ModelMatrix { get => Model.GetModelMatrix(); }
+
+    public static event Action<GLComponent>? OnBoundToModel;
 
     public override void OnAddedToModel(Model model)
     {
@@ -221,7 +222,9 @@ public class GLComponent : ModelComponent, IRenderObject
             GLComponent? glComponent = model.AddComponent<GLComponent>(new GLComponent()) as GLComponent;
             if (glComponent == null) return false;
             glComponent.GenerateBuffers(gl);
+            OnBoundToModel?.Invoke(glComponent);
         }
+        
         return true;
     }
 
@@ -233,7 +236,7 @@ public class GLComponent : ModelComponent, IRenderObject
         shader.SetColorUniform(gl, shader.GetUniformLocation(gl, "color"), color ?? new Color4(1, 1, 1, 1));
         gl.Uniform1i(shader.GetUniformLocation(gl, "useColor"), (color is null)? 0 : 1);
         gl.Uniform1i(shader.GetUniformLocation(gl, "isFullbright"), (IsFullbright) ? 1 : 0);
-        gl.Uniform1i(shader.GetUniformLocation(gl, "useTilemap"), (UseTilemap) ? 1 : 0);
+        gl.Uniform1i(shader.GetUniformLocation(gl, "useTilemap"), (UseTilemapRendering) ? 1 : 0);
 
         gl.BindVertexArray(_triangleArrayObject!.Value);
         gl.DrawElements(GL_TRIANGLES, _indiciesCount, GL_UNSIGNED_INT, 0);

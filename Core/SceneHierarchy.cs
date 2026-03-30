@@ -4,11 +4,21 @@ public class SceneHierarchy
 {
     public static SceneHierarchy Instance = new();
 
+    public const string XPlaneName = "XPlane";
+    public const string YPlaneName = "YPlane";
+    public const string ZPlaneName = "ZPlane";
+
     public IReadOnlyDictionary<HierarchyType, List<Model>> HierarchyCategories => _hierarchyCategories;
     private Dictionary<HierarchyType, List<Model>> _hierarchyCategories = new()
     {
         { HierarchyType.Model, [ModelPrefabs.Cube()] },
-        { HierarchyType.Tool, [ModelPrefabs.AxisTriad(), ModelPrefabs.SelectionInstance()] },
+        { HierarchyType.EditVisualizer, 
+        [   ModelPrefabs.Plane(40, XPlaneName),
+            ModelPrefabs.Plane(40, YPlaneName),
+            ModelPrefabs.Plane(40, ZPlaneName)] },
+        { HierarchyType.Tool, [
+            ModelPrefabs.AxisTriad(),
+            ModelPrefabs.SelectionInstance()]},
     };
 
     public event Action<HierarchyType,Model>? OnModelAdded;

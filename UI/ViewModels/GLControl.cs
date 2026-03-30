@@ -138,6 +138,7 @@ public class GLControl : OpenGlControlBase
             SelectionComponent.BindComponent(model);
             GLComponent.BindComponent(model, gl);
         }
+        
 
         SceneHierarchy.Instance.OnModelAdded += OnModelAdded;
     }
@@ -207,6 +208,7 @@ public class GLControl : OpenGlControlBase
 
         gl.Enable(GL_DEPTH_TEST);
         RenderModels(gl, HierarchyType.Model, ref view, ref proj);
+        RenderModels(gl, HierarchyType.EditVisualizer, ref view, ref proj, RenderMode.Triangles);
 
         gl.Disable(GL_DEPTH_TEST);
         RenderModels(gl, HierarchyType.Tool, ref view, ref proj, RenderMode.Triangles);

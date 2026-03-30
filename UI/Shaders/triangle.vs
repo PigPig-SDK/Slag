@@ -13,10 +13,10 @@ uniform mat4 env_matrix;
 uniform vec4 color;
 uniform bool useColor;
 
-
 out vec3 normal;
 out vec4 desiredColor;
-out vec3 posistion;
+out vec4 posistion;
+out vec3 posistionLocal;
 out vec4 envSpace;
 out vec2 uv;
 
@@ -37,8 +37,10 @@ void main()
     }
     
     normal = transpose(inverse(mat3(model_matrix))) * aNormal;
-    gl_Position = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
+    posistion = model_matrix * vec4(aPos, 1.0);
+    gl_Position = projection_matrix * view_matrix * posistion;
     envSpace =  env_matrix * model_matrix * vec4(aPos,1.0);
-    posistion = vec3(gl_Position);
+    
+    posistionLocal = aPos;
     uv = aUV;
 }
