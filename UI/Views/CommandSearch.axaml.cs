@@ -40,6 +40,9 @@ public partial class CommandSearch : UserControl
         {
             SearchBoxInput.IsDropDownOpen = true;
         };
+
+        SearchBoxInput.ClearSelectionOnLostFocus = true;
+
         SearchBoxInput.ItemsSource = _commands.Keys;
     }
 
@@ -47,22 +50,26 @@ public partial class CommandSearch : UserControl
     {
         if (e.Key == Avalonia.Input.Key.Enter)
         {
-            SearchBoxInput.IsDropDownOpen = false;
-
-            string? input = SearchBoxInput.Text;
-            if (!string.IsNullOrWhiteSpace(input))
-            {
-                if (_commands.TryGetValue(input.ToLower(), out Type? commandType))
-                {
-                    CommandInvoker.Singleton.RunCommand((ICommand)Activator.CreateInstance(commandType)!,(null, null, CommandInfo.Initialization)
-                    );
-                }
-
-                SearchBoxInput.Text = string.Empty;
-                GLControl.Instance?.Focus();
-            }
-
+            Submit();
             e.Handled = true;
         }
+    }
+    private void Submit()
+    {
+        SearchBoxInput.IsDropDownOpen = false;
+
+        string? input = SearchBoxInput.Text;
+        if (!string.IsNullOrWhiteSpace(input))
+        {
+            if (_commands.TryGetValue(input.ToLower(), out Type? commandType))
+            {
+                CommandInvoker.Singleton.RunCommand((ICommand)Activator.CreateInstance(commandType)!, (null, null, CommandInfo.Initialization)
+                );
+            }
+
+            SearchBoxInput.Text = string.Empty;
+            GLControl.Instance?.Focus();
+        }
+
     }
 }

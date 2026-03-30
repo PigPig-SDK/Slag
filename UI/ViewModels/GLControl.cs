@@ -207,6 +207,7 @@ public class GLControl : OpenGlControlBase
 
         gl.Enable(GL_DEPTH_TEST);
         RenderModels(gl, HierarchyType.Model, ref view, ref proj);
+
         gl.Disable(GL_DEPTH_TEST);
         RenderModels(gl, HierarchyType.Tool, ref view, ref proj, RenderMode.Triangles);
         RenderUI();
@@ -257,7 +258,7 @@ public class GLControl : OpenGlControlBase
                     {
                         default:
                             {
-                                component.RenderModel(gl);
+                                component.RenderModel(gl, activeShader);
                                 break;
                             }
                         case RenderMode.Edges:

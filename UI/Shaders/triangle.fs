@@ -7,6 +7,8 @@ uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
 uniform sampler2D shadowMap;
 uniform vec3 sunAngle;
+uniform bool isFullbright;
+uniform bool useTilemap;
 
 in vec3 normal;
 in vec3 posistion;
@@ -43,6 +45,12 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 void main() 
 {
+    if(isFullbright) {
+        FragColor = desiredColor;
+        return;
+    }
+
+
     float shininess = 10000.0;
     vec4 baseColor = (desiredColor * 0.5 + 0.5);
 

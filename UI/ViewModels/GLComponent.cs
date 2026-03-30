@@ -25,6 +25,12 @@ public class GLComponent : ModelComponent, IRenderObject
 
     private GlInterface? glInterface = null;
 
+    //Used for tools and such...
+    private Color4? color = null;
+    public bool IsFullbright = false;
+    public float TilemapScale = 0.0f;
+    public bool UseTilemap = true;
+
     public bool Hidden { get => Model.Hidden; set => Model.Hidden = value; }
 
     public Matrix4 ModelMatrix { get => Model.GetModelMatrix(); }
@@ -219,9 +225,16 @@ public class GLComponent : ModelComponent, IRenderObject
         return true;
     }
 
-    public void RenderModel(GlInterface gl)
+    public void RenderModel(GlInterface gl, ShaderProgram shader)
     {
         if (_triangleArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_triangleArrayObject)} while its null");
+        
+
+        shader.SetColorUniform(gl, shader.GetUniformLocation(gl, "color"), color ?? new Color4(1, 1, 1, 1));
+        gl.Uniform1i(shader.GetUniformLocation(gl, "useColor"), (color is null)? 0 : 1);
+        gl.Uniform1i(shader.GetUniformLocation(gl, "isFullbright"), (IsFullbright) ? 1 : 0);
+        gl.Uniform1i(shader.GetUniformLocation(gl, "useTilemap"), (UseTilemap) ? 1 : 0);
+
         gl.BindVertexArray(_triangleArrayObject!.Value);
         gl.DrawElements(GL_TRIANGLES, _indiciesCount, GL_UNSIGNED_INT, 0);
     }

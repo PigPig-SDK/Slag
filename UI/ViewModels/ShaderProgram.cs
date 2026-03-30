@@ -55,6 +55,15 @@ public class ShaderProgram
         gl.Uniform3f(_sunAngle, sunAngle.X, sunAngle.Y, sunAngle.Z);
     }
 
+    public unsafe int GetUniformLocation(GlInterface gl, string name)
+    {
+        return gl.GetUniformLocationString(ProgramID, name);
+    }
+    public unsafe void SetColorUniform(GlInterface gl, int uniform, Color4 color)
+    {
+        gl.Uniform4f(uniform, color.R, color.G, color.B, color.A);
+    }
+
     public static string LoadShaderFile(string shaderFile)
     {
         ArgumentNullException.ThrowIfNull(shaderFile);

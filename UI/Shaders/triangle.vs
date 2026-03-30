@@ -10,6 +10,10 @@ uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
 uniform mat4 env_matrix;
 
+uniform vec4 color;
+uniform bool useColor;
+
+
 out vec3 normal;
 out vec4 desiredColor;
 out vec3 posistion;
@@ -19,11 +23,18 @@ out vec2 uv;
 void main()
 {
     //Color base
-    vec3 offset = aPos - camera_location;
-    float dotProduct = dot(normalize(offset), aNormal);
-    float normalDotContribution = 0.5;
-    float colorDiff = 0.5;
-    desiredColor = (normalize(vec4(dotProduct,dotProduct,dotProduct, 1.0)) * normalDotContribution) + vec4(normalize(offset) * colorDiff, 1.0);
+    if(useColor)
+    {
+        desiredColor = color;
+    }
+    else
+    {
+        vec3 offset = aPos - camera_location;
+        float dotProduct = dot(normalize(offset), aNormal);
+        float normalDotContribution = 0.5;
+        float colorDiff = 0.5;
+        desiredColor = (normalize(vec4(dotProduct,dotProduct,dotProduct, 1.0)) * normalDotContribution) + vec4(normalize(offset) * colorDiff, 1.0);
+    }
     
     normal = transpose(inverse(mat3(model_matrix))) * aNormal;
     gl_Position = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);

@@ -11,6 +11,7 @@ namespace UI.ViewModels;
 public static unsafe class GlInterfaceExtensions
 {
     private delegate void Uniform3fDelegate(int location, float x, float y, float z);
+    private delegate void Uniform4fDelegate(int location, float x, float y, float z, float w);
     private delegate void LineWidthDelegate(float width);
     private delegate void ReadBufferDelegate(uint glenum);
     private delegate void DrawBuffersDelegate(int n, uint[] bufs);
@@ -18,6 +19,7 @@ public static unsafe class GlInterfaceExtensions
     private delegate void Uniform1iDelegate(int location, int value);
 
     private static Uniform3fDelegate? _uniform3f;
+    private static Uniform4fDelegate? _uniform4f;
     private static LineWidthDelegate? _lineWidth;
     private static BufferSubDataDelegate? _bufferSubData;
     private static ReadBufferDelegate? _readBuffer;
@@ -46,6 +48,18 @@ public static unsafe class GlInterfaceExtensions
         }
 
         _uniform3f(location, x, y, z);
+    }
+
+    public static void Uniform4f(this GlInterface gl, int location, float x, float y, float z, float w)
+    {
+        if (_uniform4f == null)
+        {
+            nint ptr = gl.GetProcAddress("glUniform4f");
+            if (ptr == IntPtr.Zero) throw new InvalidOperationException("glUniform4f not available");
+            _uniform4f = Marshal.GetDelegateForFunctionPointer<Uniform4fDelegate>(ptr);
+        }
+
+        _uniform4f(location, x, y, z, w);
     }
 
     public static void LineWidth(this GlInterface gl, float width)

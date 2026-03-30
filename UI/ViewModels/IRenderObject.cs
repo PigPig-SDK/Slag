@@ -19,7 +19,7 @@ public interface IRenderObject
     /// <summary>
     /// The function call to render the model
     /// </summary>
-    public void RenderModel(GlInterface gl);
+    public void RenderModel(GlInterface gl, ShaderProgram program);
     /// <summary>
     /// The function call to render the models edges
     /// </summary>
