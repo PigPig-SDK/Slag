@@ -11,7 +11,7 @@ public class EditVisualizers
 
     public Model AxisVisualizerZ;
 
-    public static EditVisualizers? _instance = null;
+    private static EditVisualizers? _instance = null;
     public static EditVisualizers Instance { 
         get 
         { 
@@ -74,5 +74,6 @@ public class EditVisualizers
 
         component.IsFullbright = true;
         component.UseTilemapRendering = true;
+        component.Hidden = true;//Start hidden, only show when needed.
     }
 }
