@@ -172,7 +172,6 @@ public class RotateCommand : ICommand
 
     private CommandState Initialize()
     {
-        if (Camera.Instance == null) throw new InvalidOperationException($"No camera in {nameof(MoveCommand)} {nameof(Initialize)}");
         if (GLControl.Instance == null) throw new InvalidOperationException($"No such {nameof(GLControl.Instance)}");
 
         _model = SelectionManager.Instance.CurrentModel;

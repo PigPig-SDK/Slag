@@ -41,8 +41,6 @@ public class MoveCommand : ICommand
         SelectionComponent? selection = activeModel.GetComponent<SelectionComponent>();
         if(selection is null) return CommandState.Discard;
 
-        if(Camera.Instance == null) throw new InvalidOperationException($"No camera in {nameof(MoveCommand)} {nameof(Initialize)}");
-
         CameraMoveDirections = Camera.Instance.GetRealitiveDirections();
         _selectedIndicies = [..selection.GetSelection<uint>()];
 
@@ -107,7 +105,6 @@ public class MoveCommand : ICommand
 
             if(args.mouseEvent.KeyModifiers.HasFlag(KeyModifiers.Shift))
             {
-                if(Camera.Instance is null) throw new InvalidOperationException($"No camera in {nameof(MoveCommand)} {nameof(Execute)}");
                 RaycastHit? output = Camera.Instance.FindRaycastHit(mousePos);
                 if(output is not null)
                     _moveDirectionOverride = output.HitPoint;

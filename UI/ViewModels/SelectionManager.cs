@@ -88,11 +88,6 @@ public class SelectionManager
 
     private void CheckForVertexSelection(Vector2 screenPosition, bool isDrag)
     {
-        if (Camera.Instance == null)
-        {
-            throw new InvalidOperationException($"{nameof(Camera.Instance)} is not initialzied!");
-        }
-
         VertexHit? hit = Raycast.GetVertexHit(SceneHierarchy.Instance.GetModels(HierarchyType.Model), Camera.Instance.ScreenToGlCoords(screenPosition), Camera.Instance.ViewMatrix);
 
         if (hit != null)
@@ -117,11 +112,6 @@ public class SelectionManager
     }
     private void CheckForEdgeSelection(Vector2 screenPosition, bool isDrag)
     {
-        if (Camera.Instance == null)
-        {
-            throw new InvalidOperationException($"{nameof(Camera.Instance)} is not initialzied!");
-        }
-
         EdgeHit? hit = Raycast.GetEdgeHit(
             SceneHierarchy.Instance.GetModels(HierarchyType.Model), 
             Camera.Instance.ScreenToGlCoords(screenPosition), 

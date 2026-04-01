@@ -8,7 +8,21 @@ using System;
 
 public class Camera
 {
-    public static Camera? Instance = null;
+
+    public static Camera? _instance = null!;
+    public static Camera Instance
+    {
+        get
+        {
+            if (_instance == null) throw new InvalidOperationException($"No instance of {nameof(Camera)} exists!");
+            return _instance;
+        }
+        set
+        {
+            if (_instance != null) throw new InvalidOperationException($"An instance of {nameof(Camera)} already exists!");
+            _instance = value;
+        }
+    }
 
     //camera controls
     //Pitch and YAW are in radians

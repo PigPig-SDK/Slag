@@ -93,7 +93,7 @@ public class InputManager
         var properties = e.GetCurrentPoint(GLControl.Instance).Properties;
         if(properties.IsRightButtonPressed)
         {
-            Vector2 screenLocation = new Vector2((float)e.GetPosition(GLControl.Instance).X, (float)e.GetPosition(GLControl.Instance).Y);
+            Vector2 screenLocation = e.GetScreenPos(GLControl.Instance!);
             SelectionManager.Instance.CheckForSelection(screenLocation, true);
             return;
         }
@@ -105,10 +105,10 @@ public class InputManager
     {
         if (CommandInvoker.Singleton.ExecuteCommandStep((null, e, CommandInfo.MouseDown))) return;
 
-        var properties = e.GetCurrentPoint(GLControl.Instance).Properties;
+        PointerPointProperties properties = e.GetCurrentPoint(GLControl.Instance).Properties;
         if (properties.IsRightButtonPressed)
         {
-            Vector2 screenLocation = new Vector2((float)e.GetPosition(GLControl.Instance).X, (float)e.GetPosition(GLControl.Instance).Y);
+            Vector2 screenLocation = e.GetScreenPos(GLControl.Instance!);
             SelectionManager.Instance.CheckForSelection(screenLocation, false);
             return;
         }
