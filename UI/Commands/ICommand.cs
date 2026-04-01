@@ -18,7 +18,7 @@ public interface ICommand
 
     public string Description { get; }
 
-    public bool ShowUpOToolbar { get; }
+    public bool DisplayToolText { get; }
 
     public void Undo();
 

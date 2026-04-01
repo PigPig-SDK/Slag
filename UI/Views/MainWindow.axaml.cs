@@ -23,7 +23,7 @@ public partial class MainWindow : Window
 
     private void Singleton_CommandExecuted(ICommand? obj)
     {
-        if (obj == null || !obj!.ShowUpOToolbar)
+        if (obj == null || !obj!.DisplayToolText)
         {
             CommandTitle.Content = string.Empty;
             CommandTitle.IsVisible = false;

@@ -17,6 +17,7 @@ public partial class CommandSearch : UserControl
         { "rotate", typeof(RotateCommand) },
         { "scale", typeof(ScaleCommand) },
         { "extrude", typeof(ExtrudeCommand) },
+        { "merge", typeof(MergeCommand) },
     };
     public CommandSearch()
     {

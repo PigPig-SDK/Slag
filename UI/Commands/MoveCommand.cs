@@ -16,10 +16,11 @@ public class MoveCommand : ICommand
 
     public string Description =>
         "[X, Y, Z] : Specify a move axis\n" +
+        "[SHIFT] : Snap to cursor" +
         "[G, Click] : Accept changes\n" +
         "[ESC] : Decline changes";
 
-    public bool ShowUpOToolbar => true;
+    public bool DisplayToolText => true;
 
     private const float _moveDistanceScale = 0.01f;
     public (Vector3 realitiveRight, Vector3 realitiveUp) CameraMoveDirections;
@@ -30,6 +31,7 @@ public class MoveCommand : ICommand
     private Dictionary<uint, Vector3> _startingPosition = [];
     private List<uint>? _selectedIndicies = null;
     private Vector2 _moveDistance;
+    private Vector3? _moveDirectionOverride = null;
 
     private CommandState Initialize()
     {
@@ -72,6 +74,11 @@ public class MoveCommand : ICommand
         Vector3 moveDirection = (CameraMoveDirections.realitiveRight * mouseDelta.X) + (CameraMoveDirections.realitiveUp * mouseDelta.Y);
         moveDirection *= _moveDistanceScale;
 
+        if(_moveDirectionOverride is not null)
+        {
+            moveDirection = _moveDirectionOverride.Value;
+        }
+
         foreach (uint index in _selectedIndicies)
         {
 
@@ -97,6 +104,18 @@ public class MoveCommand : ICommand
             Vector2 mousePos = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y);
             _mouseStartPos ??= mousePos;
             _moveDistance = mousePos - _mouseStartPos.Value;
+
+            if(args.mouseEvent.KeyModifiers.HasFlag(KeyModifiers.Shift))
+            {
+                if(Camera.Instance is null) throw new InvalidOperationException($"No camera in {nameof(MoveCommand)} {nameof(Execute)}");
+                RaycastHit? output = Camera.Instance.FindRaycastHit(mousePos);
+                if(output is not null)
+                    _moveDirectionOverride = output.HitPoint;
+            }
+            else
+            {
+                _moveDirectionOverride = null;
+            }
 
             MoveSelection(_moveDistance);
 

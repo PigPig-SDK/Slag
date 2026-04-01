@@ -23,7 +23,7 @@ public class ScaleCommand : ICommand
     "[S, Click] : Accept changes\n" +
     "[ESC] : Decline changes";
 
-    public bool ShowUpOToolbar => true;
+    public bool DisplayToolText => true;
 
     private const float _moveDistanceScale = 0.005f;
     public Vector3 SelectionCenter = new Vector3(0, 0, 0);

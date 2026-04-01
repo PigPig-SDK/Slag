@@ -13,7 +13,7 @@ public abstract class MementoCommand : ICommand
 
     public abstract string Description { get; }
 
-    public abstract bool ShowUpOToolbar { get; }
+    public abstract bool DisplayToolText { get; }
 
     public abstract CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args);
 

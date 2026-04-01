@@ -25,7 +25,7 @@ public class RotateCommand : ICommand
         "[R, Click] : Accept changes\n" +
         "[ESC] : Decline changes";
 
-    public bool ShowUpOToolbar => true;
+    public bool DisplayToolText => true;
 
     private Vector2? _mouseStart;
     private Dictionary<uint, Vector4> _startingPosition = [];

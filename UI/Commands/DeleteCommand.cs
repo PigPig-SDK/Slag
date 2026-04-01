@@ -15,7 +15,7 @@ internal class DeleteCommand : MementoCommand
 
     public override string Description => throw new InvalidProgramException("Cannot read information about this command");
 
-    public override bool ShowUpOToolbar => false;
+    public override bool DisplayToolText => false;
 
     public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
