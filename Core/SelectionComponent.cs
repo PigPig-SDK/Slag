@@ -7,7 +7,6 @@ namespace UI.ViewModels;
 
 public class SelectionComponent : ModelComponent
 {
-    //Sorted because deletion chaos!
     private SortedSet<uint> _selectedIndicies = [];
     public IReadOnlySet<uint> SelectedIndicies => _selectedIndicies; 
 
@@ -17,6 +16,7 @@ public class SelectionComponent : ModelComponent
     private HashSet<Edge> _selectedEdges = [];
     public IReadOnlySet<Edge> SelectedEdges => _selectedEdges;
 
+    public object? LastSelection { get; private set; } = null;
 
     /// <summary>
     /// First parameter is the index, second parameter is true if selected, false if deselected
@@ -30,6 +30,7 @@ public class SelectionComponent : ModelComponent
         if(index >= Model.Indicies.Count()) throw new ArgumentOutOfRangeException($"The index {index} exceeds the possible selection range!");
 
         _selectedIndicies.Add(index);
+        LastSelection = index;
         OnSelectionChanged?.Invoke(true, updateInfo);
     }
 
@@ -39,6 +40,7 @@ public class SelectionComponent : ModelComponent
         _selectedFaces.Clear();
         _selectedEdges.Clear();
         _selectedIndicies.Clear();
+        LastSelection = null;
         OnSelectionMassUpdate?.Invoke(updateInfo);
     }
 
@@ -103,6 +105,7 @@ public class SelectionComponent : ModelComponent
     public void SelectEdge(Edge edge, UpdateType updateType = UpdateType.Selection)
     {
         _selectedEdges.Add(edge);
+        LastSelection = edge;
         OnSelectionChanged?.Invoke(true, updateType);
     }
     public void DeselectFace(Face face, UpdateType updateType = UpdateType.Selection)
@@ -119,6 +122,7 @@ public class SelectionComponent : ModelComponent
     public void SelectFace(Face face, UpdateType updateType = UpdateType.Selection)
     {
         _selectedFaces.Add(face);
+        LastSelection = face;
         OnSelectionChanged?.Invoke(true, updateType);
     }
     /// <summary>

@@ -21,7 +21,6 @@ public class MergeCommand : MementoCommand
         SelectionComponent? selection = SelectionManager.Instance.GetSelectionComponent();
         if (selection is null) return CommandState.Discard;
 
-        
 
         return CommandState.Finished;
     }
