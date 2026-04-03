@@ -91,7 +91,6 @@ public class MergeCommand : MementoCommand
                     indicies.RemoveAt(i);//Remove vert from face
             }
 
-            Console.WriteLine($"Adding new face with indicies: {string.Join(", ", indicies)}");
             if (indicies.Count >= 3)
             {
                 model.AddFace(new Face(indicies), UpdateType.None);//Add new face with vert removed.
