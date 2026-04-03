@@ -1,5 +1,6 @@
 ﻿namespace Core;
 
+[Flags]
 public enum HierarchyType
 {
     Model = 1 << 0,

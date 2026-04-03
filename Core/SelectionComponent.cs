@@ -16,7 +16,7 @@ public class SelectionComponent : ModelComponent
     private HashSet<Edge> _selectedEdges = [];
     public IReadOnlySet<Edge> SelectedEdges => _selectedEdges;
 
-    public object? LastSelection { get; private set; } = null;
+    public object? LastSelection { get; private set; }
 
     /// <summary>
     /// First parameter is the index, second parameter is true if selected, false if deselected
@@ -27,7 +27,7 @@ public class SelectionComponent : ModelComponent
 
     public void SelectIndex(uint index, UpdateType updateInfo = UpdateType.Selection)
     {
-        if(index >= Model.Indicies.Count()) throw new ArgumentOutOfRangeException($"The index {index} exceeds the possible selection range!");
+        if(index >= Model.Indicies.Length) throw new ArgumentOutOfRangeException($"The index {index} exceeds the possible selection range!");
 
         _selectedIndicies.Add(index);
         LastSelection = index;
@@ -36,7 +36,6 @@ public class SelectionComponent : ModelComponent
 
     public void DeselectAll(UpdateType updateInfo = UpdateType.Selection)
     {
-        Console.WriteLine("selection cleared!");
         _selectedFaces.Clear();
         _selectedEdges.Clear();
         _selectedIndicies.Clear();
@@ -52,7 +51,10 @@ public class SelectionComponent : ModelComponent
         OnSelectionChanged?.Invoke(false, updateInfo);
     }
 
-    public override void Dispose() { }
+    public override void Dispose() 
+    {
+        GC.SuppressFinalize(this);
+    }
 
     public override void OnModelUpdate(Model model, UpdateType info)
     {
@@ -88,7 +90,7 @@ public class SelectionComponent : ModelComponent
     {
         var vertSelection = GetSelection<uint>().ToArray();
 
-        if (vertSelection.Count() == 0)
+        if (vertSelection.Length == 0)
             return Vector3.Zero;
 
         Vector3 sum = Vector3.Zero;
@@ -99,7 +101,7 @@ public class SelectionComponent : ModelComponent
             sum += v.Position;
         }
 
-        return sum / vertSelection.Count();
+        return sum / vertSelection.Length;
     }
 
     public void SelectEdge(Edge edge, UpdateType updateType = UpdateType.Selection)

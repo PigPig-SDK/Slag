@@ -17,8 +17,8 @@ public abstract class MementoCommand : ICommand
 
     public abstract CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args);
 
-    public Model? ModelState;
-    public Model? Model;
+    public Model? ModelState { get; set; }
+    public Model? Model { get; set; }
 
     protected void CreateState()
     {

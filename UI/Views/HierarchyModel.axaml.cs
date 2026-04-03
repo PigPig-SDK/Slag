@@ -5,6 +5,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Core;
 using System;
+using System.Globalization;
 using System.Runtime.Intrinsics.Arm;
 
 
@@ -15,7 +16,7 @@ public partial class HierarchyModel : UserControl
     private const float _DegreesToRadians = (float)(Math.PI / 180.0);
     private const float _RadiansToDegrees = (float)(180.0 / Math.PI);
 
-    public Model? Model;
+    public Model? Model { get; set; }
 
     public HierarchyModel()
     {
@@ -34,23 +35,23 @@ public partial class HierarchyModel : UserControl
     }
     void UpdatePositionText()
     {
-        XBox.Text = Model!.Position.X.ToString();
-        YBox.Text = Model!.Position.Y.ToString();
-        ZBox.Text = Model!.Position.Z.ToString();
+        XBox.Text = Model!.Position.X.ToString(CultureInfo.CurrentCulture);
+        YBox.Text = Model!.Position.Y.ToString(CultureInfo.CurrentCulture);
+        ZBox.Text = Model!.Position.Z.ToString(CultureInfo.CurrentCulture);
     }
 
     private void UpdateRotationText()
     {
-        XRotationBox.Text = (Model!.Rotation.X * _RadiansToDegrees).ToString();
-        YRotationBox.Text = (Model!.Rotation.Y * _RadiansToDegrees).ToString();
-        ZRotationBox.Text = (Model!.Rotation.Z * _RadiansToDegrees).ToString();
+        XRotationBox.Text = (Model!.Rotation.X * _RadiansToDegrees).ToString(CultureInfo.CurrentCulture);
+        YRotationBox.Text = (Model!.Rotation.Y * _RadiansToDegrees).ToString(CultureInfo.CurrentCulture);
+        ZRotationBox.Text = (Model!.Rotation.Z * _RadiansToDegrees).ToString(CultureInfo.CurrentCulture);
     }
 
     private void UpdateScaleText()
     {
-        XScaleBox.Text = Model!.Scale.X.ToString();
-        YScaleBox.Text = Model!.Scale.Y.ToString();
-        ZScaleBox.Text = Model!.Scale.Z.ToString();
+        XScaleBox.Text = Model!.Scale.X.ToString(CultureInfo.CurrentCulture);
+        YScaleBox.Text = Model!.Scale.Y.ToString(CultureInfo.CurrentCulture);
+        ZScaleBox.Text = Model!.Scale.Z.ToString(CultureInfo.CurrentCulture);
     }
 
 
@@ -142,10 +143,10 @@ public partial class HierarchyModel : UserControl
         if ((e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9))
             rejectKey = false;
         // Period: only allow if not already in text
-        else if ((e.Key == Key.OemPeriod || e.Key == Key.Decimal) && !tb.Text!.Contains("."))
+        else if ((e.Key == Key.OemPeriod || e.Key == Key.Decimal) && !tb.Text!.Contains('.'))
             rejectKey = false;
         // Minus: only at start and not already present
-        else if ((e.Key == Key.OemMinus || e.Key == Key.Subtract) && !tb.Text!.Contains("-"))
+        else if ((e.Key == Key.OemMinus || e.Key == Key.Subtract) && !tb.Text!.Contains('-'))
             rejectKey = false;
 
         e.Handled = rejectKey;

@@ -7,13 +7,13 @@ namespace UI.ViewModels;
 
 public class EditVisualizers
 {
-    public Model AxisVisualizerX;
+    public Model AxisVisualizerX { get; set; }
 
-    public Model AxisVisualizerY;
+    public Model AxisVisualizerY { get; set; }
 
-    public Model AxisVisualizerZ;
+    public Model AxisVisualizerZ { get; set; }
 
-    private static EditVisualizers? _instance = null;
+    private static EditVisualizers? _instance;
     public static EditVisualizers Instance { 
         get 
         { 
@@ -48,7 +48,7 @@ public class EditVisualizers
         }
         if(AxisVisualizerX is null || AxisVisualizerY is null || AxisVisualizerZ is null)
         {
-            throw new Exception("Failed to initialize edit visualizers, not all planes found!");
+            throw new InvalidOperationException("Failed to initialize edit visualizers, not all planes found!");
         }
 
         GLComponent.OnBoundToModel += OnGlComponentBound;
@@ -79,10 +79,13 @@ public class EditVisualizers
         component.Hidden = true;//Start hidden, only show when needed.
     }
 
-    public IEnumerable<Model> GetAllVisualizers()
+    public IEnumerable<Model> AllVisualizers
     {
-        yield return AxisVisualizerX;
-        yield return AxisVisualizerY;
-        yield return AxisVisualizerZ;
+        get
+        {
+            yield return AxisVisualizerX;
+            yield return AxisVisualizerY;
+            yield return AxisVisualizerZ;
+        }
     }
 }

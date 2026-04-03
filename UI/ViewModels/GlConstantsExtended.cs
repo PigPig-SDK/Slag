@@ -12,6 +12,8 @@ namespace UI.ViewModels;
 /// </summary>
 public static class GlConstantsExtended
 {
+#pragma warning disable CA1707
+#pragma warning disable CA1823
     public const int GL_UNSIGNED_INT = 0x1405;
 
     private const int GL_DYNAMIC_DRAW = 0x88E8;

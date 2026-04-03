@@ -2,7 +2,7 @@
 
 public class SelectionMeshInstance : ModelComponent
 {
-    public static SelectionMeshInstance? _instance = null!;
+    private static SelectionMeshInstance? _instance = null!;
     public static SelectionMeshInstance Instance 
     { get
         {
@@ -21,17 +21,19 @@ public class SelectionMeshInstance : ModelComponent
         Instance = this;
     }
 
-    public override void Dispose() { }
+    public override void Dispose() {
+        GC.SuppressFinalize(this);
+    }
     public override void OnAddedToModel(Model model) { }
     public override void OnModelUpdate(Model model, UpdateType info) { }
 
     public void SelectFace(Face face)
     {
-        
+        Console.WriteLine($"Selected face {face}");
     }
 
     public void DeselectFace(Face face)
     {
-
+        Console.WriteLine($"Selected face {face}");
     }
 }

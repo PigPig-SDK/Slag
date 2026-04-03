@@ -27,7 +27,6 @@ public class DebugCommand : ICommand
         {
             if(args.keyEvent.Key == Key.Escape)
             {
-                Console.WriteLine("Throw away");
                 return CommandState.Discard;
             }
         }

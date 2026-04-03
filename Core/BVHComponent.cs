@@ -98,7 +98,6 @@ public class BVHComponent : ModelComponent
 
     public override void OnAddedToModel(Model model)
     {
-        Console.WriteLine("Compute tree");
         ComputeTree();
     }
 
@@ -107,14 +106,12 @@ public class BVHComponent : ModelComponent
 
     }
 
-    public override void Dispose() { }
+    public override void Dispose() { 
+        GC.SuppressFinalize(this);
+    }
 
     public static bool BindComponent(Model model)
     {
-        if (!model.HasComponent(typeof(BVHComponent)))
-        {
-            return model.AddComponent<BVHComponent>(new BVHComponent()) != null;
-        }
-        return false;
+        return !model.HasComponent(typeof(BVHComponent)) && model.AddComponent<BVHComponent>(new BVHComponent()) != null;
     }
 }

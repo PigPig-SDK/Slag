@@ -6,6 +6,7 @@ using UI.Commands;
 using UI.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace UI;
 
@@ -48,7 +49,7 @@ public partial class CommandSearch : UserControl
         SearchBoxInput.ItemsSource = _commands.Keys;
     }
 
-    private void KeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
+    private void SearchKeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
     {
         if (e.Key == Avalonia.Input.Key.Enter)
         {
@@ -63,10 +64,9 @@ public partial class CommandSearch : UserControl
         string? input = SearchBoxInput.Text;
         if (!string.IsNullOrWhiteSpace(input))
         {
-            if (_commands.TryGetValue(input.ToLower(), out Type? commandType))
+            if (_commands.TryGetValue(input.ToLower(CultureInfo.CurrentCulture), out Type? commandType))
             {
-                CommandInvoker.Singleton.RunCommand((ICommand)Activator.CreateInstance(commandType)!, (null, null, CommandInfo.Initialization)
-                );
+                CommandInvoker.Singleton.RunCommand((ICommand)Activator.CreateInstance(commandType)!, (null, null, CommandInfo.Initialization));
             }
 
             SearchBoxInput.Text = string.Empty;

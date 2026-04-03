@@ -10,9 +10,9 @@ using Core;
 namespace UI.Commands;
 public class ExtrudeCommand : MementoCommand
 {
-    public override string Name => throw new InvalidProgramException("Cannot read information about this command");
+    public override string Name => string.Empty;
 
-    public override string Description => throw new InvalidProgramException("Cannot read information about this command");
+    public override string Description => string.Empty;
 
     public override bool DisplayToolText => false;
 
@@ -59,7 +59,7 @@ public class ExtrudeCommand : MementoCommand
     /// </summary>
     /// <param name="selection"> The selected objects selection component</param>
     /// <param name="selectedIndicies"> The selected indicies that will be modified</param>
-    private void AddFaceBorders(SelectionComponent selection, ref HashSet<uint> selectedIndicies, ref HashSet<Edge> edgeWhiteList)
+    private static void AddFaceBorders(SelectionComponent selection, ref HashSet<uint> selectedIndicies, ref HashSet<Edge> edgeWhiteList)
     {
         foreach(Edge edge in selection.GetSelection<Edge>())//All edges in our selection
         {
@@ -78,7 +78,7 @@ public class ExtrudeCommand : MementoCommand
             }
         }
     }
-    private void AdjustConnectedFaces(SelectionComponent selection, Model model, Dictionary<uint, uint> cloneMap, HashSet<Edge> edgeWhiteList)
+    private static void AdjustConnectedFaces(SelectionComponent selection, Model model, Dictionary<uint, uint> cloneMap, HashSet<Edge> edgeWhiteList)
     {
         HashSet<Edge> edgesToRemove = [];
 
@@ -138,7 +138,7 @@ public class ExtrudeCommand : MementoCommand
 
         return (a, b, c, d);
     }
-    public void Extrude(Model model, HashSet<uint> selectedIndicies, HashSet<Edge> edgeWhiteList, out Dictionary<uint, uint> cloneMapping) 
+    public static void Extrude(Model model, HashSet<uint> selectedIndicies, HashSet<Edge> edgeWhiteList, out Dictionary<uint, uint> cloneMapping) 
     {
         cloneMapping = [];
         HashSet<(uint, uint, uint, uint)> faceMap = [];

@@ -4,11 +4,11 @@ namespace Core;
 
 public class RaycastHit
 {
-    public Model Model;
-    public Face Face;
-    public (uint v1, uint v2, uint v3) triangleIndicies;
-    public Vector3 BarycentricPoint;
-    public Vector3 HitPoint;
+    public Model Model { get; set; }
+    public Face Face { get; set; }
+    public (uint v1, uint v2, uint v3) TriangleIndicies { get; set; }
+    public Vector3 BarycentricPoint { get; set; }
+    public Vector3 HitPoint { get; set; }
 
     public RaycastHit(Model model, Face face, Vector3 hitPoint, Vector3 barycentricPoint, (uint v1, uint v2, uint v3) triangleIndicies)
     {
@@ -16,7 +16,7 @@ public class RaycastHit
         Face = face;
         HitPoint = hitPoint;
         BarycentricPoint = barycentricPoint;
-        this.triangleIndicies = triangleIndicies;
+        this.TriangleIndicies = triangleIndicies;
     }
 
     public override string ToString()

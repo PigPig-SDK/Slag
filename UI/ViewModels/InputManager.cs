@@ -7,7 +7,7 @@ namespace UI.ViewModels;
 
 public class InputManager
 {
-    public static InputManager Singleton = new();
+    public static InputManager Singleton { get; set; } = new();
 
     public UserControlMode UserControlMode { get; private set; } = UserControlMode.None;
 

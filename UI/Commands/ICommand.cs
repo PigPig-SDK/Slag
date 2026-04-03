@@ -12,7 +12,7 @@ public interface ICommand
     /// Executes the command
     /// </summary>
     /// <returns>The command state after execution</returns>
-    CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args);
+    public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args);
 
     public string Name { get; }
 

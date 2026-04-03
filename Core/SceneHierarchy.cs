@@ -2,7 +2,7 @@
 
 public class SceneHierarchy
 {
-    public static SceneHierarchy Instance = new();
+    public static SceneHierarchy Instance { get; set; } = new();
 
     public const string XPlaneName = "XPlane";
     public const string YPlaneName = "YPlane";
@@ -27,7 +27,7 @@ public class SceneHierarchy
 
     public void AddModel(HierarchyType hierarchyType, Model model)
     {
-        model.hierarchyType = hierarchyType;
+        model.HierarchyType = hierarchyType;
         _hierarchyCategories[hierarchyType].Add(model);
         OnModelAdded?.Invoke(hierarchyType,model);
     }

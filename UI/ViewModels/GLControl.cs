@@ -108,13 +108,10 @@ public class GLControl : OpenGlControlBase
         CheckError(gl);
         Console.WriteLine($"Renderer: {gl.GetString(GL_RENDERER)} Version: {gl.GetString(GL_VERSION)}");
 
-        Console.WriteLine("Generating triangle shader program...");
         _triangleShaderProgram.GenerateShaderProgram(gl, TriangleVertexShader, TriangleFragmentShader);
 
-        Console.WriteLine("Generating edge shader program...");
         _edgeShaderProgram.GenerateShaderProgram(gl, EdgeVertexShader, EdgeFragmentShader);
 
-        Console.WriteLine("Generating vertex shader program...");
         _vertexShaderProgram.GenerateShaderProgram(gl, VertexVertexShader, VertexFragmentShader);
 
         _depthShaderProgram.GenerateShaderProgram(gl, DepthVertexShader, DepthFragmentShader);

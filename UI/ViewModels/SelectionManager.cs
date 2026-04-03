@@ -39,7 +39,6 @@ public class SelectionManager
         if(obj == CurrentModel)
         {
             CurrentModel = null;
-            Console.WriteLine("Deleted Selected model");
         }
     }
 

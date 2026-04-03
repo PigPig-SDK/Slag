@@ -1,0 +1,10 @@
+root = true
+
+[*.cs]
+dotnet_diagnostic.CA1002.severity = none
+dotnet_diagnostic.CA1062.severity = none
+dotnet_diagnostic.CA1051.severity = warning
+dotnet_diagnostic.CA1051.exclude_structs = true
+dotnet_diagnostic.CA1003.severity = none
+dotnet_diagnostic.CA1515.severity = none
+dotnet_diagnostic.CA1303.severity = none

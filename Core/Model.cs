@@ -6,7 +6,7 @@ namespace Core;
 
 public class Model
 {
-    public string ObjectName = "Model";
+    public string ObjectName { get; set; } = "Model";
     //Verts
     private List<Vertex> _verticies = [];
     public IReadOnlyList<Vertex> Verticies => _verticies;
@@ -14,14 +14,14 @@ public class Model
     private List<HashSet<uint>> _vertexEdgeMap = [];
     public IReadOnlyList<HashSet<uint>> VertexEdgeMap => _vertexEdgeMap;
 
-    protected List<Face> _faces = [];
+    private List<Face> _faces = [];
     public IReadOnlyList<Face> Faces => _faces;
-    protected HashSet<Edge> _edges = [];
+    private HashSet<Edge> _edges = [];
     public IReadOnlySet<Edge> Edges => _edges;
-    protected bool IsDisposed = false;
+    protected bool IsDisposed { get; set; }
     public uint[] Indicies = [];
-    public bool Hidden = false;
-    public HierarchyType hierarchyType = HierarchyType.All;
+    public bool Hidden { get; set; }
+    public HierarchyType HierarchyType { get; set; } = HierarchyType.All;
 
     private Dictionary<Type, ModelComponent> _Components = [];
 
@@ -64,15 +64,13 @@ public class Model
     public Vertex GetVertex(uint index)
     {
         if(index < 0 || index > _verticies.Count -1)
-        {
-            throw new ArgumentOutOfRangeException($"{nameof(index)} is out of range");
-        }
+            throw new ArgumentOutOfRangeException(nameof(index));
         return _verticies[(int)index];
     }
 
     public uint AddVertex(Vertex vertex, UpdateType updateType = UpdateType.Membership)
     {
-        uint index = (uint)_verticies.Count();
+        uint index = (uint)_verticies.Count;
         _verticies.Add(vertex);
         _vertexEdgeMap.Add(new());
         UpdateAllComponents(updateType);
@@ -80,7 +78,7 @@ public class Model
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool VertexExists(uint index) => index < Verticies.Count();
+    private bool VertexExists(uint index) => index < Verticies.Count;
 
     public Edge AddEdge(Edge edge, UpdateType updateType = UpdateType.Membership)
     {
@@ -145,7 +143,7 @@ public class Model
         uint uIndex = (uint)index;
         foreach (uint neighbor in _vertexEdgeMap[index])
         {
-            if (neighbor < _vertexEdgeMap.Count())
+            if (neighbor < _vertexEdgeMap.Count)
                 _vertexEdgeMap[(int)neighbor].Remove(uIndex);
         }
         _vertexEdgeMap.RemoveAt(index);
@@ -261,7 +259,6 @@ public class Model
 
     public ModelComponent AddComponent<T>(ModelComponent component)
     {
-        if(component is null) throw new ArgumentNullException($"Invalid component: {nameof(T)} | {nameof(component)}");
         _Components[typeof(T)] = component;
         component.Model = this;
         component.OnAddedToModel(this);
@@ -352,11 +349,8 @@ public class Model
         return new Model(this);
     }
 
-    public void EmplaceData(Model? modelState)
+    public void EmplaceData(Model modelState)
     {
-        if(modelState == null)
-            throw new ArgumentNullException(nameof(modelState));
-
         _verticies.Clear();
         _faces.Clear();
         _edges.Clear();

@@ -21,7 +21,7 @@ public static class OBJFile
         while ((line = reader.ReadLine()) != null)
         {
             string[] parts = line.Split(' ');
-            if (parts[0].Equals(ObjectToken))
+            if (parts[0].Equals(ObjectToken, StringComparison.Ordinal))
             {
                 reader.DiscardBufferedData();
                 reader.BaseStream.Seek(0, SeekOrigin.Begin);//Reset reader.
@@ -55,7 +55,7 @@ public static class OBJFile
             {
                 writer.WriteLine($"{FaceToken} {string.Join(" ", face.Indicies.Select(i => $"{i + 1 + objVertCount}/{i + 1 + objVertCount}/{i + 1 + objVertCount}").ToArray())}");
             }
-            objVertCount += model.Verticies.Count();
+            objVertCount += model.Verticies.Count;
         }
     }
 
@@ -183,12 +183,12 @@ public static class OBJFile
                                 index--;//Decrement for indexing (1's to 0's)
 
                                 //Vertex does not appear in mapping list.
-                                if (!objVertexMapper.ContainsKey(index.Value))
+                                if (!objVertexMapper.TryGetValue(index.Value, out int value))
                                 {
                                     if(index.Value >= vertexPositions.Count)
                                         throw new InvalidDataException($"Face data invalid, Index id not defined on line: {lineCount}\nID:{index.Value}");
-
-                                    objVertexMapper.Add(index.Value, list[^1].Verticies.Count());//Creat OBJ -> Model mapping!
+                                    value = list[^1].Verticies.Count;
+                                    objVertexMapper.Add(index.Value, value);//Creat OBJ -> Model mapping!
 
                                     if (uvIndex == null)
                                     {
@@ -201,7 +201,7 @@ public static class OBJFile
                                         list[^1].AddVertex(new Vertex(vertexPositions[index.Value].Xyz, uv[uvIndex.Value]));
                                     }
                                 }
-                                faceData.Add((uint)objVertexMapper[index.Value]);
+                                faceData.Add((uint)value);
                             }
                             list[^1].AddFace(faceData);
                             break;

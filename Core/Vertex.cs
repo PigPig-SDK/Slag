@@ -4,7 +4,7 @@ using OpenTK.Mathematics;
 namespace Core;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct Vertex
+public record struct Vertex
 {
     public Vector3 Position = Vector3.Zero;
     public Vector2 UV = Vector2.Zero;
@@ -35,11 +35,14 @@ public struct Vertex
         Position.Z = z;
     }
 
-    public static int GetSize()
+    public static int Size
     {
-        unsafe
+        get
         {
-            return sizeof(Vector3) + sizeof(Vector2) + sizeof(Vector3);
+            unsafe
+            {
+                return sizeof(Vector3) + sizeof(Vector2) + sizeof(Vector3);
+            }
         }
     }
 }

@@ -9,7 +9,7 @@ public class Edge : ICloneable
 {
     public uint Vertex1 { get; internal set; }
     public uint Vertex2 { get; internal set; }
-    public bool IsSharp = false;
+    public bool IsSharp { get; set; }
 
     public List<Face> Faces { get; set; } = [];
 

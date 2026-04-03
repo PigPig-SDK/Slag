@@ -9,6 +9,7 @@ using UI.Views;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace UI.Commands;
 
@@ -26,10 +27,10 @@ public class ScaleCommand : ICommand
     public bool DisplayToolText => true;
 
     private const float _moveDistanceScale = 0.005f;
-    public Vector3 SelectionCenter = new Vector3(0, 0, 0);
-    private Vector3 _activeAxis = new Vector3(1, 1, 1);
+    private Vector3 _selectionCenter = new(0, 0, 0);
+    private Vector3 _activeAxis = new(1, 1, 1);
     private Vector2 _mouseScreenCenter = Vector2.Zero;
-    private List<uint>? _selectedIndicies = null;
+    private List<uint>? _selectedIndicies;
 
     private Dictionary<uint, (Vector3 position, Vector3 moveNormal)> _StartingPosition = [];
     private float _ScaleValue;
@@ -37,7 +38,7 @@ public class ScaleCommand : ICommand
     //UI stuff..
     private Line? _uiLine;
     private TextBlock? _textblock;
-    public bool ActiveAxisOverride = false;
+    private bool activeAxisOverride;
 
     private CommandState Initialize()
     {
@@ -49,14 +50,14 @@ public class ScaleCommand : ICommand
 
         _selectedIndicies = [.. selection.GetSelection<uint>()];
 
-        SelectionCenter = selection.GetCenter();
+        _selectionCenter = selection.GetCenter();
         //Compute center.
         _mouseScreenCenter = Camera.Instance.WorldToScreen(selection.GetWorldCenter());
         int selectedCount = 0;
         foreach (uint index in selection.GetSelection<uint>())
         {
             Vertex vert = activeModel.GetVertex(index);
-            _StartingPosition[index] = (vert.Position, (SelectionCenter - vert.Position).Normalized());
+            _StartingPosition[index] = (vert.Position, (_selectionCenter - vert.Position).Normalized());
             selectedCount++;
         }
         //UI
@@ -90,15 +91,14 @@ public class ScaleCommand : ICommand
     {
         if (_activeAxis == Vector3.Zero)
         {
-            ActiveAxisOverride = false;
+            activeAxisOverride = false;
             _activeAxis = new Vector3(1, 1, 1);
         }
     }
     private void Scale(float ammount)
     {
-        Model? model = SelectionManager.Instance.CurrentModel;
-        if (model == null) throw new Exception("No current model in MoveCommand.MoveSelection");
-        if (_selectedIndicies == null) throw new Exception($"No selection set {nameof(_selectedIndicies)}!");
+        Model? model = SelectionManager.Instance.CurrentModel ?? throw new InvalidOperationException("No current model in MoveCommand.MoveSelection");
+        if (_selectedIndicies == null) throw new InvalidOperationException($"No selection set {nameof(_selectedIndicies)}!");
 
         Vertex[] vertices = model.GetVertexBackingField();
 
@@ -134,7 +134,7 @@ public class ScaleCommand : ICommand
                 Vector2 textPosition = _mouseScreenCenter + mouseDelta/2;
                 _textblock.IsVisible = true;
                 _textblock!.RenderTransform = new TranslateTransform(textPosition.X, textPosition.Y);
-                _textblock.Text = (_ScaleValue*-1).ToString("F2");
+                _textblock.Text = (_ScaleValue*-1).ToString("F2", CultureInfo.InvariantCulture);
             }    
 
             Scale(_ScaleValue);
@@ -152,9 +152,9 @@ public class ScaleCommand : ICommand
                 CleanUpUi();
                 return CommandState.Finished;
             case Key.X:
-                if (ActiveAxisOverride == false)
+                if (activeAxisOverride == false)
                 {
-                    ActiveAxisOverride = true;
+                    activeAxisOverride = true;
                     _activeAxis = new Vector3(1, 0, 0);
                 }
                 else
@@ -164,9 +164,9 @@ public class ScaleCommand : ICommand
                 ActiveAxisZeroCheck();
                 return CommandState.Idle;
             case Key.Y:
-                if (ActiveAxisOverride == false)
+                if (activeAxisOverride == false)
                 {
-                    ActiveAxisOverride = true;
+                    activeAxisOverride = true;
                     _activeAxis = new Vector3(0, 1, 0);
                 }
                 else
@@ -176,9 +176,9 @@ public class ScaleCommand : ICommand
                 ActiveAxisZeroCheck();
                 return CommandState.Idle;
             case Key.Z:
-                if (ActiveAxisOverride == false)
+                if (activeAxisOverride == false)
                 {
-                    ActiveAxisOverride = true;
+                    activeAxisOverride = true;
                     _activeAxis = new Vector3(0, 0, 1);
                 }
                 else

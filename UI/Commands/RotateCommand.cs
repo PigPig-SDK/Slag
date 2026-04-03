@@ -9,6 +9,7 @@ using UI.Views;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace UI.Commands;
 
@@ -95,7 +96,7 @@ public class RotateCommand : ICommand
                 _totalRotation -= clampFactor;
             }
 
-            _textblock!.Text = (_totalRotation * (180.0 / MathF.PI)).ToString("F1");
+            _textblock!.Text = (_totalRotation * (180.0 / MathF.PI)).ToString("F1", CultureInfo.InvariantCulture);
 
             Rotate(_totalRotation);
             if (args.info.HasFlag(CommandInfo.MouseDown))

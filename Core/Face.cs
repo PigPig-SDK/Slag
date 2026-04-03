@@ -6,11 +6,11 @@
 /// <param name="indicies">The indicies which define a face. The data for the indicies is stored within ParentModel</param>
 public class Face : ICloneable
 {
-    public List<uint> Indicies;
+    public List<uint> Indicies { get; }
 
-    public List<Edge> Edges { get; set; } = [];
+    public List<Edge> Edges { get; private set; } = [];
 
-    public Model? ParentModel = null;
+    public Model? ParentModel { get; set; }
 
     public Face(List<uint> indicies)
     {

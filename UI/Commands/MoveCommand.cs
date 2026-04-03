@@ -24,15 +24,15 @@ public class MoveCommand : ICommand
     public bool DisplayToolText => true;
 
     private const float _moveDistanceScale = 0.01f;
-    public (Vector3 realitiveRight, Vector3 realitiveUp) CameraMoveDirections;
-    private Vector2? _mouseStartPos = null;
-    private bool ActiveAxisOverride = false;
-    private Vector3 _activeAxis = new Vector3(1, 1, 1);
+    private (Vector3 realitiveRight, Vector3 realitiveUp) _cameraMoveDirections;
+    private Vector2? _mouseStartPos;
+    private bool _activeAxisOverride;
+    private Vector3 _activeAxis = new(1, 1, 1);
 
     private Dictionary<uint, Vector3> _startingPosition = [];
     private List<uint> _selectedIndicies = [];
     private Vector2 _moveDistance;
-    private Vector3? _moveDirectionOverride = null;
+    private Vector3? _moveDirectionOverride;
     private Vector3 _selectionCenter = Vector3.Zero;
     private Model _model = null!;//Null is allowed here.
 
@@ -46,7 +46,7 @@ public class MoveCommand : ICommand
 
         _selectionCenter = selection.GetCenter();
 
-        CameraMoveDirections = Camera.Instance.GetRealitiveDirections();
+        _cameraMoveDirections = Camera.Instance.GetRealitiveDirections();
         _selectedIndicies = [..selection.GetSelection<uint>()];
 
 
@@ -63,9 +63,9 @@ public class MoveCommand : ICommand
         return CommandState.Idle;//Continue the command.
     }
 
-    void CleanUp()
+    static void CleanUp()
     {
-        foreach(Model model in EditVisualizers.Instance.GetAllVisualizers())
+        foreach(Model model in EditVisualizers.Instance.AllVisualizers)
         {
             model.Hidden = true;
             model.Position = Vector3.Zero;
@@ -76,7 +76,7 @@ public class MoveCommand : ICommand
     {
         Vertex[] vertices = _model.GetVertexBackingField();
 
-        Vector3 moveDirection = (CameraMoveDirections.realitiveRight * mouseDelta.X) + (CameraMoveDirections.realitiveUp * mouseDelta.Y);
+        Vector3 moveDirection = (_cameraMoveDirections.realitiveRight * mouseDelta.X) + (_cameraMoveDirections.realitiveUp * mouseDelta.Y);
         moveDirection *= _moveDistanceScale;
 
         if(_moveDirectionOverride is not null)
@@ -144,9 +144,9 @@ public class MoveCommand : ICommand
                     return CommandState.Finished;
                 }
             case Key.X:
-                if (ActiveAxisOverride == false)
+                if (_activeAxisOverride == false)
                 {
-                    ActiveAxisOverride = true;
+                    _activeAxisOverride = true;
                     _activeAxis = new Vector3(1, 0, 0);
                 }
                 else
@@ -156,9 +156,9 @@ public class MoveCommand : ICommand
                 ActiveAxisZeroCheck();
                 return CommandState.Idle;
             case Key.Y:
-                if (ActiveAxisOverride == false)
+                if (_activeAxisOverride == false)
                 {
-                    ActiveAxisOverride = true;
+                    _activeAxisOverride = true;
                     _activeAxis = new Vector3(0, 1, 0);
                 }
                 else
@@ -168,9 +168,9 @@ public class MoveCommand : ICommand
                 ActiveAxisZeroCheck();
                 return CommandState.Idle;
             case Key.Z:
-                if (ActiveAxisOverride == false)
+                if (_activeAxisOverride == false)
                 {
-                    ActiveAxisOverride = true;
+                    _activeAxisOverride = true;
                     _activeAxis = new Vector3(0, 0, 1);
                 }
                 else
@@ -197,7 +197,7 @@ public class MoveCommand : ICommand
 
         if (_activeAxis == Vector3.Zero)
         {
-            ActiveAxisOverride = false;
+            _activeAxisOverride = false;
             _activeAxis = new Vector3(1, 1, 1);
         }
     }

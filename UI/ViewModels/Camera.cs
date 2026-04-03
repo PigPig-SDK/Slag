@@ -2,9 +2,10 @@
 using Avalonia.Input;
 using Avalonia.OpenGL.Controls;
 using Core;
-using UI.ViewModels;
 using OpenTK.Mathematics;
 using System;
+
+namespace UI.ViewModels;
 
 public class Camera
 {
@@ -26,10 +27,10 @@ public class Camera
     //camera controls
     //Pitch and YAW are in radians
     private float _pitch = float.Pi / 4;
-    private float _yaw = float.Pi/4;
+    private float _yaw = float.Pi / 4;
     private float _zoom = 5.0f;
 
-    private bool _isDragging = false;
+    private bool _isDragging;
     private Point _lastDragLocation;
     private Vector3 _cameraOffset;
 
@@ -47,10 +48,10 @@ public class Camera
     public void OnWheel(object? sender, PointerWheelEventArgs e)
     {
         _zoom -= ZoomAmmount * (float)e.Delta.Y;
-        if(_zoom < 0.1f) _zoom = 0.1f;
+        if (_zoom < 0.1f) _zoom = 0.1f;
     }
 
-    public void OnPointerMove(object? sender, Avalonia.Input.PointerEventArgs e)
+    public void OnPointerMove(object? sender, PointerEventArgs e)
     {
         if (!_isDragging) return;
         Point dragDelta = _lastDragLocation - e.GetPosition(_glBase);
@@ -70,7 +71,7 @@ public class Camera
         }
     }
 
-    public void OnMouseUp(object? sender, Avalonia.Input.PointerReleasedEventArgs e)
+    public void OnMouseUp(object? sender, PointerReleasedEventArgs e)
     {
         _isDragging = false;
     }
@@ -80,7 +81,7 @@ public class Camera
         float width = (float)GLControl.Instance.Bounds.Width;
         float height = (float)GLControl.Instance.Bounds.Height;
 
-        Vector2 pos = new Vector2((screenPosition.X / width) * 2.0f - 1.0f, 1.0f - (screenPosition.Y / height) * 2.0f);
+        Vector2 pos = new Vector2(screenPosition.X / width * 2.0f - 1.0f, 1.0f - screenPosition.Y / height * 2.0f);
 
         return new Vector2(
         MathHelper.Clamp(pos.X, -1, 1),
@@ -104,11 +105,11 @@ public class Camera
         _isDragging = true;
     }
 
-    public Vector3 Origin => (new Vector3(MathF.Cos(_pitch) * MathF.Sin(_yaw), MathF.Sin(_pitch), MathF.Cos(_pitch) * MathF.Cos(_yaw)) * _zoom) + _cameraOffset;
+    public Vector3 Origin => new Vector3(MathF.Cos(_pitch) * MathF.Sin(_yaw), MathF.Sin(_pitch), MathF.Cos(_pitch) * MathF.Cos(_yaw)) * _zoom + _cameraOffset;
 
     public Vector3 LookAt => _cameraOffset;
 
-    public Vector3 WorldUp => Vector3.UnitY;
+    public static Vector3 WorldUp => Vector3.UnitY;
 
     public Vector3 Right => GetRealitiveDirections().realitiveRight;
 
@@ -129,7 +130,7 @@ public class Camera
         //TODO: Test orthographic projection
         //return Matrix4.CreateOrthographic(10*aspect, 10, 0, 1000);
 
-        return Matrix4.CreatePerspectiveFieldOfView(FOV, (aspect == 0) ? 1.0f : aspect, 0.01f, 100000f);
+        return Matrix4.CreatePerspectiveFieldOfView(FOV, aspect == 0 ? 1.0f : aspect, 0.01f, 100000f);
     }
 
     public Matrix4 ViewMatrix => CreateLookAt() * CreatePrespective(GLControl.Instance!.Aspect);
@@ -139,7 +140,7 @@ public class Camera
         Matrix4 matrix = ViewMatrix;
         Vector4 p4 = new Vector4(position);
         p4.W = 1.0f;
-        p4 = (p4 * matrix);//translate to clip space
+        p4 = p4 * matrix;//translate to clip space
         p4 /= p4.W;
         Vector2 worldToScreen = p4.Xy;
 
@@ -154,6 +155,6 @@ public class Camera
     /// <summary>
     /// Gets FOV in Radians
     /// </summary>
-    public float FOV => (MathF.PI/180.0f) * 90.0f;
+    public static float FOV => MathF.PI / 180.0f * 90.0f;
 
 }

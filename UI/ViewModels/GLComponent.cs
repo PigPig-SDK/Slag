@@ -47,7 +47,6 @@ public class GLComponent : ModelComponent, IRenderObject
     {
         if (gl == null)
         {
-            Console.WriteLine("Tried to update selection buffer when opengl interface is null!");
             return;
         }
 
@@ -71,7 +70,6 @@ public class GLComponent : ModelComponent, IRenderObject
     {
         if (gl == null)
         {
-            Console.WriteLine("Tried to update selection buffer when opengl interface is null!");
             return;
         }
 
@@ -82,7 +80,7 @@ public class GLComponent : ModelComponent, IRenderObject
         gl.BindBuffer(GL_ARRAY_BUFFER, _vertexBufferObject!.Value);
         fixed (Vertex* ptr = verts)
         {
-            gl.BufferSubData(GL_ARRAY_BUFFER, (nint)0, Vertex.GetSize() * _vertexCount, (IntPtr)ptr);
+            gl.BufferSubData(GL_ARRAY_BUFFER, (nint)0, Vertex.Size * _vertexCount, (IntPtr)ptr);
         }
     }
 
@@ -102,7 +100,6 @@ public class GLComponent : ModelComponent, IRenderObject
 
     public void OpenglRestart(GlInterface gl)
     {
-        Console.WriteLine("Opengl Reset");
         //Clear buffers
         _indiciesBuffer = null;
         _vertexBufferObject = null;
@@ -138,13 +135,13 @@ public class GLComponent : ModelComponent, IRenderObject
         //Vertex Data
         gl.BindBuffer(GL_ARRAY_BUFFER, _vertexBufferObject!.Value);
 
-        gl.VertexAttribPointer(0, 3, GL_FLOAT, 0, Vertex.GetSize(), 0);
+        gl.VertexAttribPointer(0, 3, GL_FLOAT, 0, Vertex.Size, 0);
         gl.EnableVertexAttribArray(0);
 
-        gl.VertexAttribPointer(1, 3, GL_FLOAT, 0, Vertex.GetSize(), Marshal.OffsetOf<Vertex>("Normal"));
+        gl.VertexAttribPointer(1, 3, GL_FLOAT, 0, Vertex.Size, Marshal.OffsetOf<Vertex>("Normal"));
         gl.EnableVertexAttribArray(1);
 
-        gl.VertexAttribPointer(2, 2, GL_FLOAT, 0, Vertex.GetSize(), Marshal.OffsetOf<Vertex>("UV"));
+        gl.VertexAttribPointer(2, 2, GL_FLOAT, 0, Vertex.Size, Marshal.OffsetOf<Vertex>("UV"));
         gl.EnableVertexAttribArray(2);
 
         //Selection Related data
@@ -163,7 +160,6 @@ public class GLComponent : ModelComponent, IRenderObject
         {
             gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * edgeIndicies.Length, (nint)ptr, GL_STATIC_DRAW);
         }
-        Console.WriteLine($"{nameof(edgeIndicies)} Upload Error: {gl.GetError()}");
         _edgeIndiciesCount = edgeIndicies.Length;
     }
 
@@ -190,9 +186,8 @@ public class GLComponent : ModelComponent, IRenderObject
         gl.BindBuffer(GL_ARRAY_BUFFER, _vertexBufferObject!.Value);
         fixed (Vertex* ptr = verts)
         {
-            gl.BufferData(GL_ARRAY_BUFFER, Vertex.GetSize() * _vertexCount, (nint)ptr, GL_STATIC_DRAW);
+            gl.BufferData(GL_ARRAY_BUFFER, Vertex.Size * _vertexCount, (nint)ptr, GL_STATIC_DRAW);
         }
-        Console.WriteLine($"{nameof(verts)} Upload Error: {gl.GetError()}");
 
         //Inform of indicies
         gl.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indiciesBuffer!.Value);
@@ -200,7 +195,6 @@ public class GLComponent : ModelComponent, IRenderObject
         {
             gl.BufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * indicies.Length, (nint)ptr, GL_STATIC_DRAW);
         }
-        Console.WriteLine($"{nameof(indicies)} Upload Error: {gl.GetError()}");
 
         //Buffer selection
         byte[] selectionData = new byte[verts.Length];
@@ -209,7 +203,6 @@ public class GLComponent : ModelComponent, IRenderObject
         {
             gl.BufferData(GL_ARRAY_BUFFER, sizeof(byte) * verts.Length, (nint)ptr, GL_STATIC_DRAW);
         }
-        Console.WriteLine($"{nameof(selectionData)} Upload Error: {gl.GetError()}");
     }
 
     public static bool BindComponent(Model model, GlInterface gl)

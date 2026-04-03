@@ -2,7 +2,7 @@
 
 public class VertexHit
 {
-    public Model Model;
+    public Model Model { get; set; }
     public uint VertexIndex;
     public float Distance;
 

@@ -19,7 +19,7 @@
                      FilterMode="Contains"
                      MinimumPrefixLength="0"
                      MinimumPopulateDelay="0"
-                     KeyDown="KeyDown"
+                     KeyDown="SearchKeyDown"
                      Padding="32,0,8,0" Height="20">
                     <AutoCompleteBox.Styles>
                         <Style Selector="AutoCompleteBox TextBox">
