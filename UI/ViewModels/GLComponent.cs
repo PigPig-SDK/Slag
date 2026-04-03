@@ -90,10 +90,7 @@ public class GLComponent : ModelComponent, IRenderObject
     {
         if (update.HasFlag(UpdateType.Ignore)) return;
 
-        if(GLControl.Instance != null)
-        {
-            GLControl.Instance!.ModelActions.Push(SelectonMassUpdate);
-        }
+        GLControl.Instance.ModelActions.Push(SelectonMassUpdate);
     }
 
     private void OnSelectionChanged(bool isSelected, UpdateType update)
@@ -296,14 +293,14 @@ public class GLComponent : ModelComponent, IRenderObject
     {
         if((info & (UpdateType.Locational)) != 0)
         {
-            GLControl.Instance?.ModelActions.Push(UpdateModel);
+            GLControl.Instance.ModelActions.Push(UpdateModel);
         }
 
         //Redraw requested.
         if((info & UpdateType.Membership) != 0)
         {
-            GLControl.Instance?.ModelActions.Push(InitializeTrangleBuffers);
-            GLControl.Instance?.ModelActions.Push(UpdateEdgeBuffers);
+            GLControl.Instance.ModelActions.Push(InitializeTrangleBuffers);
+            GLControl.Instance.ModelActions.Push(UpdateEdgeBuffers);
         }
     }
 

@@ -14,7 +14,20 @@ using static Avalonia.OpenGL.GlConsts;
 
 public class GLControl : OpenGlControlBase
 {
-    public static GLControl? Instance;
+    public static GLControl? _instance;
+    public static GLControl Instance
+    {
+        get
+        {
+            if (_instance == null) throw new InvalidOperationException($"No instance of {nameof(GLControl)} exists!");
+            return _instance;
+        }
+        private set
+        {
+            if (_instance != null) throw new InvalidOperationException($"An instance of {nameof(GLControl)} already exists!");
+            _instance = value;
+        }
+    }
     public static RenderMode RenderMode = RenderMode.Solid;
     /// <summary>
     /// This stack exists so that OpenGL Actions are all executed on the main thread

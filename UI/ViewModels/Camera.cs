@@ -78,11 +78,6 @@ public class Camera
 
     public Vector2 ScreenToGlCoords(Vector2 screenPosition)
     {
-        if(GLControl.Instance == null)
-        {
-            throw new InvalidOperationException($"{nameof(GLControl)}Instance is null!");
-        }
-
         float width = (float)GLControl.Instance.Bounds.Width;
         float height = (float)GLControl.Instance.Bounds.Height;
 

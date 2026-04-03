@@ -83,7 +83,7 @@ public class InputManager
     {
         if (CommandInvoker.Singleton.ExecuteCommandStep((null, e, CommandInfo.MouseUp))) return;
 
-        Camera.Instance?.OnMouseUp(sender, e);
+        Camera.Instance.OnMouseUp(sender, e);
     }
 
     public void OnPointerMove(object? sender, PointerEventArgs e)
@@ -93,12 +93,12 @@ public class InputManager
         var properties = e.GetCurrentPoint(GLControl.Instance).Properties;
         if(properties.IsRightButtonPressed)
         {
-            Vector2 screenLocation = e.GetScreenPos(GLControl.Instance!);
+            Vector2 screenLocation = e.GetScreenPos(GLControl.Instance);
             SelectionManager.Instance.CheckForSelection(screenLocation, true);
             return;
         }
 
-        Camera.Instance?.OnPointerMove(sender, e);
+        Camera.Instance.OnPointerMove(sender, e);
     }
 
     public void OnMouseDown(object? sender, PointerPressedEventArgs e)
@@ -108,7 +108,7 @@ public class InputManager
         PointerPointProperties properties = e.GetCurrentPoint(GLControl.Instance).Properties;
         if (properties.IsRightButtonPressed)
         {
-            Vector2 screenLocation = e.GetScreenPos(GLControl.Instance!);
+            Vector2 screenLocation = e.GetScreenPos(GLControl.Instance);
             SelectionManager.Instance.CheckForSelection(screenLocation, false);
             return;
         }

@@ -141,12 +141,7 @@ public class SelectionManager
 
     private void CheckForFaceSelection(Vector2 screenPosition, bool isDrag)
     {
-        if(SelectionMeshInstance.Instance == null)
-        {
-            throw new InvalidOperationException($"Cannot check for face selection while {nameof(SelectionMeshInstance.Instance)} is null");
-        }
-
-        RaycastHit? hit = Camera.Instance?.FindRaycastHit(screenPosition);
+        RaycastHit? hit = Camera.Instance.FindRaycastHit(screenPosition);
         if (hit != null)
         {
             SelectModel(hit.Model);

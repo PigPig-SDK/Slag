@@ -13,7 +13,21 @@ namespace UI.Views;
 
 public partial class MainWindow : Window
 {
-    public static MainWindow? Instance;
+
+    public static MainWindow? _instance;
+    public static MainWindow Instance
+    {
+        get
+        {
+            if (_instance == null) throw new InvalidOperationException($"Critical failure! Main window DNE!");
+            return _instance;
+        }
+        private set
+        {
+            if (_instance != null) throw new InvalidOperationException($"Cannot set {nameof(MainWindow)} more than once!");
+            _instance = value;
+        }
+    }
     public MainWindow()
     {
         InitializeComponent();

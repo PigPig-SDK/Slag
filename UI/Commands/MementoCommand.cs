@@ -22,10 +22,6 @@ public abstract class MementoCommand : ICommand
 
     protected void CreateState()
     {
-        if(SelectionManager.Instance is null)
-        {
-            throw new InvalidOperationException($"{nameof(SelectionManager.Instance)} is being called while not initialized!");
-        }
         Model = SelectionManager.Instance.CurrentModel;
         ModelState = Model?.Clone();
     }

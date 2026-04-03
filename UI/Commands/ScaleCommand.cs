@@ -41,8 +41,6 @@ public class ScaleCommand : ICommand
 
     private CommandState Initialize()
     {
-        if (GLControl.Instance == null) throw new InvalidOperationException($"No such {nameof(GLControl.Instance)}");
-
         Model? activeModel = SelectionManager.Instance.CurrentModel;
         if (activeModel == null) return CommandState.Discard;//Cannot execute command
 
@@ -100,7 +98,6 @@ public class ScaleCommand : ICommand
     {
         Model? model = SelectionManager.Instance.CurrentModel;
         if (model == null) throw new Exception("No current model in MoveCommand.MoveSelection");
-
         if (_selectedIndicies == null) throw new Exception($"No selection set {nameof(_selectedIndicies)}!");
 
         Vertex[] vertices = model.GetVertexBackingField();
@@ -203,7 +200,6 @@ public class ScaleCommand : ICommand
     }
     private void CleanUpUi()
     {
-        if (MainWindow.Instance == null) return;
         Canvas canvas = MainWindow.Instance.OverlayCanvas;
 
         if(_uiLine is not null)

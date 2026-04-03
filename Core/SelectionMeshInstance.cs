@@ -2,15 +2,22 @@
 
 public class SelectionMeshInstance : ModelComponent
 {
-    public static SelectionMeshInstance? Instance { get; set; }
+    public static SelectionMeshInstance? _instance = null!;
+    public static SelectionMeshInstance Instance 
+    { get
+        {
+            if(_instance is null) throw new InvalidOperationException($"Please initialzie the {nameof(SelectionMeshInstance)} before trying to access it!");
+            return _instance;
+        }
+        set
+        {
+            if(_instance is not null) throw new InvalidOperationException($"Cannot set {nameof(SelectionMeshInstance)} more than once!");
+            _instance = value;
+        }
+    }
 
     public SelectionMeshInstance() 
     {
-        if(Instance is not null)
-        {
-            throw new InvalidOperationException("Constructed more than one SelectionMeshInstance");
-        }
-
         Instance = this;
     }
 

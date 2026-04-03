@@ -44,6 +44,7 @@ public class RotateCommand : ICommand
     private Line? _dynamicLine;
     private Ellipse? _outlineElipse;
     private TextBlock? _textblock;
+
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
         if (SelectionManager.Instance.CurrentModel == null) return CommandState.Discard;
@@ -64,6 +65,8 @@ public class RotateCommand : ICommand
             Vector2 distanceVector = mousePos - _mouseStart.Value;
             if(distanceVector.LengthSquared == 0) return CommandState.Idle;//Cannot compute right now.
             float angle = MathF.Atan2(distanceVector.Y, distanceVector.X);
+
+            //Handle UI
             if (_initialRotation is null)
             {
                 _initialRotation = angle;
@@ -141,8 +144,6 @@ public class RotateCommand : ICommand
     }
     private void CleanUpUi()
     {
-        if (MainWindow.Instance == null) return;
-
         Canvas canvas = MainWindow.Instance.OverlayCanvas;
 
         if (_initialLine is not null)
@@ -172,8 +173,6 @@ public class RotateCommand : ICommand
 
     private CommandState Initialize()
     {
-        if (GLControl.Instance == null) throw new InvalidOperationException($"No such {nameof(GLControl.Instance)}");
-
         _model = SelectionManager.Instance.CurrentModel;
         if (_model == null) return CommandState.Discard;//Cannot execute command
 
