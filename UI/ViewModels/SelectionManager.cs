@@ -178,17 +178,14 @@ public class SelectionManager
         {
             if (obj is uint index)
             {
-                Console.WriteLine("index : " + index);
                 CurrentModel.RemoveVertex((int)index, UpdateType.Ignore);
             }
             else if (obj is Edge edge)
             {
-                Console.WriteLine("edge : " + edge);
                 CurrentModel.RemoveEdge(edge, UpdateType.Ignore);
             }
             else if (obj is Face face)
             {
-                Console.WriteLine("face : " + face);
                 CurrentModel.RemoveFace(face, UpdateType.Ignore);
             }
         }

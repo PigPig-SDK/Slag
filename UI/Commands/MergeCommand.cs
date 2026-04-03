@@ -50,7 +50,9 @@ public class MergeCommand : MementoCommand
     public void Merge(uint mergeIntoIndex, Model model, SelectionComponent selection)
     {
         HashSet<uint> selectedIndicies = [..selection.GetSelection<uint>()];
+        HashSet<Edge> oldEdges = [.. model.Edges];
 
+        //Handle faces
         foreach (Face face in model.Faces.ToArray())
         {
             //See if our face needs to be adjusted.
@@ -65,21 +67,21 @@ public class MergeCommand : MementoCommand
             }
             if (!faceRequiresRebuild) continue;//Skip the face.
 
-            //Rebuild face with vertex in place
+            //Rebuild face
             List<uint> indicies = [.. face.Indicies.ToArray()];//Clone indicies
 
             //Find closest vertex to implace merge vertex.
             if(!faceContainsMergingIndex)
             {
                 //Replace our closest vert with the merge vert, and remove the rest later.
-                uint closestIndex = 0;
+                int closestIndex = 0;
                 for (int cloneArrayIndex = 1; cloneArrayIndex < indicies.Count; cloneArrayIndex++)
                 {
                     if (Vector3.DistanceSquared(model.Verticies[(int)indicies[cloneArrayIndex]].Position, model.Verticies[(int)mergeIntoIndex].Position)
-                        > Vector3.DistanceSquared(model.Verticies[(int)indicies[cloneArrayIndex]].Position, model.Verticies[(int)mergeIntoIndex].Position))
-                        closestIndex = (uint)cloneArrayIndex;
+                        < Vector3.DistanceSquared(model.Verticies[(int)indicies[closestIndex]].Position, model.Verticies[(int)mergeIntoIndex].Position))
+                        closestIndex = cloneArrayIndex;
                 }
-                indicies[(int)closestIndex] = mergeIntoIndex;//Implace merge vertex into face.
+                indicies[closestIndex] = mergeIntoIndex;//Implace merge vertex into face.
             }
 
             //Remove remaining indicies
@@ -96,6 +98,16 @@ public class MergeCommand : MementoCommand
             }
             model.RemoveFace(face, UpdateType.None);
         }
+
+        //Remove old edges.
+        foreach(Edge edge in oldEdges)
+        {
+            if ((selectedIndicies.Contains(edge.Vertex1) && edge.Vertex1 != mergeIntoIndex) || (selectedIndicies.Contains(edge.Vertex2) && edge.Vertex2 != mergeIntoIndex))
+            {
+                model.RemoveEdge(edge, UpdateType.Ignore);
+            }
+        }
+
         model.UpdateAllComponents(UpdateType.Membership);
     }
 }

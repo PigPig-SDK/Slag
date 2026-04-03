@@ -30,11 +30,11 @@ public class MoveCommand : ICommand
     private Vector3 _activeAxis = new Vector3(1, 1, 1);
 
     private Dictionary<uint, Vector3> _startingPosition = [];
-    private List<uint>? _selectedIndicies = null;
+    private List<uint> _selectedIndicies = [];
     private Vector2 _moveDistance;
     private Vector3? _moveDirectionOverride = null;
     private Vector3 _selectionCenter = Vector3.Zero;
-    private Model _model;
+    private Model _model = null!;//Null is allowed here.
 
     private CommandState Initialize()
     {

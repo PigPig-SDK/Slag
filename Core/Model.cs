@@ -172,11 +172,11 @@ public class Model
         editCount += _edges.RemoveWhere(x => x.Contains(index));
 
         //Remap old edges by replacing them with new ones.
-        foreach (Edge e in _edges.Where(x => x.RequiresDecrement(index)).Select(x => x).ToArray())
+        foreach (Edge edge in _edges.Where(x => x.RequiresDecrement(index)).Select(x => x).ToArray())
         {
-            _edges.Remove(e);
-            e.DecrementForIndex(index);
-            _edges.Add(e);
+            _edges.Remove(edge);
+            edge.DecrementForIndex(index);
+            _edges.Add(edge);
         }
 
         _verticies.RemoveAt(index);
