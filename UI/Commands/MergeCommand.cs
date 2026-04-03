@@ -108,6 +108,13 @@ public class MergeCommand : MementoCommand
             }
         }
 
+        //Remove extra verts.
+        foreach(uint index in selectedIndicies.ToArray().OrderDescending())
+        {
+            if(mergeIntoIndex == index) continue;//Don't remove the vert we are merging into.
+            model.RemoveVertex((int)index, UpdateType.Ignore);
+        }
+
         model.UpdateAllComponents(UpdateType.Membership);
     }
 }
