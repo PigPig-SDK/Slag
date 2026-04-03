@@ -23,7 +23,6 @@ public class CommandInvoker
     {
         if(CurrentCommand != null)
         {
-            Console.WriteLine("A command is already running!");  
             return;
         }
 
