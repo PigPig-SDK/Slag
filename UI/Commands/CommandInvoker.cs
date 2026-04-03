@@ -14,7 +14,7 @@ public class CommandInvoker
     /// <summary>
     /// If NULL, than no command is being executed
     /// </summary>
-    public event Action<ICommand?>? CommandExecuted;
+    public event Action<ICommand?>? CommandTextUpdated;
 
     private FixedSizeStack<ICommand> _undoQueue = new(40);
     private FixedSizeStack<ICommand> _redoQueue = new(40);
@@ -27,7 +27,7 @@ public class CommandInvoker
             return;
         }
 
-        CommandExecuted?.Invoke(command);
+        CommandTextUpdated?.Invoke(command);
         CurrentCommand = command;
         ExecuteCommandStep(args);
     }
@@ -41,7 +41,8 @@ public class CommandInvoker
 
         if (commandState == CommandState.Discard)
         {
-            CommandExecuted?.Invoke(null);//No command now...
+            CommandTextUpdated?.Invoke(null);//No command now...
+            CurrentCommand = null;
             return true;
         }
 
@@ -49,7 +50,6 @@ public class CommandInvoker
         {
             _undoQueue.Push(CurrentCommand);
             _redoQueue.Clear();
-            Console.WriteLine(_undoQueue);
             CurrentCommand = CurrentCommand.Next;
             if (CurrentCommand != null && commandState == CommandState.Continue)// Continue immediately to next command
             {
@@ -59,7 +59,7 @@ public class CommandInvoker
             {
                 CurrentCommand = null;
             }
-            CommandExecuted?.Invoke(CurrentCommand);//No command now...
+            CommandTextUpdated?.Invoke(CurrentCommand);//No command now...
         }
         return true;
     }
@@ -78,5 +78,10 @@ public class CommandInvoker
         command.Undo();
         _redoQueue.Push(command);
         return true;
+    }
+
+    public void UpdateCommandInfo(ICommand cmd)
+    {
+        CommandTextUpdated?.Invoke(cmd);
     }
 }

@@ -32,7 +32,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Instance = this;
-        CommandInvoker.Singleton.CommandExecuted += Singleton_CommandExecuted;
+        CommandInvoker.Singleton.CommandTextUpdated += Singleton_CommandExecuted;
     }
 
     private void Singleton_CommandExecuted(ICommand? obj)

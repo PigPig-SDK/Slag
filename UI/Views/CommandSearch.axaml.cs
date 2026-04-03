@@ -18,6 +18,7 @@ public partial class CommandSearch : UserControl
         { "scale", typeof(ScaleCommand) },
         { "extrude", typeof(ExtrudeCommand) },
         { "merge", typeof(MergeCommand) },
+        { "debug", typeof(DebugCommand) },
     };
     public CommandSearch()
     {
