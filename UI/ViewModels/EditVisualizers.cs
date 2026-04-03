@@ -1,5 +1,7 @@
 ﻿using Core;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace UI.ViewModels;
 
@@ -75,5 +77,12 @@ public class EditVisualizers
         component.IsFullbright = true;
         component.UseTilemapRendering = true;
         component.Hidden = true;//Start hidden, only show when needed.
+    }
+
+    public IEnumerable<Model> GetAllVisualizers()
+    {
+        yield return AxisVisualizerX;
+        yield return AxisVisualizerY;
+        yield return AxisVisualizerZ;
     }
 }

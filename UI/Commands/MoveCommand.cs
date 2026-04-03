@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Core;
+using System.Reflection.Metadata.Ecma335;
 
 namespace UI.Commands;
 
@@ -32,6 +33,8 @@ public class MoveCommand : ICommand
     private List<uint>? _selectedIndicies = null;
     private Vector2 _moveDistance;
     private Vector3? _moveDirectionOverride = null;
+    private Vector3 _selectionCenter = Vector3.Zero;
+    private Model _model;
 
     private CommandState Initialize()
     {
@@ -41,8 +44,15 @@ public class MoveCommand : ICommand
         SelectionComponent? selection = activeModel.GetComponent<SelectionComponent>();
         if(selection is null) return CommandState.Discard;
 
+        _selectionCenter = selection.GetCenter();
+
         CameraMoveDirections = Camera.Instance.GetRealitiveDirections();
         _selectedIndicies = [..selection.GetSelection<uint>()];
+
+
+
+        if (SelectionManager.Instance.CurrentModel is null) return CommandState.Discard;
+        _model = SelectionManager.Instance.CurrentModel;
 
         foreach (uint index in _selectedIndicies)
         {
@@ -55,19 +65,16 @@ public class MoveCommand : ICommand
 
     void CleanUp()
     {
-        EditVisualizers.Instance.AxisVisualizerZ.Hidden = true;
-        EditVisualizers.Instance.AxisVisualizerY.Hidden = true;
-        EditVisualizers.Instance.AxisVisualizerX.Hidden = true;
+        foreach(Model model in EditVisualizers.Instance.GetAllVisualizers())
+        {
+            model.Hidden = true;
+            model.Position = Vector3.Zero;
+        }
     }
 
     private void MoveSelection(Vector2 mouseDelta)
     {
-        Model? model = SelectionManager.Instance.CurrentModel;
-        if (model == null) throw new Exception("No current model in MoveCommand.MoveSelection");
-
-        if(_selectedIndicies == null) throw new Exception($"No selection exists {nameof(_selectedIndicies)}!");
-
-        Vertex[] vertices = model.GetVertexBackingField();
+        Vertex[] vertices = _model.GetVertexBackingField();
 
         Vector3 moveDirection = (CameraMoveDirections.realitiveRight * mouseDelta.X) + (CameraMoveDirections.realitiveUp * mouseDelta.Y);
         moveDirection *= _moveDistanceScale;
@@ -79,11 +86,16 @@ public class MoveCommand : ICommand
 
         foreach (uint index in _selectedIndicies)
         {
-
             vertices[index].Position = (_startingPosition[index] + (moveDirection * _activeAxis));
-            
         }
-        model.UpdateAllComponents(UpdateType.Locational);
+
+        Vector3 visualizerPosition = _selectionCenter + (moveDirection * _activeAxis);
+
+        EditVisualizers.Instance.AxisVisualizerY.Position = visualizerPosition * new Vector3(0,1,0);
+        EditVisualizers.Instance.AxisVisualizerX.Position = visualizerPosition * new Vector3(0,0,1);
+        EditVisualizers.Instance.AxisVisualizerZ.Position = visualizerPosition * new Vector3(1,0,0);
+
+        _model.UpdateAllComponents(UpdateType.Locational);
     }
 
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
