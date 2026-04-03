@@ -8,8 +8,7 @@ using System;
 
 public class Camera
 {
-
-    public static Camera? _instance = null!;
+    private static Camera? _instance = null!;
     public static Camera Instance
     {
         get

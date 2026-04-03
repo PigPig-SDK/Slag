@@ -93,9 +93,7 @@ public class SelectionManager
         if (hit != null)
         {
             SelectModel(hit.Model);
-            SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>();
-            if (ms == null) throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
-
+            SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>() ?? throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
 
@@ -121,9 +119,7 @@ public class SelectionManager
         if (hit != null)
         {
             SelectModel(hit.Model);
-            SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>();
-            if (ms == null) throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
-
+            SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>() ?? throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!"); ;
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
 
@@ -145,10 +141,7 @@ public class SelectionManager
         if (hit != null)
         {
             SelectModel(hit.Model);
-            SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>();
-
-            if (ms == null) throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
-
+            SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>() ?? throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
             {
                 ClearSelection();

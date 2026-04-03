@@ -10,8 +10,10 @@ public static partial class ModelPrefabs
     /// <returns>A basic cube for debugging</returns>
     public static Model Cube()
     {
-        Model cube = new();
-        cube.ObjectName = "Cube";
+        Model cube = new()
+        {
+            ObjectName = "Cube"
+        };
 
         //Add verts
         cube.AddVertex(new Vertex(-1, -1, -1)); // 0
@@ -54,8 +56,10 @@ public static partial class ModelPrefabs
     }
     public static Model BBoxVisualizer(Vector3 start, Vector3 end)
     {
-        Model bboxVisualizer = new();
-        bboxVisualizer.ObjectName = "VISUALIZER";
+        Model bboxVisualizer = new()
+        {
+            ObjectName = "VISUALIZER"
+        };
 
         //Add verts
         bboxVisualizer.AddVertex(new Vertex(end.X, end.Y, end.Z)); // 0
@@ -81,8 +85,10 @@ public static partial class ModelPrefabs
     /// <returns>A basic cube for debugging</returns>
     public static Model Torus(int torusIterations, int ringIterations, float torusRadius, float ringRadius)
     {
-        Model torus = new();
-        torus.ObjectName = "Torus";
+        Model torus = new()
+        {
+            ObjectName = "Torus"
+        };
 
         const float pi = MathF.PI;
 
@@ -97,7 +103,7 @@ public static partial class ModelPrefabs
             for (int iRadial = 0; iRadial < ringIterations; iRadial++)
             {
                 //build vert position based on local distance
-                Vector3 vertPos = new Vector3(MathF.Cos(ringStep * (float)iRadial) * ringRadius, MathF.Sin(ringStep * (float)iRadial) * ringRadius, 0);
+                Vector3 vertPos = new(MathF.Cos(ringStep * (float)iRadial) * ringRadius, MathF.Sin(ringStep * (float)iRadial) * ringRadius, 0);
                 Vector4 posVec4 = new Vector4(vertPos, 1.0f) * translation;
                 torus.AddVertex(new Vertex(posVec4.X, posVec4.Y, posVec4.Z));
             }

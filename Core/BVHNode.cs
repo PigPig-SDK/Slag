@@ -2,6 +2,9 @@
 
 namespace Core;
 
+/// <summary>
+/// NOTE: THIS CLASS IS UNUSED!
+/// </summary>
 internal class BVHNode
 {
     public BVHNode? left, right, parent;

@@ -7,7 +7,7 @@ namespace UI.ViewModels;
 
 public class InputManager
 {
-    public static InputManager Singleton = new InputManager();
+    public static InputManager Singleton = new();
 
     public UserControlMode UserControlMode { get; private set; } = UserControlMode.None;
 
@@ -93,7 +93,7 @@ public class InputManager
         var properties = e.GetCurrentPoint(GLControl.Instance).Properties;
         if(properties.IsRightButtonPressed)
         {
-            Vector2 screenLocation = e.GetScreenPos(GLControl.Instance);
+            Vector2 screenLocation = e.GetScreenPos();
             SelectionManager.Instance.CheckForSelection(screenLocation, true);
             return;
         }
@@ -108,7 +108,7 @@ public class InputManager
         PointerPointProperties properties = e.GetCurrentPoint(GLControl.Instance).Properties;
         if (properties.IsRightButtonPressed)
         {
-            Vector2 screenLocation = e.GetScreenPos(GLControl.Instance);
+            Vector2 screenLocation = e.GetScreenPos();
             SelectionManager.Instance.CheckForSelection(screenLocation, false);
             return;
         }

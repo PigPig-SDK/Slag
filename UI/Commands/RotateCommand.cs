@@ -55,7 +55,7 @@ public class RotateCommand : ICommand
         if ((args.info & CommandInfo.MouseEvent) != 0)
         {
             var mouseInfo = args.mouseEvent!.GetPosition(GLControl.Instance);
-            Vector2 mousePos = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y);
+            Vector2 mousePos = new((float)mouseInfo.X, (float)mouseInfo.Y);
             if (_mouseStart is null)
             {
                 _mouseStart = mousePos;
@@ -203,7 +203,7 @@ public class RotateCommand : ICommand
                 EndPoint = new(0, 0),
                 Stroke = SelectionManager.SelectionColor,
                 StrokeThickness = 2,
-                StrokeDashArray = new () { 4, 4 },
+                StrokeDashArray = [4, 4],
                 IsVisible = false
             };
             _dynamicLine = new()

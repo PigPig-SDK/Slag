@@ -160,17 +160,17 @@ public partial class MainWindow : Window
             Title = "Save Scene As...",
             SuggestedFileName = "ObjectSet",
             DefaultExtension = "obj",
-            FileTypeChoices = new[]
-            {
+            FileTypeChoices =
+            [
                 new FilePickerFileType("OBJ Files")
                 {
-                    Patterns = new[] { "*.obj" },
+                    Patterns = ["*.obj"],
                 },
                 new FilePickerFileType("All Files")
                 {
-                    Patterns = new[] { "*.*" }
+                    Patterns = ["*.*"]
                 }
-            },
+            ],
             ShowOverwritePrompt = true
         });
 
@@ -179,7 +179,7 @@ public partial class MainWindow : Window
         Stream stream = await file.OpenWriteAsync();
         try
         {
-            using StreamWriter streamWriter = new StreamWriter(stream);
+            using StreamWriter streamWriter = new(stream);
             OBJFile.SaveOBJ(streamWriter);
         }
         catch (InvalidDataException exception)

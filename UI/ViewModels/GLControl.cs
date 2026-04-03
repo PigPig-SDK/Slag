@@ -9,6 +9,7 @@ using Avalonia.OpenGL.Controls;
 using Core;
 using OpenTK.Mathematics;
 using System;
+using System.Collections.ObjectModel;
 using System.Security.Cryptography.X509Certificates;
 using static Avalonia.OpenGL.GlConsts;
 
@@ -34,10 +35,10 @@ public class GLControl : OpenGlControlBase
     /// </summary>
     public Stack<Action<GlInterface>> ModelActions = new();
 
-    private ShaderProgram _triangleShaderProgram = new();
-    private ShaderProgram _edgeShaderProgram = new();
-    private ShaderProgram _vertexShaderProgram = new();
-    private ShaderProgram _depthShaderProgram = new();
+    private readonly ShaderProgram _triangleShaderProgram = new();
+    private readonly ShaderProgram _edgeShaderProgram = new();
+    private readonly ShaderProgram _vertexShaderProgram = new();
+    private readonly ShaderProgram _depthShaderProgram = new();
 
 
     public float Aspect { get; private set; } = 0;
@@ -56,17 +57,17 @@ public class GLControl : OpenGlControlBase
     private const string DepthVertexShader = "Shaders/depth.vs";
     private const string DepthFragmentShader = "Shaders/depth.fs";
 
-    private List<Model> _LateModelAddition = [];
+    private readonly List<Model> _lateModelAddition = [];
 
-    Dictionary<RenderMode, ShaderProgram> renderModeToShaderProgram;
+    private readonly Dictionary<RenderMode, ShaderProgram> _renderModeToShaderProgram;
 
     private int? _shadowmapFrameBuffer = null;
     private int? _depthMap = null;
     Matrix4 LightSpaceMatrix = Matrix4.Identity;
     public Vector3 SunAngle = new Vector3(50, 50, 25).Normalized();
 
-    int _shadowWidth = 2048, _shadowHeight = 2048;
-    private float _sunDistance = 75;
+    private const int _shadowWidth = 2048, _shadowHeight = 2048;
+    private const float _sunDistance = 75;
 
     public GLControl()
     {
@@ -84,7 +85,7 @@ public class GLControl : OpenGlControlBase
         
         AddHandler(PointerWheelChangedEvent, _camera.OnWheel, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
         
-        renderModeToShaderProgram = new() {
+        _renderModeToShaderProgram = new() {
             { RenderMode.Triangles, _triangleShaderProgram },
             { RenderMode.Edges, _edgeShaderProgram },
             { RenderMode.Verts, _vertexShaderProgram},
@@ -93,7 +94,7 @@ public class GLControl : OpenGlControlBase
 
     private void OnPress(object? sender, PointerPressedEventArgs e) => Focus();
 
-    public void OnModelAdded(HierarchyType hierarchyType, Model model) => _LateModelAddition.Add(model);
+    public void OnModelAdded(HierarchyType hierarchyType, Model model) => _lateModelAddition.Add(model);
 
     public static void CheckError(GlInterface gl)
     {
@@ -158,16 +159,16 @@ public class GLControl : OpenGlControlBase
 
     void CheckAppendingModels(GlInterface gl)
     {
-        if (_LateModelAddition.Count == 0) return;
+        if (_lateModelAddition.Count == 0) return;
 
-        foreach (Model model in _LateModelAddition)
+        foreach (Model model in _lateModelAddition)
         {
             SelectionComponent.BindComponent(model);
             GLComponent.BindComponent(model, gl);
             //TODO: Implement BVH if optimization is truly warranted.
             //BVHComponent.BindComponent(model);
         }
-        _LateModelAddition.Clear();
+        _lateModelAddition.Clear();
     }
 
     protected override unsafe void OnOpenGlRender(GlInterface gl, int fb)
@@ -256,11 +257,11 @@ public class GLControl : OpenGlControlBase
     {
         if (rendermode == null) rendermode = RenderMode;
         
-        foreach (RenderMode mode in renderModeToShaderProgram.Keys)
+        foreach (RenderMode mode in _renderModeToShaderProgram.Keys)
         {
             if(rendermode.Value.HasFlag(mode))
             {
-                ShaderProgram activeShader = renderModeToShaderProgram[mode];
+                ShaderProgram activeShader = _renderModeToShaderProgram[mode];
                 activeShader.UseProgram(gl, view, proj, _camera.Origin, LightSpaceMatrix, _depthMap!.Value, SunAngle);
 
                 foreach (IRenderObject component in AllRenderables(SceneHierarchy.Instance.GetModels(hierarchy)))

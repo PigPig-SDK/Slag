@@ -61,8 +61,6 @@ public class ExtrudeCommand : MementoCommand
     /// <param name="selectedIndicies"> The selected indicies that will be modified</param>
     private void AddFaceBorders(SelectionComponent selection, ref HashSet<uint> selectedIndicies, ref HashSet<Edge> edgeWhiteList)
     {
-        int total = selection.GetSelection<Edge>().Count();
-
         foreach(Edge edge in selection.GetSelection<Edge>())//All edges in our selection
         {
             int count = 0;
@@ -172,10 +170,9 @@ public class ExtrudeCommand : MementoCommand
 
                 var sorted = SortFour(index, neighbor, neighborCloneIndex, cloneIndex);
                 //Double check if face data exists before adding it.
-                if (!faceMap.Contains(sorted))
+                if (faceMap.Add(sorted))
                 {
-                    faceMap.Add(sorted);
-                    model.AddFaceUpdate(UpdateType.None, index, neighbor, neighborCloneIndex, cloneIndex);//Adds edges automatically.
+                    model.AddFaceWithMembership(UpdateType.None, index, neighbor, neighborCloneIndex, cloneIndex);//Adds edges automatically.
                 }
             }
         }

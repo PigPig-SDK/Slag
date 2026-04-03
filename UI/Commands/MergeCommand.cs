@@ -31,7 +31,7 @@ public class MergeCommand : MementoCommand
             CreateState();
             VertexHit? hit = Raycast.GetVertexHit(
                 [selection.Model],
-                Camera.Instance.ScreenToGlCoords(args.mouseEvent.GetScreenPos(GLControl.Instance!)),
+                Camera.Instance.ScreenToGlCoords(args.mouseEvent.GetScreenPos()),
                 Camera.Instance.ViewMatrix);
 
             if (hit is null) return CommandState.Finished;

@@ -108,8 +108,8 @@ public class Model
     }
 
 
-    public void AddFace(params uint[] indicies) => AddFaceUpdate(UpdateType.Membership, indicies);
-    public void AddFaceUpdate(UpdateType updateType, params uint[] indicies) => AddFace([.. indicies], updateType);
+    public void AddFace(params uint[] indicies) => AddFaceWithMembership(UpdateType.Membership, indicies);
+    public void AddFaceWithMembership(UpdateType updateType, params uint[] indicies) => AddFace([.. indicies], updateType);
     public void AddFace(List<uint> indicies, UpdateType info = UpdateType.Membership) => AddFace(new Face(indicies), info);
     public void AddFace(Face face, UpdateType info = UpdateType.Membership)
     {
