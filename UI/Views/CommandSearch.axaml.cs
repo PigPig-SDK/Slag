@@ -29,6 +29,8 @@ public partial class CommandSearch : UserControl
         this.AttachedToVisualTree += (s, e) =>
         {
             var window = TopLevel.GetTopLevel(this);
+            if(window is null) return;
+
             window.KeyDown += (s, e) =>
             {
                 if (e.Key == Key.F && e.KeyModifiers == KeyModifiers.Control)

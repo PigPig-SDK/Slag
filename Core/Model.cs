@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 
@@ -11,26 +12,26 @@ public class Model
     private List<Vertex> _verticies = [];
     public IReadOnlyList<Vertex> Verticies => _verticies;
 
-    private List<HashSet<uint>> _vertexEdgeMap = [];
+    private readonly List<HashSet<uint>> _vertexEdgeMap = [];
     public IReadOnlyList<HashSet<uint>> VertexEdgeMap => _vertexEdgeMap;
 
-    private List<Face> _faces = [];
+    private readonly List<Face> _faces = [];
     public IReadOnlyList<Face> Faces => _faces;
-    private HashSet<Edge> _edges = [];
+    private readonly HashSet<Edge> _edges = [];
     public IReadOnlySet<Edge> Edges => _edges;
     protected bool IsDisposed { get; set; }
     public uint[] Indicies = [];
     public bool Hidden { get; set; }
     public HierarchyType HierarchyType { get; set; } = HierarchyType.All;
 
-    private Dictionary<Type, ModelComponent> _Components = [];
+    private readonly Dictionary<Type, ModelComponent> _components = [];
 
     public Vector3 Position = Vector3.Zero;
     public Vector3 Rotation = Vector3.Zero;
     public Vector3 Scale = Vector3.One;
 
     //Store starting index
-    public Dictionary<(uint,uint,uint), Face> TriangleToFaceMapping = [];
+    public readonly Dictionary<(uint,uint,uint), Face> TriangleToFaceMapping = [];
 
     /// <summary>
     /// Model clone constructor.
@@ -259,19 +260,19 @@ public class Model
 
     public ModelComponent AddComponent<T>(ModelComponent component)
     {
-        _Components[typeof(T)] = component;
+        _components[typeof(T)] = component;
         component.Model = this;
         component.OnAddedToModel(this);
         return component;
     }
 
-    public bool RemoveComponent(Type component) => _Components.Remove(component);
+    public bool RemoveComponent(Type component) => _components.Remove(component);
 
     public T? GetComponent<T>() where T : ModelComponent
     {
         Type type = typeof(T);
 
-        if (_Components.TryGetValue(type, out var component))
+        if (_components.TryGetValue(type, out var component))
         {
             return (T)component;
         }
@@ -287,7 +288,7 @@ public class Model
 
     public bool TryGetComponent<T>(out ModelComponent? component)
     {
-        if (_Components.TryGetValue(typeof(T), out var obj))
+        if (_components.TryGetValue(typeof(T), out var obj))
         {
             component = obj;
             return true;
@@ -298,7 +299,7 @@ public class Model
 
     public IEnumerable<T> GetAllOfType<T>()
     {
-        foreach(KeyValuePair<Type, ModelComponent> component in _Components)
+        foreach(KeyValuePair<Type, ModelComponent> component in _components)
         {
             if(component.Value is T typedValue)
             {
@@ -307,11 +308,11 @@ public class Model
         }
     }
 
-    public bool HasComponent(Type type) => _Components.ContainsKey(type);
+    public bool HasComponent(Type type) => _components.ContainsKey(type);
 
     public void UpdateAllComponents(UpdateType info)
     {
-        foreach (var component in _Components.Values) component.OnModelUpdate(this, info);
+        foreach (var component in _components.Values) component.OnModelUpdate(this, info);
     }
 
     public IEnumerable<(uint v1,uint v2,uint v3)> AllTrianglesAsIndicies()
@@ -334,7 +335,7 @@ public class Model
     public void Dispose()
     {
         IsDisposed = true;
-        foreach (var component in _Components.Values)
+        foreach (var component in _components.Values)
         {
             component.Dispose();
         }

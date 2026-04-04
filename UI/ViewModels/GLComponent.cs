@@ -11,24 +11,24 @@ namespace UI.ViewModels;
 
 public class GLComponent : ModelComponent, IRenderObject
 {
-    private int? _vertexBufferObject = null;
-    private int? _indiciesBuffer = null;
-    private int? _edgeIndiciesBuffer = null;
-    private int? _selectionBuffer = null;
+    private int? _vertexBufferObject;
+    private int? _indiciesBuffer;
+    private int? _edgeIndiciesBuffer;
+    private int? _selectionBuffer;
 
     private int? _triangleArrayObject;
     private int? _edgeArrayObject;
 
-    private int _indiciesCount = 0;
-    private int _vertexCount = 0;
-    private int _edgeIndiciesCount = 0;
+    private int _indiciesCount;
+    private int _vertexCount;
+    private int _edgeIndiciesCount;
 
-    private GlInterface? glInterface = null;
+    private GlInterface? glInterface;
 
     //Used for tools and such...
-    public Color4? color = null;
-    public bool IsFullbright = false;
-    public bool UseTilemapRendering = false;
+    public Color4? color;
+    public bool IsFullbright;
+    public bool UseTilemapRendering;
 
     public bool Hidden { get => Model.Hidden; set => Model.Hidden = value; }
 
@@ -218,15 +218,15 @@ public class GLComponent : ModelComponent, IRenderObject
         return true;
     }
 
-    public void RenderModel(GlInterface gl, ShaderProgram shader)
+    public void RenderModel(GlInterface gl, ShaderProgram program)
     {
         if (_triangleArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_triangleArrayObject)} while its null");
         
 
-        shader.SetColorUniform(gl, shader.GetUniformLocation(gl, "color"), color ?? new Color4(1, 1, 1, 1));
-        gl.Uniform1i(shader.GetUniformLocation(gl, "useColor"), (color is null)? 0 : 1);
-        gl.Uniform1i(shader.GetUniformLocation(gl, "isFullbright"), (IsFullbright) ? 1 : 0);
-        gl.Uniform1i(shader.GetUniformLocation(gl, "useTilemap"), (UseTilemapRendering) ? 1 : 0);
+        program.SetColorUniform(gl, program.GetUniformLocation(gl, "color"), color ?? new Color4(1, 1, 1, 1));
+        gl.Uniform1i(program.GetUniformLocation(gl, "useColor"), (color is null)? 0 : 1);
+        gl.Uniform1i(program.GetUniformLocation(gl, "isFullbright"), (IsFullbright) ? 1 : 0);
+        gl.Uniform1i(program.GetUniformLocation(gl, "useTilemap"), (UseTilemapRendering) ? 1 : 0);
 
         gl.BindVertexArray(_triangleArrayObject!.Value);
         gl.DrawElements(GL_TRIANGLES, _indiciesCount, GL_UNSIGNED_INT, 0);
@@ -321,7 +321,6 @@ public class GLComponent : ModelComponent, IRenderObject
         _triangleArrayObject = null;
         _indiciesBuffer = null;
         _vertexBufferObject = null;
-
         glInterface = null;
     }
 

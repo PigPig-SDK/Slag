@@ -31,7 +31,7 @@ public class RotateCommand : ICommand
     private Vector2? _mouseStart;
     private Dictionary<uint, Vector4> _startingPosition = [];
     private float _totalRotation;
-    private float? _initialRotation = null;
+    private float? _initialRotation;
     private Model? _model;
     
     private Vector3 _cameraRotationRight = Vector3.Zero;

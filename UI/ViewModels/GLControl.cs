@@ -15,7 +15,7 @@ using static Avalonia.OpenGL.GlConsts;
 
 public class GLControl : OpenGlControlBase
 {
-    public static GLControl? _instance;
+    private static GLControl? _instance;
     public static GLControl Instance
     {
         get
@@ -29,11 +29,11 @@ public class GLControl : OpenGlControlBase
             _instance = value;
         }
     }
-    public static RenderMode RenderMode = RenderMode.Solid;
+    public static RenderMode RenderMode { get; set; } = RenderMode.Solid;
     /// <summary>
     /// This stack exists so that OpenGL Actions are all executed on the main thread
     /// </summary>
-    public Stack<Action<GlInterface>> ModelActions = new();
+    public readonly Stack<Action<GlInterface>> ModelActions = new();
 
     private readonly ShaderProgram _triangleShaderProgram = new();
     private readonly ShaderProgram _edgeShaderProgram = new();
@@ -41,7 +41,7 @@ public class GLControl : OpenGlControlBase
     private readonly ShaderProgram _depthShaderProgram = new();
 
 
-    public float Aspect { get; private set; } = 0;
+    public float Aspect { get; private set; }
 
     private Camera _camera;
 
@@ -61,10 +61,10 @@ public class GLControl : OpenGlControlBase
 
     private readonly Dictionary<RenderMode, ShaderProgram> _renderModeToShaderProgram;
 
-    private int? _shadowmapFrameBuffer = null;
-    private int? _depthMap = null;
+    private int? _shadowmapFrameBuffer;
+    private int? _depthMap;
     Matrix4 LightSpaceMatrix = Matrix4.Identity;
-    public Vector3 SunAngle = new Vector3(50, 50, 25).Normalized();
+    public static Vector3 SunAngle => new Vector3(50, 50, 25).Normalized();
 
     private const int _shadowWidth = 2048, _shadowHeight = 2048;
     private const float _sunDistance = 75;
@@ -140,7 +140,7 @@ public class GLControl : OpenGlControlBase
         var status = gl.CheckFramebufferStatus(GL_FRAMEBUFFER);
         if (gl.CheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         {
-            throw new Exception($"Shadowmap framebuffer incomplete: {status}");
+            throw new InvalidOperationException($"Shadowmap framebuffer incomplete: {status}");
         }
 
         //Add components and buffer data to opengl.
@@ -223,18 +223,6 @@ public class GLControl : OpenGlControlBase
 
         gl.Disable(GL_DEPTH_TEST);
         RenderModels(gl, HierarchyType.Tool, ref view, ref proj, RenderMode.Triangles);
-        RenderUI();
-        RenderOverview(gl);
-    }
-
-    private void RenderOverview(GlInterface gl)
-    {
-        
-    }
-
-    private void RenderUI()
-    {
-
     }
 
     /// <summary>

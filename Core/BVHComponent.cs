@@ -26,7 +26,7 @@ public class BVHComponent : ModelComponent
             throw new InvalidOperationException($"{nameof(ComputeTree)} called when tree has not been cleared!");
         }
 
-        Queue<BVHNode> pending = new Queue<BVHNode>();
+        Queue<BVHNode> pending = new();
         pending.Enqueue( _root );
         List<uint> tempIndicies = [.. Model.Indicies];
         Dictionary<BVHNode, (int start, int size)> tempMapping = [];

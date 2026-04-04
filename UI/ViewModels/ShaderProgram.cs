@@ -8,9 +8,9 @@ namespace UI.ViewModels;
 
 public class ShaderProgram
 {
-    public int ProgramID;
+    public int ProgramID { get; set; }
 
-    public int ModelMatrixLocation;
+    public int ModelMatrixLocation { get; set; }
 
     private int _projectionMatrixLoc, _viewMatrixLoc, _cameraLocationLoc, _envMatrix, _shadowMap, _sunAngle;
 

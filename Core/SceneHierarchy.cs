@@ -2,7 +2,7 @@
 
 public class SceneHierarchy
 {
-    public static SceneHierarchy Instance { get; set; } = new();
+    public static SceneHierarchy Instance { get; } = new();
 
     public const string XPlaneName = "XPlane";
     public const string YPlaneName = "YPlane";

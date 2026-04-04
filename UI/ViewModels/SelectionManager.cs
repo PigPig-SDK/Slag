@@ -11,11 +11,11 @@ namespace UI.ViewModels;
 
 public class SelectionManager
 {
-    public static SelectionManager Instance = new();
+    public static SelectionManager Instance { get; } = new();
 
     private SelectionMode _selectionMode = SelectionMode.Face;
 
-    public static SolidColorBrush SelectionColor = new (new Color(255, 255, 165, 0));
+    public static SolidColorBrush SelectionColor => new (new Color(255, 255, 165, 0));
 
     public SelectionMode CurrentSelectionMode
     {
@@ -27,7 +27,7 @@ public class SelectionManager
         }
     }
 
-    public Model? CurrentModel { get; private set; } = null;
+    public Model? CurrentModel { get; private set; }
 
     private SelectionManager()
     {

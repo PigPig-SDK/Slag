@@ -121,11 +121,11 @@ public partial class MainWindow : Window
                     Patterns = new[] { "*.obj" },
                 } },
             AllowMultiple = true
-        });
+        }).ConfigureAwait(false);
 
         for (int i = 0; i < files.Count; i++)
         {
-            Stream stream = await files[i].OpenReadAsync();
+            Stream stream = await files[i].OpenReadAsync().ConfigureAwait(false);
 
             StreamReader streamReader = new(stream);
             try
