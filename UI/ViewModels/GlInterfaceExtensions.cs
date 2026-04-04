@@ -1,4 +1,5 @@
-﻿using Avalonia.OpenGL;
+﻿using Avalonia.Controls;
+using Avalonia.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,10 @@ public static unsafe class GlInterfaceExtensions
     private delegate void DrawBuffersDelegate(int n, uint[] bufs);
     private delegate void BufferSubDataDelegate(int target, IntPtr offset, IntPtr size, IntPtr data);
     private delegate void Uniform1iDelegate(int location, int value);
+    private delegate void StencilMaskDelegate(uint mask);
+    private delegate void StencilFuncDelegate(uint func, int reference, uint mask);
+    private delegate void StencilOpDelegate(uint stencilFail, uint depthPassFail, uint depthPassPass);
+    private delegate void ColorMaskDelegate(bool red, bool green, bool blue, bool alpha);
 
     private static Uniform3fDelegate? _uniform3f;
     private static Uniform4fDelegate? _uniform4f;
@@ -25,6 +30,10 @@ public static unsafe class GlInterfaceExtensions
     private static ReadBufferDelegate? _readBuffer;
     private static DrawBuffersDelegate? _drawBuffers;
     private static Uniform1iDelegate? _uniform1i;
+    private static StencilMaskDelegate? _stencilMask;
+    private static StencilFuncDelegate? _stencilFunc;
+    private static StencilOpDelegate? _stencilOp;
+    private static ColorMaskDelegate? _colorMask;
 
     public static void BufferSubData(this GlInterface gl, int target, IntPtr offset, IntPtr size, IntPtr data)
     {
@@ -106,5 +115,52 @@ public static unsafe class GlInterfaceExtensions
         }
 
         _uniform1i(location, value);
+    }
+
+    public static void StencilMask(this GlInterface gl, uint mask)
+    {
+        if (_stencilMask == null)
+        {
+            nint ptr = gl.GetProcAddress("glStencilMask");
+            if (ptr == IntPtr.Zero) throw new InvalidOperationException("glStencilMask not available");
+            _stencilMask = Marshal.GetDelegateForFunctionPointer<StencilMaskDelegate>(ptr);
+        }
+
+        _stencilMask(mask);
+    }
+
+    public static void StencilFunc(this GlInterface gl, uint func, int reference, uint mask)
+    {
+        if (_stencilFunc == null)
+        {
+            nint ptr = gl.GetProcAddress("glStencilFunc");
+            if (ptr == IntPtr.Zero) throw new InvalidOperationException("glStencilFunc not available");
+            _stencilFunc = Marshal.GetDelegateForFunctionPointer<StencilFuncDelegate>(ptr);
+        }
+
+        _stencilFunc(func, reference, mask);
+    }
+    
+    public static void StencilOp(this GlInterface gl, uint stencilFail, uint depthPassFail, uint depthPassPass)
+    {
+        if (_stencilOp == null)
+        {
+            nint ptr = gl.GetProcAddress("glStencilOp");
+            if (ptr == IntPtr.Zero) throw new InvalidOperationException("glStencilOp not available");
+            _stencilOp = Marshal.GetDelegateForFunctionPointer<StencilOpDelegate>(ptr);
+        }
+
+        _stencilOp(stencilFail, depthPassFail, depthPassPass);
+    }
+    public static void ColorMask(this GlInterface gl, bool red, bool green, bool blue, bool alpha)
+    {
+        if (_colorMask == null)
+        {
+            nint ptr = gl.GetProcAddress("glColorMask");
+            if (ptr == IntPtr.Zero) throw new InvalidOperationException("glColorMask not available");
+            _colorMask = Marshal.GetDelegateForFunctionPointer<ColorMaskDelegate>(ptr);
+        }
+
+        _colorMask(red, green, blue, alpha);
     }
 }

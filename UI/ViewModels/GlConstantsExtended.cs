@@ -16,7 +16,13 @@ public static class GlConstantsExtended
 #pragma warning disable CA1823
     public const int GL_UNSIGNED_INT = 0x1405;
 
-    private const int GL_DYNAMIC_DRAW = 0x88E8;
+    public const int GL_DYNAMIC_DRAW = 0x88E8;
+
+    public const int GL_DEPTH_STENCIL_ATTACHMENT = 0x821a;
+
+    public const int GL_RGBA = 0x1908;
+
+    public const int GL_RGBA8 = 0x8058;
 
     public const int GL_POINTS = 0x0000;
 
@@ -51,4 +57,12 @@ public static class GlConstantsExtended
     public const int GL_DEPTH_COMPONENT24 = 33190;
 
     public const int GL_TEXTURE_COMPARE_MODE = 34892;
+
+    public const int GL_STENCIL_TEST = 2960;
+
+    public const uint GL_KEEP = 7680;
+
+    public const uint GL_REPLACE = 7681;
+
+    public const uint GL_NOTEQUAL = 517;
 }

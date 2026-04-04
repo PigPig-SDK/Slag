@@ -7,6 +7,7 @@ public enum RenderMode
     Edges = 1 << 1,
     Verts = 1 << 2,
     Depth = 1 << 3,
+    Outline = 1 << 4,
     Solid = Triangles | Verts | Edges,
     Wireframe = Edges | Verts,
 }

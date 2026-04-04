@@ -234,7 +234,7 @@ public static partial class ModelPrefabs
             bottomFace[i] = (i * 2) + 1;
         }
 
-        cylinder.AddFace(bottomFace);
+        cylinder.AddFace(bottomFace.Reverse().ToArray());
         cylinder.AddFace(topFace);
 
         return cylinder;

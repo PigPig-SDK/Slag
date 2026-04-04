@@ -33,6 +33,15 @@ public class GLComponent : ModelComponent, IRenderObject
     public bool Hidden { get => Model.Hidden; set => Model.Hidden = value; }
 
     public Matrix4 ModelMatrix { get => Model.GetModelMatrix(); }
+    public bool Selected
+    { 
+        get
+        {
+            SelectionComponent selectionComponent = Model.GetComponent<SelectionComponent>()!;
+            if(selectionComponent.LastSelection is null) return false;
+            return true;
+        }
+    }
 
     public static event Action<GLComponent>? OnBoundToModel;
 

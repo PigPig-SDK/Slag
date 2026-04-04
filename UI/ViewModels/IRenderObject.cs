@@ -9,6 +9,10 @@ public interface IRenderObject
     /// If the model should be rendered or not
     /// </summary>
     public bool Hidden { get; set; }
+    /// <summary>
+    /// If the model is selected, used to render the model differently and to show the models properties in the UI
+    /// </summary>
+    public bool Selected { get; }
     /// The objects model matrix
     /// </summary>
     public Matrix4 ModelMatrix { get; }
