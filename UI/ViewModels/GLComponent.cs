@@ -26,9 +26,9 @@ public class GLComponent : ModelComponent, IRenderObject
     private GlInterface? glInterface;
 
     //Used for tools and such...
-    public Color4? color;
-    public bool IsFullbright;
-    public bool UseTilemapRendering;
+    public Color4? Color { get; set; } 
+    public bool IsFullbright { get; set; }
+    public bool UseTilemapRendering { get; set; }
 
     public bool Hidden { get => Model.Hidden; set => Model.Hidden = value; }
 
@@ -232,8 +232,8 @@ public class GLComponent : ModelComponent, IRenderObject
         if (_triangleArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_triangleArrayObject)} while its null");
         
 
-        program.SetColorUniform(gl, program.GetUniformLocation(gl, "color"), color ?? new Color4(1, 1, 1, 1));
-        gl.Uniform1i(program.GetUniformLocation(gl, "useColor"), (color is null)? 0 : 1);
+        program.SetColorUniform(gl, program.GetUniformLocation(gl, "color"), Color ?? new Color4(1, 1, 1, 1));
+        gl.Uniform1i(program.GetUniformLocation(gl, "useColor"), (Color is null)? 0 : 1);
         gl.Uniform1i(program.GetUniformLocation(gl, "isFullbright"), (IsFullbright) ? 1 : 0);
         gl.Uniform1i(program.GetUniformLocation(gl, "useTilemap"), (UseTilemapRendering) ? 1 : 0);
 

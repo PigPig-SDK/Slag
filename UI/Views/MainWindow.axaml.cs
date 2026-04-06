@@ -93,7 +93,7 @@ public partial class MainWindow : Window
 
     private void OnFacePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SelectionModeChange(ViewModels.SelectionMode.Face);
 
-    private void OnShapePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SelectionModeChange(ViewModels.SelectionMode.Object);
+    private void OnShapePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SelectionModeChange(ViewModels.SelectionMode.Mesh);
 
     private void SelectionModeChange(ViewModels.SelectionMode mode)
     {
@@ -101,7 +101,7 @@ public partial class MainWindow : Window
 
         faceButton.Background = (mode == ViewModels.SelectionMode.Face) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
         vertexButton.Background = (mode == ViewModels.SelectionMode.Vertex) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
-        objectButton.Background = (mode == ViewModels.SelectionMode.Object) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
+        objectButton.Background = (mode == ViewModels.SelectionMode.Mesh) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
         edgeButton.Background = (mode == ViewModels.SelectionMode.Edge) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
     }
 

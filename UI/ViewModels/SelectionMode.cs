@@ -5,5 +5,5 @@ public enum SelectionMode
     Vertex,
     Edge,
     Face,
-    Object
+    Mesh
 }

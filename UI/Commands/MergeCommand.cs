@@ -47,7 +47,7 @@ public class MergeCommand : MementoCommand
         }
         return CommandState.Idle;
     }
-    public void Merge(uint mergeIntoIndex, Model model, SelectionComponent selection)
+    public static void Merge(uint mergeIntoIndex, Model model, SelectionComponent selection)
     {
         HashSet<uint> selectedIndicies = [..selection.GetSelection<uint>()];
         HashSet<Edge> oldEdges = [.. model.Edges];

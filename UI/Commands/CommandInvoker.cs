@@ -7,7 +7,7 @@ namespace UI.Commands;
 
 public class CommandInvoker
 {
-    public static CommandInvoker Singleton = new();
+    public static CommandInvoker Singleton { get; private set; } = new();
 
     public ICommand? CurrentCommand { get; set; }
 

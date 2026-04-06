@@ -46,7 +46,7 @@ public class SelectionManager
     {
         if (CurrentModel == null || CurrentSelectionMode == oldValue) return;
 
-        if (CurrentSelectionMode == SelectionMode.Object)//Object mode to model editing mode.
+        if (CurrentSelectionMode == SelectionMode.Mesh)//Object mode to model editing mode.
         {
             ClearSelection();
         }

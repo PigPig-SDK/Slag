@@ -34,7 +34,7 @@ public class GLControl : OpenGlControlBase
     /// <summary>
     /// This stack exists so that OpenGL Actions are all executed on the main thread
     /// </summary>
-    public readonly Stack<Action<GlInterface>> ModelActions = new();
+    public Stack<Action<GlInterface>> ModelActions { get; private set; } = new();
 
     private readonly ShaderProgram _triangleShaderProgram = new();
     private readonly ShaderProgram _edgeShaderProgram = new();
