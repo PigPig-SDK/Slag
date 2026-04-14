@@ -13,7 +13,7 @@ public static class Raycast
         return true;
     }
 
-    public static (Vector3 hitPoint, Vector3 barryCoords)? CheckForHit(Model m, (uint e1, uint e2, uint e3) incidies, Vector3 origin, Vector3 direction)
+    private static (Vector3 hitPoint, Vector3 barryCoords)? CheckForHit(Model m, (uint e1, uint e2, uint e3) incidies, Vector3 origin, Vector3 direction)
     {
         Vector3 p1 = m.Verticies[(int)incidies.e1].Position;
         Vector3 p2 = m.Verticies[(int)incidies.e2].Position;
@@ -69,7 +69,7 @@ public static class Raycast
         float stepY = strideVertical * 2.0f / (float)screenSize.Y;
         Vector3 direction = Vector3.Normalize(lookDirection - (realitiveRight * (stepX * (screenPos.X - screenSize.X / 2)) + (realitiveUp * (stepY * (screenPos.Y - screenSize.Y/ 2)))));
 
-        return ComputeRaycastHit(models, origin, direction);
+        return GetRaycastHit(models, origin, direction);
     }
 
     public static EdgeHit? GetEdgeHit(IEnumerable<Model> models, Vector2 glScreenPos, Matrix4 cameraMatrix, Vector3 cameraCenter)
@@ -167,7 +167,7 @@ public static class Raycast
         return hit;
     }
 
-    public static RaycastHit? ComputeRaycastHit(IEnumerable<Model> models, Vector3 origin, Vector3 direction)
+    public static RaycastHit? GetRaycastHit(IEnumerable<Model> models, Vector3 origin, Vector3 direction)
     {
         RaycastHit? hit = null; 
         float closestDistance = float.PositiveInfinity;
