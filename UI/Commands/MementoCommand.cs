@@ -10,6 +10,7 @@ public abstract class MementoCommand : ICommand
     public ICommand? Next { get; set; }
 
     public abstract string Name { get; }
+    public override string ToString() => Name;
 
     public abstract string Description { get; }
 

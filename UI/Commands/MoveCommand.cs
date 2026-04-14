@@ -14,6 +14,7 @@ public class MoveCommand : ICommand
     public ICommand? Next { get; set; }
 
     public string Name => "Move";
+    public override string ToString() => Name;
 
     public string Description =>
         "[X, Y, Z] : Specify a move axis\n" +

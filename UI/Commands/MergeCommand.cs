@@ -12,6 +12,7 @@ namespace UI.Commands;
 public class MergeCommand : MementoCommand
 {
     public override string Name => "Merge";
+    public override string ToString() => Name;
     public override string Description => "Select a vertex to merge into";
     public override bool DisplayToolText => true;
 

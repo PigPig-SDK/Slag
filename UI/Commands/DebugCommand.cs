@@ -14,6 +14,7 @@ public class DebugCommand : ICommand
     public ICommand? Next { get; set; }
 
     public string Name => "Information";
+    public override string ToString() => Name;
 
     private string _description = "Click on a primitive to print information about it";
     public string Description => _description;

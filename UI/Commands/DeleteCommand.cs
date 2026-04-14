@@ -11,9 +11,9 @@ namespace UI.Commands;
 
 internal class DeleteCommand : MementoCommand
 {
-    public override string Name => throw new InvalidProgramException("Cannot read information about this command");
-
-    public override string Description => throw new InvalidProgramException("Cannot read information about this command");
+    public override string Name => "Delete";
+    public override string ToString() => Name;
+    public override string Description => "Removes your current selection";
 
     public override bool DisplayToolText => false;
 

@@ -19,6 +19,7 @@ public class RotateCommand : ICommand
     private Vector3 _selectionCenter { get; set; }
 
     public string Name => "Rotate";
+    public override string ToString() => Name;
 
     public string Description => 
         "[X, Y, Z] : Specify a rotation axis\n" +

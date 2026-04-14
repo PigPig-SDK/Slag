@@ -10,9 +10,9 @@ using Core;
 namespace UI.Commands;
 public class ExtrudeCommand : MementoCommand
 {
-    public override string Name => string.Empty;
+    public override string Name => "Extrude";
 
-    public override string Description => string.Empty;
+    public override string Description => "From selection";
 
     public override bool DisplayToolText => false;
 

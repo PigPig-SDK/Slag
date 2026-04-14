@@ -2,24 +2,27 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
-using UI.Commands;
-using UI.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
+using System.Linq;
+using UI.Commands;
+using UI.ViewModels;
 
 namespace UI;
 
+
 public partial class CommandSearch : UserControl
 {
-    private Dictionary<string, Type> _commands = new() 
-    { 
-        { "move", typeof(MoveCommand) },
-        { "rotate", typeof(RotateCommand) },
-        { "scale", typeof(ScaleCommand) },
-        { "extrude", typeof(ExtrudeCommand) },
-        { "merge", typeof(MergeCommand) },
-        { "debug", typeof(DebugCommand) },
+    HashSet<Type> _commands = new ()
+    {
+        typeof(MoveCommand),
+        typeof(RotateCommand),
+        typeof(ScaleCommand),
+        typeof(ExtrudeCommand),
+        typeof(MergeCommand),
+        typeof(DebugCommand),
     };
     public CommandSearch()
     {
@@ -39,6 +42,11 @@ public partial class CommandSearch : UserControl
                     e.Handled = true;
                 }
             };
+
+            SearchBoxInput.AsyncPopulator = async (text, token) =>
+            {
+                return CommandList(text).ToList();
+            };
         };
 
         SearchBoxInput.GotFocus += (s, e) =>
@@ -47,8 +55,20 @@ public partial class CommandSearch : UserControl
         };
 
         SearchBoxInput.ClearSelectionOnLostFocus = true;
+    }
 
-        SearchBoxInput.ItemsSource = _commands.Keys;
+    IEnumerable<ICommand> CommandList(string? text)
+    {
+        if (text is not null)
+        {
+            foreach (var commandType in _commands)
+            {
+                if (Activator.CreateInstance(commandType) is not ICommand command) continue;
+
+                if (command.Name.ToLower(CultureInfo.CurrentCulture).Contains(text.ToLower(CultureInfo.CurrentCulture), StringComparison.CurrentCulture))
+                    yield return command;
+            }
+        }
     }
 
     private void SearchKeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
@@ -66,14 +86,20 @@ public partial class CommandSearch : UserControl
         string? input = SearchBoxInput.Text;
         if (!string.IsNullOrWhiteSpace(input))
         {
-            if (_commands.TryGetValue(input.ToLower(CultureInfo.CurrentCulture), out Type? commandType))
+            foreach (Type commandType in _commands)
             {
-                CommandInvoker.Singleton.RunCommand((ICommand)Activator.CreateInstance(commandType)!, (null, null, CommandInfo.Initialization));
-            }
+                ICommand? command = Activator.CreateInstance(commandType) as ICommand;
 
-            SearchBoxInput.Text = string.Empty;
-            GLControl.Instance?.Focus();
+                if (command is null) goto End;
+
+                if(command.Name.ToLower(CultureInfo.CurrentCulture)
+                    .Equals(input.ToLower(CultureInfo.CurrentCulture), StringComparison.Ordinal)) 
+                    CommandInvoker.Singleton.RunCommand((ICommand)Activator.CreateInstance(commandType)!, (null, null, CommandInfo.Initialization));
+            }
         }
 
+    End:
+        SearchBoxInput.Text = string.Empty;
+        GLControl.Instance?.Focus();
     }
 }

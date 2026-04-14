@@ -19,6 +19,8 @@ public class ScaleCommand : ICommand
 
     public string Name => "Scale";
 
+    public override string ToString() => Name;
+
     public string Description =>
     "[X, Y, Z] : Specify a scale axis\n" +
     "[S, Click] : Accept changes\n" +
