@@ -21,6 +21,7 @@ public partial class CommandSearch : UserControl
         typeof(ScaleCommand),
         typeof(ExtrudeCommand),
         typeof(MergeCommand),
+        typeof(FlipCommand),
         typeof(DebugCommand),
     };
     public CommandSearch()

@@ -1,6 +1,9 @@
 ﻿using Avalonia.Input;
-using UI.Commands;
 using OpenTK.Mathematics;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using UI.Commands;
 
 
 namespace UI.ViewModels;
@@ -10,6 +13,15 @@ public class InputManager
     public static InputManager Singleton { get; set; } = new();
 
     public UserControlMode UserControlMode { get; private set; } = UserControlMode.None;
+
+    private Dictionary<Key, Type> _keyBinds = new(){
+        {Key.G, typeof(MoveCommand)},
+        {Key.R, typeof(RotateCommand)},
+        {Key.S, typeof(ScaleCommand)},
+        {Key.E, typeof(ExtrudeCommand)},
+        {Key.F, typeof(FlipCommand)},
+        {Key.Delete, typeof(DeleteCommand)},
+    };
 
     //TOTO: REFACTOR THIS.
     public void OnKeyDown(object? sender, KeyEventArgs e)
@@ -24,31 +36,6 @@ public class InputManager
                     UserControlMode |= UserControlMode.Ctrl;
                     break;
                 }
-            case Key.G:
-                {
-                    CommandInvoker.Singleton?.RunCommand(new MoveCommand(), cmdInfo);
-                    break;
-                }
-            case Key.R:
-                {
-                    CommandInvoker.Singleton?.RunCommand(new RotateCommand(), cmdInfo);
-                    break;
-                }
-            case Key.S:
-                {
-                    CommandInvoker.Singleton?.RunCommand(new ScaleCommand(), cmdInfo);
-                    break;
-                }
-            case Key.E:
-                {
-                    CommandInvoker.Singleton?.RunCommand(new ExtrudeCommand(), cmdInfo);
-                    break;
-                }
-            case Key.Delete:
-                {
-                    CommandInvoker.Singleton?.RunCommand(new DeleteCommand(), cmdInfo);
-                    break;
-                }
             case Key.Z:
                 {
                     if(UserControlMode.HasFlag(UserControlMode.Ctrl))
@@ -59,6 +46,17 @@ public class InputManager
                 {
                     if (UserControlMode.HasFlag(UserControlMode.Ctrl))
                         CommandInvoker.Singleton.ExecuteRedo();
+                    break;
+                }
+            default:
+                {
+                    if(_keyBinds.TryGetValue(e.Key, out Type? value))
+                    {
+                        if (value is null) return;
+                        if (Activator.CreateInstance(value) is not ICommand command) return;
+
+                        CommandInvoker.Singleton?.RunCommand(command, cmdInfo);
+                    }
                     break;
                 }
         }

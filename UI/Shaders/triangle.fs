@@ -46,15 +46,22 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 void main() 
 {
+    vec4 matColor = desiredColor;
+
+    if(!gl_FrontFacing)
+    {
+        matColor = vec4(0.1f, 0.1f, 1.0f, 1.0f);
+    }
+
     //Lighting stage
     if(isFullbright) 
     {
-        FragColor = desiredColor;
+        FragColor = matColor;
     }
     else
     {
         float shininess = 10000.0;
-        vec4 baseColor = (desiredColor * 0.5 + 0.5);
+        vec4 baseColor = (matColor * 0.5 + 0.5);
 
         vec3 N = normalize(normal);
         vec3 L = normalize(sunAngle);  // make sure L is normalized
@@ -104,4 +111,5 @@ void main()
         FragColor = mix(fogColor, FragColor, fog);
 
     }
+
 }
