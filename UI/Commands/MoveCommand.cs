@@ -33,7 +33,7 @@ public class MoveCommand : ICommand
     private Vector3 _activeAxis = new(1, 1, 1);
 
     private Dictionary<uint, Vector3> _startingPosition = [];
-    private List<uint> _selectedIndicies = [];
+    private List<uint> _selectedIndices = [];
     private Vector2 _moveDistance;
     private Vector3? _moveDirectionOverride;
     private Vector3 _selectionCenter = Vector3.Zero;
@@ -50,14 +50,14 @@ public class MoveCommand : ICommand
         _selectionCenter = selection.GetCenter();
 
         _cameraMoveDirections = Camera.Instance.GetRealitiveDirections();
-        _selectedIndicies = [..selection.GetSelection<uint>()];
+        _selectedIndices = [..selection.GetSelection<uint>()];
 
 
 
         if (SelectionManager.Instance.CurrentModel is null) return CommandState.Discard;
         _model = SelectionManager.Instance.CurrentModel;
 
-        foreach (uint index in _selectedIndicies)
+        foreach (uint index in _selectedIndices)
         {
             Vertex vert = activeModel.GetVertex(index);
             _startingPosition[index] = vert.Position;
@@ -87,7 +87,7 @@ public class MoveCommand : ICommand
             moveDirection = _moveDirectionOverride.Value;
         }
 
-        foreach (uint index in _selectedIndicies)
+        foreach (uint index in _selectedIndices)
         {
             vertices[index].Position = (_startingPosition[index] + (moveDirection * _activeAxis));
         }

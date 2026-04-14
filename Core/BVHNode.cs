@@ -8,7 +8,7 @@ namespace Core;
 internal class BVHNode
 {
     public BVHNode? left, right, parent;
-    public List<uint>? Indicies = null;
+    public List<uint>? Indices = null;
 
     public Vector3 Start;
     public Vector3 End;
@@ -17,17 +17,17 @@ internal class BVHNode
 
     public void AddIndex(Model model, uint index, bool regenParents)
     {
-        if(Indicies == null) Indicies = new List<uint>();
-        Indicies.Add(index);
+        if(Indices == null) Indices = new List<uint>();
+        Indices.Add(index);
         if (!model.TryGetVertex(index, out Vertex? vertex)) return;
         RefitParents(vertex!.Value.Position);
     }
 
     public void RemoveIndex(Model model, uint id)
     {
-        if (Indicies == null || Indicies.Count == 0)
+        if (Indices == null || Indices.Count == 0)
             return;
-        Indicies.Remove(id);
+        Indices.Remove(id);
     }
 
     public bool Refit(Vector3 vertexLocation)
@@ -49,11 +49,11 @@ internal class BVHNode
             parent?.RefitParents(vertexLocation);
     }
 
-    public void ComputeSize(Model model, List<uint> indicies, (int start, int size) range)
+    public void ComputeSize(Model model, List<uint> indices, (int start, int size) range)
     {
         for(int i = range.start; i < range.start + range.size; i++)
         {
-            if (!model.TryGetVertex(indicies[i], out Vertex? vertex)) continue;
+            if (!model.TryGetVertex(indices[i], out Vertex? vertex)) continue;
             Refit(vertex!.Value.Position);
         }
         _visualizer = ModelPrefabs.BBoxVisualizer(Start, End);

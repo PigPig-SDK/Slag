@@ -20,7 +20,7 @@ public class Model
     private readonly HashSet<Edge> _edges = [];
     public IReadOnlySet<Edge> Edges => _edges;
     protected bool IsDisposed { get; set; }
-    public uint[] Indicies = [];
+    public uint[] Indices = [];
     public bool Hidden { get; set; }
     public HierarchyType HierarchyType { get; set; } = HierarchyType.All;
 
@@ -107,9 +107,9 @@ public class Model
     }
 
 
-    public void AddFace(params uint[] indicies) => AddFaceWithMembership(UpdateType.Membership, indicies);
-    public void AddFaceWithMembership(UpdateType updateType, params uint[] indicies) => AddFace([.. indicies], updateType);
-    public void AddFace(List<uint> indicies, UpdateType info = UpdateType.Membership) => AddFace(new Face(indicies), info);
+    public void AddFace(params uint[] indices) => AddFaceWithMembership(UpdateType.Membership, indices);
+    public void AddFaceWithMembership(UpdateType updateType, params uint[] indices) => AddFace([.. indices], updateType);
+    public void AddFace(List<uint> indices, UpdateType info = UpdateType.Membership) => AddFace(new Face(indices), info);
     public void AddFace(Face face, UpdateType info = UpdateType.Membership)
     {
         foreach(uint i in face.Indices)
@@ -152,15 +152,15 @@ public class Model
         _vertexEdgeMap.RemoveAt(index);
 
         //Decrement edgemap set
-        foreach (HashSet<uint> edgeIndicies in _vertexEdgeMap)
+        foreach (HashSet<uint> edgeIndices in _vertexEdgeMap)
         {
-            foreach (uint neighbor in edgeIndicies.ToArray())
+            foreach (uint neighbor in edgeIndices.ToArray())
             {
                 if(neighbor > index)
                 {
                     //Decrement!
-                    edgeIndicies.Remove(neighbor);
-                    edgeIndicies.Add(neighbor - 1);
+                    edgeIndices.Remove(neighbor);
+                    edgeIndices.Add(neighbor - 1);
                 }
             }
         }
@@ -220,27 +220,27 @@ public class Model
         UpdateAllComponents(info);
     }
 
-    private void GenerateIndicies()
+    private void GenerateIndices()
     {
         TriangleToFaceMapping.Clear();
-        List<uint> indicies = [];
+        List<uint> indices = [];
         foreach (Face face in _faces)
         {
-            face.Triangulate(ref indicies);
+            face.Triangulate(ref indices);
         }
-        Indicies = indicies.ToArray();
+        Indices = indices.ToArray();
     }
 
-    public uint[] GetEdgeIndicies()
+    public uint[] GetEdgeIndices()
     {
-        uint[] indicies = new uint[_edges.Count * 2];
+        uint[] indices = new uint[_edges.Count * 2];
         int index = 0;
         foreach (Edge edge in _edges)
         {
-            indicies[index++] = edge.Vertex1;
-            indicies[index++] = edge.Vertex2;
+            indices[index++] = edge.Vertex1;
+            indices[index++] = edge.Vertex2;
         }
-        return indicies;
+        return indices;
     }
 
     public Matrix4 GetRotationMatrix()
@@ -326,19 +326,19 @@ public class Model
         foreach (var component in _components.Values) component.OnModelUpdate(this, info);
     }
 
-    public IEnumerable<(uint v1,uint v2,uint v3)> AllTrianglesAsIndicies()
+    public IEnumerable<(uint v1,uint v2,uint v3)> AllTrianglesAsIndices()
     {
-        for(int i = 0; i < Indicies.Length; i+=3)
+        for(int i = 0; i < Indices.Length; i+=3)
         {
-            yield return (Indicies[i], Indicies[i + 1], Indicies[i + 2]);
+            yield return (Indices[i], Indices[i + 1], Indices[i + 2]);
         }
     }
 
-    public void GenerateTriangulatedModel(ref Vertex[] verts, ref List<uint> indicies)
+    public void GenerateTriangulatedModel(ref Vertex[] verts, ref List<uint> indices)
     {
         verts = _verticies.BackingField();
-        GenerateIndicies();
-        indicies = new (Indicies);
+        GenerateIndices();
+        indices = new (Indices);
     }
 
     ~Model() => Dispose();
@@ -380,7 +380,7 @@ public class Model
         foreach (Edge edge in modelState.Edges)
             AddEdge((Edge)edge.Clone(), UpdateType.Ignore);
 
-        GenerateIndicies();
+        GenerateIndices();
         UpdateAllComponents(UpdateType.Membership);
     }
 }

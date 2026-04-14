@@ -6,17 +6,17 @@ public class RaycastHit
 {
     public Model Model { get; set; }
     public Face Face { get; set; }
-    public (uint v1, uint v2, uint v3) TriangleIndicies { get; set; }
+    public (uint v1, uint v2, uint v3) TriangleIndices { get; set; }
     public Vector3 BarycentricPoint { get; set; }
     public Vector3 HitPoint { get; set; }
 
-    public RaycastHit(Model model, Face face, Vector3 hitPoint, Vector3 barycentricPoint, (uint v1, uint v2, uint v3) triangleIndicies)
+    public RaycastHit(Model model, Face face, Vector3 hitPoint, Vector3 barycentricPoint, (uint v1, uint v2, uint v3) triangleIndices)
     {
         Model = model;
         Face = face;
         HitPoint = hitPoint;
         BarycentricPoint = barycentricPoint;
-        this.TriangleIndicies = triangleIndicies;
+        this.TriangleIndices = triangleIndices;
     }
 
     public override string ToString()

@@ -26,15 +26,15 @@ public class ExtrudeCommand : MementoCommand
         if(selection is null) return CommandState.Discard;
         CreateState();
 
-        HashSet<uint> selectedIndicies = [];
+        HashSet<uint> selectedIndices = [];
         HashSet<Edge> edgeWhiteList = [];
 
         //If faces are selected, find border
-        AddFaceBorders(selection, ref selectedIndicies, ref edgeWhiteList);
+        AddFaceBorders(selection, ref selectedIndices, ref edgeWhiteList);
 
-        selectedIndicies.AddRange(selection.SelectedIndicies);
+        selectedIndices.AddRange(selection.SelectedIndices);
 
-        Extrude(sm.CurrentModel, selectedIndicies, edgeWhiteList, out Dictionary<uint, uint> cloneMap);
+        Extrude(sm.CurrentModel, selectedIndices, edgeWhiteList, out Dictionary<uint, uint> cloneMap);
 
         AdjustConnectedFaces(selection, sm.CurrentModel, cloneMap, edgeWhiteList);
 
@@ -57,11 +57,11 @@ public class ExtrudeCommand : MementoCommand
     /// <summary>
     /// This function selects the outline of a set of faces.
     /// Say you select 10 faces that are contiguous,
-    /// Edges that partake in two or more faces will not be added to the selected indicies.
+    /// Edges that partake in two or more faces will not be added to the selected indices.
     /// </summary>
     /// <param name="selection"> The selected objects selection component</param>
-    /// <param name="selectedIndicies"> The selected indicies that will be modified</param>
-    private static void AddFaceBorders(SelectionComponent selection, ref HashSet<uint> selectedIndicies, ref HashSet<Edge> edgeWhiteList)
+    /// <param name="selectedIndices"> The selected indices that will be modified</param>
+    private static void AddFaceBorders(SelectionComponent selection, ref HashSet<uint> selectedIndices, ref HashSet<Edge> edgeWhiteList)
     {
         foreach(Edge edge in selection.GetSelection<Edge>())//All edges in our selection
         {
@@ -74,8 +74,8 @@ public class ExtrudeCommand : MementoCommand
             //Edge is only seen once in face set or never.
             if(count <= 1)
             {
-                selectedIndicies.Add(edge.Vertex1);
-                selectedIndicies.Add(edge.Vertex2);
+                selectedIndices.Add(edge.Vertex1);
+                selectedIndices.Add(edge.Vertex2);
                 edgeWhiteList.Add(edge);
             }
         }
@@ -110,20 +110,20 @@ public class ExtrudeCommand : MementoCommand
             if (!containsClones) break;
 
             // Reuse allocation of old face.
-            var newFaceIndicies = face.Indices;
+            var newFaceIndices = face.Indices;
 
 
 
             //Delete existing polygon
             model.RemoveFace(face);
 
-            for(int i = 0; i < newFaceIndicies.Count; i++)
+            for(int i = 0; i < newFaceIndices.Count; i++)
             {
-                if(cloneMap.ContainsKey((uint)newFaceIndicies[i]))
-                    newFaceIndicies[i] = cloneMap[newFaceIndicies[i]];//Remap to new index.
+                if(cloneMap.ContainsKey((uint)newFaceIndices[i]))
+                    newFaceIndices[i] = cloneMap[newFaceIndices[i]];//Remap to new index.
             }
             //Throw back into mesh
-            model.AddFace(new Face(newFaceIndicies), UpdateType.Ignore);
+            model.AddFace(new Face(newFaceIndices), UpdateType.Ignore);
         }
 
         //Remove 'floating' undesirable edges.
@@ -140,12 +140,12 @@ public class ExtrudeCommand : MementoCommand
 
         return (a, b, c, d);
     }
-    public static void Extrude(Model model, HashSet<uint> selectedIndicies, HashSet<Edge> edgeWhiteList, out Dictionary<uint, uint> cloneMapping) 
+    public static void Extrude(Model model, HashSet<uint> selectedIndices, HashSet<Edge> edgeWhiteList, out Dictionary<uint, uint> cloneMapping) 
     {
         cloneMapping = [];
         HashSet<(uint, uint, uint, uint)> faceMap = [];
 
-        foreach (uint index in selectedIndicies)
+        foreach (uint index in selectedIndices)
         {
             //Add clone if possible
             if (!cloneMapping.TryGetValue(index, out uint cloneIndex))
@@ -158,7 +158,7 @@ public class ExtrudeCommand : MementoCommand
             foreach(uint neighbor in model.VertexEdgeMap[(int)index].ToArray())
             {
                 //Ignore non selected edges
-                if (!selectedIndicies.Contains(neighbor)) continue;
+                if (!selectedIndices.Contains(neighbor)) continue;
                 //Ignore edges that are not whitelisted.
                 if(!edgeWhiteList.Contains(new Edge(index,neighbor))) continue;
 

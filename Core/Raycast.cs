@@ -181,9 +181,9 @@ public static class Raycast
 
             if (!HasHitBoundingBox(model, originHomo, directionHomo)) continue;
 
-            foreach (var triangleIndicies in model.AllTrianglesAsIndicies())
+            foreach (var triangleIndices in model.AllTrianglesAsIndices())
             {
-                (Vector3 hitPoint, Vector3 barryCoords)? hitPoints = CheckForHit(model, triangleIndicies, originHomo, directionHomo);
+                (Vector3 hitPoint, Vector3 barryCoords)? hitPoints = CheckForHit(model, triangleIndices, originHomo, directionHomo);
                 if(hitPoints != null)
                 {
                     //Translate hitpoint by model transformation
@@ -192,7 +192,7 @@ public static class Raycast
                     float distanceCheck = Vector3.DistanceSquared(originHomo, hitPoint);
                     if (distanceCheck > closestDistance) continue;
                     closestDistance = distanceCheck;
-                    hit = new (model, model.TriangleToFaceMapping[triangleIndicies], hitPoint, hitPoints!.Value.barryCoords, triangleIndicies);
+                    hit = new (model, model.TriangleToFaceMapping[triangleIndices], hitPoint, hitPoints!.Value.barryCoords, triangleIndices);
                 }
             }
         }

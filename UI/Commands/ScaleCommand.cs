@@ -34,7 +34,7 @@ public class ScaleCommand : ICommand
     private Vector3 _selectionCenter = new(0, 0, 0);
     private Vector3 _activeAxis = new(1, 1, 1);
     private Vector2 _mouseScreenCenter = Vector2.Zero;
-    private List<uint>? _selectedIndicies;
+    private List<uint>? _selectedIndices;
 
     private Dictionary<uint, (Vector3 position, Vector3 moveNormal)> _StartingPosition = [];
     private float _ScaleValue;
@@ -52,7 +52,7 @@ public class ScaleCommand : ICommand
         SelectionComponent? selection = activeModel.GetComponent<SelectionComponent>();
         if (selection is null) return CommandState.Discard;
 
-        _selectedIndicies = [.. selection.GetSelection<uint>()];
+        _selectedIndices = [.. selection.GetSelection<uint>()];
 
         _selectionCenter = selection.GetCenter();
         //Compute center.
@@ -102,11 +102,11 @@ public class ScaleCommand : ICommand
     private void Scale(float ammount)
     {
         Model? model = SelectionManager.Instance.CurrentModel ?? throw new InvalidOperationException("No current model in MoveCommand.MoveSelection");
-        if (_selectedIndicies == null) throw new InvalidOperationException($"No selection set {nameof(_selectedIndicies)}!");
+        if (_selectedIndices == null) throw new InvalidOperationException($"No selection set {nameof(_selectedIndices)}!");
 
         Vertex[] vertices = model.GetVertexBackingField();
 
-        foreach (uint index in _selectedIndicies)
+        foreach (uint index in _selectedIndices)
         {
             vertices[index].Position = _StartingPosition[index].position + ((_StartingPosition[index].moveNormal* ammount) * _activeAxis);
         }

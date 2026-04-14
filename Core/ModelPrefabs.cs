@@ -262,12 +262,12 @@ public static partial class ModelPrefabs
         }
 
         //Bottom
-        uint[] bottomIndicies = new uint [segments];
+        uint[] bottomIndices = new uint [segments];
         for(uint i = 0; i < segments; i++)
         {
-            bottomIndicies[i] = i + 1;
+            bottomIndices[i] = i + 1;
         }
-        cone.AddFace(bottomIndicies);
+        cone.AddFace(bottomIndices);
 
         return cone;
     }

@@ -28,16 +28,16 @@ public class BVHComponent : ModelComponent
 
         Queue<BVHNode> pending = new();
         pending.Enqueue( _root );
-        List<uint> tempIndicies = [.. Model.Indicies];
+        List<uint> tempIndices = [.. Model.Indices];
         Dictionary<BVHNode, (int start, int size)> tempMapping = [];
-        tempMapping[_root] = (0,tempIndicies.Count - 1);
+        tempMapping[_root] = (0,tempIndices.Count - 1);
 
         while (pending.Count > 0)
         {
             BVHNode node = pending.Dequeue();
             //Compute size
             var range = tempMapping[node];
-            node.ComputeSize(Model, tempIndicies, range);
+            node.ComputeSize(Model, tempIndices, range);
 
             //Node is too lge, split it
             if (tempMapping[node].size > MaxBranchSize)
@@ -47,14 +47,14 @@ public class BVHComponent : ModelComponent
                 int splitAxis = curVolume.X > curVolume.Y && curVolume.X > curVolume.Z ? 0 :
                 curVolume.Y > curVolume.Z ? 1 : 2;
 
-                //Sort indicies in range by axis
-                SortBasedOnAxis(splitAxis, node.Start[splitAxis] + (curVolume[splitAxis] / 2.0), range, ref tempIndicies);
+                //Sort indices in range by axis
+                SortBasedOnAxis(splitAxis, node.Start[splitAxis] + (curVolume[splitAxis] / 2.0), range, ref tempIndices);
 
                 //Create child nodes
                 node.left = new BVHNode { parent = node };
                 node.right = new BVHNode { parent = node };
 
-                //Split indicies in half
+                //Split indices in half
                 int leftSize = range.size / 2;
                 //Extra element when odd.
                 int rightSize = range.size - leftSize;
@@ -69,7 +69,7 @@ public class BVHComponent : ModelComponent
             else//Just right.
             {
                 //Push data into node...
-                foreach (uint index in tempIndicies.GetRange(range.start, range.size))
+                foreach (uint index in tempIndices.GetRange(range.start, range.size))
                 {
                     node.AddIndex(Model, index, false);
                 }
@@ -77,20 +77,20 @@ public class BVHComponent : ModelComponent
         }
     }
 
-    private void SortBasedOnAxis(int splitAxis, double splitPos, (int start, int size) range, ref List<uint> indicies)
+    private void SortBasedOnAxis(int splitAxis, double splitPos, (int start, int size) range, ref List<uint> indices)
     {
         int i = range.start;
         int j = range.start + range.size;
         while(i < j)
         {
-            if (Model.Verticies[(int)indicies[i]].Position[splitAxis] < splitPos)
+            if (Model.Verticies[(int)indices[i]].Position[splitAxis] < splitPos)
                 i++;
             else
             {
                 //Swap
-                indicies[i] ^= indicies[j];
-                indicies[j] ^= indicies[i];
-                indicies[i] ^= indicies[j];
+                indices[i] ^= indices[j];
+                indices[j] ^= indices[i];
+                indices[i] ^= indices[j];
                 --j;
             }
         }

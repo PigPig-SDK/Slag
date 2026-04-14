@@ -7,8 +7,8 @@ namespace UI.ViewModels;
 
 public class SelectionComponent : ModelComponent
 {
-    private SortedSet<uint> _selectedIndicies = [];
-    public IReadOnlySet<uint> SelectedIndicies => _selectedIndicies; 
+    private SortedSet<uint> _selectedIndices = [];
+    public IReadOnlySet<uint> SelectedIndices => _selectedIndices; 
 
     private HashSet<Face> _selectedFaces = [];
     public IReadOnlySet<Face> SelectedFaces => _selectedFaces;
@@ -27,9 +27,9 @@ public class SelectionComponent : ModelComponent
 
     public void SelectIndex(uint index, UpdateType updateInfo = UpdateType.Selection)
     {
-        if(index >= Model.Indicies.Length) throw new ArgumentOutOfRangeException($"The index {index} exceeds the possible selection range!");
+        if(index >= Model.Indices.Length) throw new ArgumentOutOfRangeException($"The index {index} exceeds the possible selection range!");
 
-        _selectedIndicies.Add(index);
+        _selectedIndices.Add(index);
         LastSelection = index;
         OnSelectionChanged?.Invoke(true, updateInfo);
     }
@@ -43,7 +43,7 @@ public class SelectionComponent : ModelComponent
 
         _selectedFaces.Clear();
         _selectedEdges.Clear();
-        _selectedIndicies.Clear();
+        _selectedIndices.Clear();
         LastSelection = null;
         OnSelectionMassUpdate?.Invoke(updateInfo);
     }
@@ -52,7 +52,7 @@ public class SelectionComponent : ModelComponent
 
     public void DeselectIndex(uint index, UpdateType updateInfo = UpdateType.Selection)
     {
-        _selectedIndicies.Remove(index);
+        _selectedIndices.Remove(index);
         OnSelectionChanged?.Invoke(false, updateInfo);
     }
 
@@ -68,7 +68,7 @@ public class SelectionComponent : ModelComponent
 
     public override void OnAddedToModel(Model model) { }
 
-    public bool IsVertexSelected(uint i) => _selectedIndicies.Contains(i);
+    public bool IsVertexSelected(uint i) => _selectedIndices.Contains(i);
 
     public static bool BindComponent(Model model)
     {
@@ -77,13 +77,13 @@ public class SelectionComponent : ModelComponent
         return true;
     }
     /// <summary>
-    /// Yields all indicies ordered from largest to smallest
+    /// Yields all indices ordered from largest to smallest
     /// This functionality is to help with deletion operations, which might re-shuffle your selected set.
     /// Keep this in mind, as it might become part of your nightmares.
     /// </summary>
-    public IEnumerable<uint> SelectionIndicies()
+    public IEnumerable<uint> SelectionIndices()
     {
-        foreach(uint item in _selectedIndicies.Reverse()) yield return item;
+        foreach(uint item in _selectedIndices.Reverse()) yield return item;
     }
 
     public Vector3 GetWorldCenter()
@@ -171,7 +171,7 @@ public class SelectionComponent : ModelComponent
             //Search for verts
             HashSet<uint> verts = [];
 
-            foreach (uint index in _selectedIndicies.Reverse()) verts.Add(index);
+            foreach (uint index in _selectedIndices.Reverse()) verts.Add(index);
 
             foreach(Edge edge in _selectedEdges)
             {
@@ -199,7 +199,7 @@ public class SelectionComponent : ModelComponent
     /// Only yields Face, Edge and uints
     /// Use this function if you are expecting to deal with all of these at once.
     ///</summary>
-    ///<returns>Faces, then Edges, then sorted indicies (descending)</returns>
+    ///<returns>Faces, then Edges, then sorted indices (descending)</returns>
     /// <remarks> uints are returned sorted from largest to smallest. (Descending order)</remarks>
     public IEnumerable<object> SelectionBucket()
     {
@@ -207,9 +207,9 @@ public class SelectionComponent : ModelComponent
 
         foreach (Edge edge in _selectedEdges) yield return edge;
 
-        ///IMPORTANT NOTE: We feed the indicies through in reverse!
-        ///This is to simplify deletion, deleting indicies from largest to smallest keeps the
-        ///indicies in tact! (Deletion causes mass re-shuffling, this mitigates it's affect on most logic)
-        foreach(uint index in  _selectedIndicies.Reverse()) yield return index;
+        ///IMPORTANT NOTE: We feed the indices through in reverse!
+        ///This is to simplify deletion, deleting indices from largest to smallest keeps the
+        ///indices in tact! (Deletion causes mass re-shuffling, this mitigates it's affect on most logic)
+        foreach(uint index in  _selectedIndices.Reverse()) yield return index;
     }
 }

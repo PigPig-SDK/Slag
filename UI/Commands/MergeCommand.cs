@@ -52,7 +52,7 @@ public class MergeCommand : MementoCommand
     }
     public static void Merge(uint mergeIntoIndex, Model model, SelectionComponent selection)
     {
-        HashSet<uint> selectedIndicies = [..selection.GetSelection<uint>()];
+        HashSet<uint> selectedIndices = [..selection.GetSelection<uint>()];
         HashSet<Edge> oldEdges = [.. model.Edges];
 
         //Handle faces
@@ -63,7 +63,7 @@ public class MergeCommand : MementoCommand
             bool faceContainsMergingIndex = false;
             foreach (uint index in face.Indices)//Index is to be removed.
             {
-                if (selectedIndicies.Contains(index))
+                if (selectedIndices.Contains(index))
                     faceRequiresRebuild = true;
                 if(index == mergeIntoIndex) 
                     faceContainsMergingIndex = true;
@@ -71,32 +71,32 @@ public class MergeCommand : MementoCommand
             if (!faceRequiresRebuild) continue;//Skip the face.
 
             //Rebuild face
-            List<uint> indicies = [.. face.Indices.ToArray()];//Clone indicies
+            List<uint> indices = [.. face.Indices.ToArray()];//Clone indices
 
             //Find closest vertex to implace merge vertex.
             if(!faceContainsMergingIndex)
             {
                 //Replace our closest vert with the merge vert, and remove the rest later.
                 int closestIndex = 0;
-                for (int cloneArrayIndex = 1; cloneArrayIndex < indicies.Count; cloneArrayIndex++)
+                for (int cloneArrayIndex = 1; cloneArrayIndex < indices.Count; cloneArrayIndex++)
                 {
-                    if (Vector3.DistanceSquared(model.Verticies[(int)indicies[cloneArrayIndex]].Position, model.Verticies[(int)mergeIntoIndex].Position)
-                        < Vector3.DistanceSquared(model.Verticies[(int)indicies[closestIndex]].Position, model.Verticies[(int)mergeIntoIndex].Position))
+                    if (Vector3.DistanceSquared(model.Verticies[(int)indices[cloneArrayIndex]].Position, model.Verticies[(int)mergeIntoIndex].Position)
+                        < Vector3.DistanceSquared(model.Verticies[(int)indices[closestIndex]].Position, model.Verticies[(int)mergeIntoIndex].Position))
                         closestIndex = cloneArrayIndex;
                 }
-                indicies[closestIndex] = mergeIntoIndex;//Implace merge vertex into face.
+                indices[closestIndex] = mergeIntoIndex;//Implace merge vertex into face.
             }
 
-            //Remove remaining indicies
-            for (int i = indicies.Count - 1; i >= 0; i--)
+            //Remove remaining indices
+            for (int i = indices.Count - 1; i >= 0; i--)
             {
-                if (selectedIndicies.Contains(indicies[i]) && indicies[i] != mergeIntoIndex)
-                    indicies.RemoveAt(i);//Remove vert from face
+                if (selectedIndices.Contains(indices[i]) && indices[i] != mergeIntoIndex)
+                    indices.RemoveAt(i);//Remove vert from face
             }
 
-            if (indicies.Count >= 3)
+            if (indices.Count >= 3)
             {
-                model.AddFace(new Face(indicies), UpdateType.None);//Add new face with vert removed.
+                model.AddFace(new Face(indices), UpdateType.None);//Add new face with vert removed.
             }
             model.RemoveFace(face, UpdateType.None);
         }
@@ -104,14 +104,14 @@ public class MergeCommand : MementoCommand
         //Remove old edges.
         foreach(Edge edge in oldEdges)
         {
-            if ((selectedIndicies.Contains(edge.Vertex1) && edge.Vertex1 != mergeIntoIndex) || (selectedIndicies.Contains(edge.Vertex2) && edge.Vertex2 != mergeIntoIndex))
+            if ((selectedIndices.Contains(edge.Vertex1) && edge.Vertex1 != mergeIntoIndex) || (selectedIndices.Contains(edge.Vertex2) && edge.Vertex2 != mergeIntoIndex))
             {
                 model.RemoveEdge(edge, UpdateType.Ignore);
             }
         }
 
         //Remove extra verts.
-        foreach(uint index in selectedIndicies.ToArray().OrderDescending())
+        foreach(uint index in selectedIndices.ToArray().OrderDescending())
         {
             if(mergeIntoIndex == index) continue;//Don't remove the vert we are merging into.
             model.RemoveVertex((int)index, UpdateType.Ignore);

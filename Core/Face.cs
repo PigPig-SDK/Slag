@@ -3,7 +3,7 @@
 /// <summary>
 /// The ParentModel property is ignored in hashcode and Equals
 /// </summary>
-/// <param name="indices">The indices which define a face. The data for the indicies is stored within ParentModel</param>
+/// <param name="indices">The indices which define a face. The data for the indices is stored within ParentModel</param>
 public class Face : ICloneable
 {
     public List<uint> Indices { get; }
@@ -83,6 +83,6 @@ public class Face : ICloneable
     }
     public override string ToString()
     {
-        return $"Indicies : {string.Join(",", Indices)}\nEdges : {string.Join(",", Edges)}";
+        return $"Indices : {string.Join(",", Indices)}\nEdges : {string.Join(",", Edges)}";
     }
 }
