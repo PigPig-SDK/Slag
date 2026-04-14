@@ -149,12 +149,10 @@ public class SelectionManager
             if (!ms.IsFaceSelected(hit.Face))
             {
                 ms.SelectFace(hit!.Face, UpdateType.Selection);
-                SelectionMeshInstance.Instance.SelectFace(hit.Face);
             }
             else if (!isDrag)
             {
                 ms.DeselectFace(hit!.Face, UpdateType.Selection);
-                SelectionMeshInstance.Instance.DeselectFace(hit.Face);
             }
         }
         else if(!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))

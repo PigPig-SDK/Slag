@@ -112,7 +112,7 @@ public class Model
     public void AddFace(List<uint> indicies, UpdateType info = UpdateType.Membership) => AddFace(new Face(indicies), info);
     public void AddFace(Face face, UpdateType info = UpdateType.Membership)
     {
-        foreach(uint i in face.Indicies)
+        foreach(uint i in face.Indices)
         {
             if(!VertexExists(i))
             {
@@ -123,14 +123,14 @@ public class Model
         face.ParentModel = this;
         _faces.Add(face);
 
-        for(int i = 0; i < face.Indicies.Count - 1; i++) {
-            uint start = (uint)face.Indicies[i];
-            uint end = (uint)face.Indicies[i + 1];
+        for(int i = 0; i < face.Indices.Count - 1; i++) {
+            uint start = (uint)face.Indices[i];
+            uint end = (uint)face.Indices[i + 1];
             Edge edge = AddEdge(new Edge(start, end, face), UpdateType.Ignore);
 
             face.Edges.Add(edge);
         }
-        Edge edgeOverlap = AddEdge(new Edge(face.Indicies[0], face.Indicies[^1], face), UpdateType.Ignore);
+        Edge edgeOverlap = AddEdge(new Edge(face.Indices[0], face.Indices[^1], face), UpdateType.Ignore);
         face.Edges.Add(edgeOverlap);
         UpdateAllComponents(info);
     }

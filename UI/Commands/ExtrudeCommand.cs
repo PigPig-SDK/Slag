@@ -99,7 +99,7 @@ public class ExtrudeCommand : MementoCommand
         foreach(Face face in selection.SelectedFaces.ToArray())//Will be modified. ToArray required
         {
             bool containsClones = false;
-            foreach(uint index in face.Indicies)
+            foreach(uint index in face.Indices)
             {
                 if(cloneMap.ContainsKey(index))
                 {
@@ -110,7 +110,7 @@ public class ExtrudeCommand : MementoCommand
             if (!containsClones) break;
 
             // Reuse allocation of old face.
-            var newFaceIndicies = face.Indicies;
+            var newFaceIndicies = face.Indices;
 
 
 

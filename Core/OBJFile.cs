@@ -53,7 +53,7 @@ public static class OBJFile
             //Write faces
             foreach(Face face in model.Faces)
             {
-                writer.WriteLine($"{FaceToken} {string.Join(" ", face.Indicies.Select(i => $"{i + 1 + objVertCount}/{i + 1 + objVertCount}/{i + 1 + objVertCount}").ToArray())}");
+                writer.WriteLine($"{FaceToken} {string.Join(" ", face.Indices.Select(i => $"{i + 1 + objVertCount}/{i + 1 + objVertCount}/{i + 1 + objVertCount}").ToArray())}");
             }
             objVertCount += model.Verticies.Count;
         }

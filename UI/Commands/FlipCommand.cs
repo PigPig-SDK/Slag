@@ -49,8 +49,8 @@ public class FlipCommand : ICommand
         foreach (Face face in _faces)
         {
             _currentModel.RemoveFace(face);
-            face.Indicies.Reverse();
-            _currentModel.AddFace(face.Indicies);
+            face.Indices.Reverse();
+            _currentModel.AddFace(face.Indices);
         }
     }
 

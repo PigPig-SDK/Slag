@@ -61,7 +61,7 @@ public class MergeCommand : MementoCommand
             //See if our face needs to be adjusted.
             bool faceRequiresRebuild = false;
             bool faceContainsMergingIndex = false;
-            foreach (uint index in face.Indicies)//Index is to be removed.
+            foreach (uint index in face.Indices)//Index is to be removed.
             {
                 if (selectedIndicies.Contains(index))
                     faceRequiresRebuild = true;
@@ -71,7 +71,7 @@ public class MergeCommand : MementoCommand
             if (!faceRequiresRebuild) continue;//Skip the face.
 
             //Rebuild face
-            List<uint> indicies = [.. face.Indicies.ToArray()];//Clone indicies
+            List<uint> indicies = [.. face.Indices.ToArray()];//Clone indicies
 
             //Find closest vertex to implace merge vertex.
             if(!faceContainsMergingIndex)

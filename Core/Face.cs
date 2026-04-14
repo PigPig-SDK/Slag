@@ -3,44 +3,44 @@
 /// <summary>
 /// The ParentModel property is ignored in hashcode and Equals
 /// </summary>
-/// <param name="indicies">The indicies which define a face. The data for the indicies is stored within ParentModel</param>
+/// <param name="indices">The indices which define a face. The data for the indicies is stored within ParentModel</param>
 public class Face : ICloneable
 {
-    public List<uint> Indicies { get; }
+    public List<uint> Indices { get; }
 
     public List<Edge> Edges { get; private set; } = [];
 
     public Model? ParentModel { get; set; }
 
-    public Face(List<uint> indicies)
+    public Face(List<uint> indices)
     {
-        Indicies = indicies;
+        Indices = indices;
     }
 
     public Face(params uint[] values)
     {
-        Indicies = [.. values];
+        Indices = [.. values];
     }
 
     public override bool Equals(object? obj)
     {
-        return obj is Face face && EqualityComparer<List<uint>>.Default.Equals(Indicies, face.Indicies);
+        return obj is Face face && EqualityComparer<List<uint>>.Default.Equals(Indices, face.Indices);
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Indicies);
+        return HashCode.Combine(Indices);
     }
     
-    public void Flip() => Indicies.Reverse();
+    public void Flip() => Indices.Reverse();
 
-    public bool Contains(uint index) => Indicies.Contains(index);
+    public bool Contains(uint index) => Indices.Contains(index);
 
     public void DecrementForIndex(int index)
     {
-        for (int i = 0; i < Indicies.Count; i++)
+        for (int i = 0; i < Indices.Count; i++)
         {
-            if(Indicies[i] > index) Indicies[i]--;
+            if(Indices[i] > index) Indices[i]--;
         }
     }
 
@@ -51,15 +51,15 @@ public class Face : ICloneable
 
     private void FanTriangulate(ref List<uint> list)
     {
-        uint fanSource = Indicies.First();
-        for(int i = 1; i < Indicies.Count - 1; i++)
+        uint fanSource = Indices.First();
+        for(int i = 1; i < Indices.Count - 1; i++)
         {
             list.Add(fanSource);
-            list.Add(Indicies[i]);
-            list.Add(Indicies[i + 1]);
+            list.Add(Indices[i]);
+            list.Add(Indices[i + 1]);
             if(ParentModel is not null)
             {
-                var tuple = (fanSource, Indicies[i], Indicies[i + 1]);
+                var tuple = (fanSource, Indices[i], Indices[i + 1]);
 
                 if (ParentModel.TriangleToFaceMapping.ContainsKey(tuple))
                 {
@@ -79,10 +79,10 @@ public class Face : ICloneable
     /// </summary>
     public object Clone()
     {
-        return new Face(Indicies.ToArray());
+        return new Face(Indices.ToArray());
     }
     public override string ToString()
     {
-        return $"Indicies : {string.Join(",", Indicies)}\nEdges : {string.Join(",", Edges)}";
+        return $"Indicies : {string.Join(",", Indices)}\nEdges : {string.Join(",", Edges)}";
     }
 }
