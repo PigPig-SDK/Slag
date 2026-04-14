@@ -62,13 +62,13 @@ public class EditVisualizers
         switch (component.Model.ObjectName)
         {
             case SceneHierarchy.XPlaneName:
-                component.color = new OpenTK.Mathematics.Color4(1, 0, 0, 1.0f);
+                component.Color = new OpenTK.Mathematics.Color4(1, 0, 0, 1.0f);
                 break;
             case SceneHierarchy.YPlaneName:
-                component.color = new OpenTK.Mathematics.Color4(0, 1, 0, 1.0f);
+                component.Color = new OpenTK.Mathematics.Color4(0, 1, 0, 1.0f);
                 break;
             case SceneHierarchy.ZPlaneName:
-                component.color = new OpenTK.Mathematics.Color4(0, 0, 1, 1.0f);
+                component.Color = new OpenTK.Mathematics.Color4(0, 0, 1, 1.0f);
                 break;
             default:
                 return;//Do nothing

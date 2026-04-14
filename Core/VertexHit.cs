@@ -3,8 +3,8 @@
 public class VertexHit
 {
     public Model Model { get; set; }
-    public uint VertexIndex;
-    public float Distance;
+    public uint VertexIndex { get; set; }
+    public float Distance { get; set; }
 
     public VertexHit(Model model, uint vertexIndex, float distance)
     {
