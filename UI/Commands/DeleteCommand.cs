@@ -15,6 +15,8 @@ internal class DeleteCommand : MementoCommand
     public override string ToString() => Name;
     public override string Description => "Removes your current selection";
 
+    public override string IconSource => "./Assets/edge.png";
+
     public override bool DisplayToolText => false;
 
     public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)

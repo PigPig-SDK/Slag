@@ -5,14 +5,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:uiCMD="using:UI.Commands"
+             xmlns:local="using:UI"
              x:Class="UI.CommandSearch">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <local:StringToBitmapConverter x:Key="StringToBitmap"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
             <Panel 
                MaxWidth="400"
                HorizontalAlignment="Stretch"
                x:Name="SearchBoxPanel"
                Margin="50,0,-30,0">
-
+              
               <AutoCompleteBox HorizontalAlignment="Stretch"
                      VerticalAlignment="Center"
                      Watermark="Modifier..."
@@ -40,6 +46,8 @@
                     <AutoCompleteBox.ItemTemplate>
                         <DataTemplate DataType="uiCMD:ICommand">
                             <StackPanel Orientation="Horizontal" Spacing="8">
+                                
+                                <Image Source="{Binding IconSource, Converter={StaticResource StringToBitmap}}" Width="16" Height="16"/>
                                 <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
                                 <TextBlock Text="{Binding Description}" Foreground="Gray" FontSize="11"/>
                             </StackPanel>

@@ -21,6 +21,8 @@ public class RotateCommand : ICommand
     public string Name => "Rotate";
     public override string ToString() => Name;
 
+    public string IconSource => "avares://Slag/Assets/icons/rotate.png";
+
     public string Description => 
         "[X, Y, Z] : Specify a rotation axis\n" +
         "[HOLD CTRL] : Lock to a unit of 11.25°\n" +

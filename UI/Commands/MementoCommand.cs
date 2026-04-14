@@ -21,6 +21,8 @@ public abstract class MementoCommand : ICommand
     public Model? ModelState { get; set; }
     public Model? Model { get; set; }
 
+    public abstract string IconSource {get;}
+
     protected void CreateState()
     {
         Model = SelectionManager.Instance.CurrentModel;

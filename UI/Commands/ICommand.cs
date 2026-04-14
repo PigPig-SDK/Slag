@@ -20,6 +20,8 @@ public interface ICommand
 
     public bool DisplayToolText { get; }
 
+    public string IconSource { get; }
+
     public void Undo();
 
     public void Redo();

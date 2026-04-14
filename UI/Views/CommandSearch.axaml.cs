@@ -12,7 +12,6 @@ using UI.ViewModels;
 
 namespace UI;
 
-
 public partial class CommandSearch : UserControl
 {
     HashSet<Type> _commands = new ()

@@ -16,6 +16,8 @@ public class MergeCommand : MementoCommand
     public override string Description => "Select a vertex to merge into";
     public override bool DisplayToolText => true;
 
+    public override string IconSource => "avares://Slag/Assets/icons/merge.png";
+
     public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
         if (SelectionManager.Instance.CurrentModel is null) return CommandState.Discard;

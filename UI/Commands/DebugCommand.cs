@@ -19,6 +19,8 @@ public class DebugCommand : ICommand
     private string _description = "Click on a primitive to print information about it";
     public string Description => _description;
 
+    public string IconSource => "avares://Slag/Assets/icons/information.png";
+
     public bool DisplayToolText => true;
 
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)

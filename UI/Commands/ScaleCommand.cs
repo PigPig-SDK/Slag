@@ -21,6 +21,8 @@ public class ScaleCommand : ICommand
 
     public override string ToString() => Name;
 
+    public string IconSource => "avares://Slag/Assets/icons/scale.png";
+
     public string Description =>
     "[X, Y, Z] : Specify a scale axis\n" +
     "[S, Click] : Accept changes\n" +

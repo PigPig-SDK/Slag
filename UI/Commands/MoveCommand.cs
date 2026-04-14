@@ -24,6 +24,8 @@ public class MoveCommand : ICommand
 
     public bool DisplayToolText => true;
 
+    public string IconSource => "avares://Slag/Assets/icons/move.png";
+
     private const float _moveDistanceScale = 0.01f;
     private (Vector3 realitiveRight, Vector3 realitiveUp) _cameraMoveDirections;
     private Vector2? _mouseStartPos;

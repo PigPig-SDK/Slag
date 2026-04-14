@@ -9,8 +9,9 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <CA1051ExcludeStructs>true</CA1051ExcludeStructs>
+    <AssemblyName>Slag</AssemblyName>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
