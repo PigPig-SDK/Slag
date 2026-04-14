@@ -15,7 +15,7 @@ public class DebugCommand : ICommand
 
     public string Name => "Information";
 
-    private string _description = "Click on a vertex to print information about it";
+    private string _description = "Click on a primitive to print information about it";
     public string Description => _description;
 
     public bool DisplayToolText => true;
@@ -32,21 +32,40 @@ public class DebugCommand : ICommand
         }
         if(args.mouseEvent != null)
         {
+            string info = "Vertex:\n";
+
             var properties = args.mouseEvent.GetCurrentPoint(null).Properties;
             if (properties.IsLeftButtonPressed)
             {
+                var screenCoordsGL = Camera.Instance.ScreenToGlCoords(args.mouseEvent.GetScreenPos());
+                var cameraMatrix = Camera.Instance.ViewMatrix;
+
                 VertexHit? hit = Raycast.GetVertexHit(
                     SceneHierarchy.Instance.GetModels(HierarchyType.Model),
-                    Camera.Instance.ScreenToGlCoords(args.mouseEvent.GetScreenPos()),
-                    Camera.Instance.ViewMatrix);
+                    screenCoordsGL,
+                    cameraMatrix);
                 if(hit != null)
                 {
-                    string info = 
+                    info += 
                         $"Vertex Index: {hit.VertexIndex}\n" +
-                        $"Neighbors: [{string.Join(",", hit.Model.VertexEdgeMap[(int)hit.VertexIndex])}]";
-
-                    SetDescription(info);
+                        $"Neighbors: [{string.Join(",", hit.Model.VertexEdgeMap[(int)hit.VertexIndex])}]\n";
                 }
+
+                RaycastHit? faceHit = Camera.Instance.FindRaycastHit(args.mouseEvent.GetScreenPos());
+                if (faceHit != null)
+                {
+                    info += $"Face Hit:\n{faceHit.Face.ToString()}\n";
+                }
+
+                EdgeHit? edgeHit = Raycast.GetEdgeHit(
+                    SceneHierarchy.Instance.HierarchyCategories[HierarchyType.Model],
+                    screenCoordsGL, cameraMatrix, Camera.Instance.Origin);
+                if (edgeHit != null)
+                {
+                    info += $"Edge Hit:\n{edgeHit.Edge.ToString()}\n";
+                }
+
+                SetDescription(info);
             }
         }
         return CommandState.Idle;
@@ -54,7 +73,7 @@ public class DebugCommand : ICommand
 
     private void SetDescription(string description)
     {
-        _description = $"Click on a vertex to print information about it\n{description}";
+        _description = $"Click on a Vertex/Edge/Face to print information about it\n{description}";
         CommandInvoker.Singleton.UpdateCommandInfo(this);
     }
 

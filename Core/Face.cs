@@ -81,4 +81,8 @@ public class Face : ICloneable
     {
         return new Face(Indicies.ToArray());
     }
+    public override string ToString()
+    {
+        return $"Indicies : {string.Join(",", Indicies)}\nEdges : {string.Join(",", Edges)}";
+    }
 }
