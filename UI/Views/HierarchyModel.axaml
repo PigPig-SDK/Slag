@@ -3,8 +3,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              x:Class="UI.HierarchyModel">
-    <Grid Background="Gray">
-        <Expander HorizontalAlignment="Stretch" Focusable="False" ExpandDirection="Down" IsExpanded="False" x:Name="BodyExpander">
+    <Grid Background="Transparent" Margin="5">
+        <Expander CornerRadius="10,10,0,0"
+                  HorizontalAlignment="Stretch" Focusable="False" 
+                  ExpandDirection="Down" IsExpanded="False" x:Name="BodyExpander">
             <Expander.Header>
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="5">
                     <Button Grid.Column="0" MinWidth="0" Focusable="False" x:Name="HideButton" Click="OnHideButtonClick" CornerRadius="40" Background ="Transparent">
@@ -17,6 +19,7 @@
                              x:Name="NameTextbox"
                              Text="Test"
                              VerticalAlignment="Center"
+                             TextAlignment="Center"
                              Watermark="ObjectName" MinWidth="0" KeyDown="OnNameKeyDown"/>
                 </Grid>
             </Expander.Header>
@@ -71,7 +74,6 @@
                 <Label Grid.Row="1" Grid.Column="4" MaxWidth="20" MinWidth="0"  Content="Z" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <TextBox Grid.Row="1" Grid.Column="5" MinWidth="0" x:Name="ZScaleBox" TextChanged="OnScaleTextChanged" TextAlignment="Center" HorizontalAlignment="Stretch" KeyDown="HandleNonNumericInput" VerticalAlignment="Center"/>
             </Grid>
-            <Separator Grid.Row="5"/>
         </Grid>
         </Expander>
     </Grid>

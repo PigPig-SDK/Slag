@@ -2,7 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="UI.ViewModels.HierarchyView">
         <Grid RowDefinitions="Auto,Auto,*">
-            <Button Grid.Row="0" Content="AddObject" CornerRadius="0" HorizontalAlignment="Stretch" Focusable="False" Click="OnAddObjectButtonClick">
+            <Button Grid.Row="0"
+                    HorizontalAlignment="Stretch" 
+                    Focusable="False" 
+                    Margin="5"
+                    CornerRadius="15"
+                    Click="OnAddObjectButtonClick" ToolTip.Tip="Add Object">
+                <Image Source="../Assets/addObject.png" Height="20"/>
                 <Button.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Cube" Click="OnAddCubePressed"/>

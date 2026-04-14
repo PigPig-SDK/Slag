@@ -29,11 +29,11 @@ public class SelectionMeshInstance : ModelComponent
 
     public void SelectFace(Face face)
     {
-        Console.WriteLine($"Selected face {face}");
+
     }
 
     public void DeselectFace(Face face)
     {
-        Console.WriteLine($"Selected face {face}");
+
     }
 }
