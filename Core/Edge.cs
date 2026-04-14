@@ -37,7 +37,7 @@ public class Edge : ICloneable
 
     public bool Contains(int index) => (Vertex1 == index || Vertex2 == index);
 
-    public bool RequiresDecrement(int index) => (Vertex1 > 1) || (Vertex2 > index);
+    public bool RequiresDecrement(int index) => (Vertex1 > index) || (Vertex2 > index);
 
     internal void DecrementForIndex(int index)
     {
@@ -57,7 +57,7 @@ public class Edge : ICloneable
 
     public override int GetHashCode()
     {
-        return (EqualityComparer<uint>.Default.GetHashCode(Vertex1)) * -1521134295 + EqualityComparer<uint>.Default.GetHashCode(Vertex1);
+        return (EqualityComparer<uint>.Default.GetHashCode(Vertex1)) * -1521134295 + EqualityComparer<uint>.Default.GetHashCode(Vertex2);
     }
 
     public object Clone()
@@ -65,5 +65,9 @@ public class Edge : ICloneable
         var edge = new Edge(Vertex1, Vertex2);
         edge.IsSharp = IsSharp;
         return edge;
+    }
+    public override string ToString()
+    {
+        return $"[{Vertex1},{Vertex2}]";
     }
 }

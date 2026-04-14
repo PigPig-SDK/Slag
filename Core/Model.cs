@@ -142,11 +142,13 @@ public class Model
 
         //Clear out edgemap and our neighbors
         uint uIndex = (uint)index;
+        //Remove US from our NEIGHBORS
         foreach (uint neighbor in _vertexEdgeMap[index])
         {
             if (neighbor < _vertexEdgeMap.Count)
                 _vertexEdgeMap[(int)neighbor].Remove(uIndex);
         }
+        //Remove US
         _vertexEdgeMap.RemoveAt(index);
 
         //Decrement edgemap set
@@ -164,19 +166,28 @@ public class Model
         }
 
         //Manage faces
-        int editCount = _faces.RemoveAll(x => x.Contains(uIndex));
+        _faces.RemoveAll(x => x.Contains(uIndex));
         _faces.ForEach(face => face.DecrementForIndex(index));
 
         //Manage edges
-        editCount += _edges.RemoveWhere(x => x.Contains(index));
+        _edges.RemoveWhere(x => x.Contains(index));
 
+
+        HashSet<Edge> overflowEdges = [];
         //Remap old edges by replacing them with new ones.
         foreach (Edge edge in _edges.Where(x => x.RequiresDecrement(index)).Select(x => x).ToArray())
         {
             _edges.Remove(edge);
             edge.DecrementForIndex(index);
-            _edges.Add(edge);
+
+            if(_edges.Contains(edge))
+                overflowEdges.Add(edge);
+            else
+                _edges.Add(edge);
         }
+        //Add edges we couldn't due to hash issues.
+        foreach (Edge edge in overflowEdges) _edges.Add(edge);
+
 
         _verticies.RemoveAt(index);
         UpdateAllComponents(info);
