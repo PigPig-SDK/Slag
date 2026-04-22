@@ -180,10 +180,8 @@ public class Model
             _edges.Remove(edge);
             edge.DecrementForIndex(index);
 
-            if(_edges.Contains(edge))
+            if(!_edges.Add(edge))
                 overflowEdges.Add(edge);
-            else
-                _edges.Add(edge);
         }
         //Add edges we couldn't due to hash issues.
         foreach (Edge edge in overflowEdges) _edges.Add(edge);
