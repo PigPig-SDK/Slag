@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using static Avalonia.OpenGL.GlConsts;
 using static UI.ViewModels.GlConstantsExtended;
 
@@ -25,13 +26,14 @@ public class GLComponent : ModelComponent, IRenderObject
     private int _edgeIndicesCount;
 
     private GlInterface? glInterface;
+    public bool IsDisposed { get; private set; }
 
     //Used for tools and such...
     public Color4? Color { get; set; } 
     public bool IsFullbright { get; set; }
     public bool UseTilemapRendering { get; set; }
 
-    public bool Hidden { get => Model.Hidden; set => Model.Hidden = value; }
+    public bool Hidden { get => Model.Hidden || IsDisposed; set => Model.Hidden = value; }
 
     public Matrix4 ModelMatrix { get => Model.GetModelMatrix(); }
     public bool Selected
@@ -231,7 +233,6 @@ public class GLComponent : ModelComponent, IRenderObject
     public void RenderModel(GlInterface gl, ShaderProgram program)
     {
         if (_triangleArrayObject == null) throw new InvalidOperationException($"Tried to render {nameof(_triangleArrayObject)} while its null");
-        
 
         program.SetColorUniform(gl, program.GetUniformLocation(gl, "color"), Color ?? new Color4(1, 1, 1, 1));
         gl.Uniform1i(program.GetUniformLocation(gl, "useColor"), (Color is null)? 0 : 1);
@@ -332,6 +333,7 @@ public class GLComponent : ModelComponent, IRenderObject
         _indicesBuffer = null;
         _vertexBufferObject = null;
         glInterface = null;
+        IsDisposed = true;
     }
 
     public void UnloadBuffers(GlInterface gl)
