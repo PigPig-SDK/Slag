@@ -89,14 +89,14 @@ public class Camera
         );
     }
 
-    public RaycastHit? FindRaycastHit(Vector2 screenLocation)
+    public RaycastHit? FindRaycastHit(Vector2 screenLocation, HierarchyType hierarchySelection = HierarchyType.Model)
     {
         double width = _glBase.Bounds.Width;
         double height = _glBase.Bounds.Height;
         float aspect = (float)(width / height);
         Vector2 screenSize = new Vector2((float)width, (float)height);
 
-        return Raycast.GetObjectHitScreenLocation(SceneHierarchy.Instance.GetModels(HierarchyType.Model), Origin, WorldUp, LookAt, aspect, FOV, screenLocation, screenSize);
+        return Raycast.GetObjectHitScreenLocation(SceneHierarchy.Instance.GetModels(hierarchySelection), Origin, WorldUp, LookAt, aspect, FOV, screenLocation, screenSize);
     }
 
     public void OnMouseDown(object? sender, PointerPressedEventArgs e)

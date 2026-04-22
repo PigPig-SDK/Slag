@@ -13,7 +13,7 @@ public class SelectionManager
 {
     public static SelectionManager Instance { get; } = new();
 
-    private SelectionMode _selectionMode = SelectionMode.Face;
+    private SelectionMode _selectionMode = SelectionMode.Mesh;
 
     public static SolidColorBrush SelectionColor => new (new Color(255, 255, 165, 0));
 
@@ -28,10 +28,16 @@ public class SelectionManager
     }
 
     public Model? CurrentModel { get; private set; }
+    private readonly List<Model> _currentBroadModels = [];
+    /// <summary>
+    /// Broad models are 'models selected not in object mode'
+    /// </summary>
+    public IReadOnlyList<Model> CurrentBroadModels => _currentBroadModels.AsReadOnly();
 
     private SelectionManager()
     {
         SceneHierarchy.Instance.OnModelRemoved += OnModelDeleted;
+        SceneHierarchy.Instance.SelectedSetReference = _currentBroadModels;
     }
 
     private void OnModelDeleted(HierarchyType hierarchyType, Model obj)
@@ -81,17 +87,37 @@ public class SelectionManager
             case SelectionMode.Edge:
                 CheckForEdgeSelection(screenPosition, isDrag);
                 break;
+            case SelectionMode.Mesh:
+                CheckForMeshSelection(screenPosition, isDrag);
+                break;
 
+        }
+    }
+
+    private void CheckForMeshSelection(Vector2 screenPosition, bool isDrag)
+    {
+        RaycastHit? hit = Camera.Instance.FindRaycastHit(screenPosition);
+        if (hit != null)
+        {
+            if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
+                _currentBroadModels.Clear();
+            _currentBroadModels.Add(hit.Model);
+            SelectModel(hit.Model);
+        }
+        else if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))
+        {
+            _currentBroadModels.Clear();
         }
     }
 
     private void CheckForVertexSelection(Vector2 screenPosition, bool isDrag)
     {
-        VertexHit? hit = Raycast.GetVertexHit(SceneHierarchy.Instance.GetModels(HierarchyType.Model), Camera.Instance.ScreenToGlCoords(screenPosition), Camera.Instance.ViewMatrix);
+        VertexHit? hit = Raycast.GetVertexHit(SceneHierarchy.Instance.GetModels(HierarchyType.Selected),
+            Camera.Instance.ScreenToGlCoords(screenPosition), Camera.Instance.ViewMatrix);
 
         if (hit != null)
         {
-            SelectModel(hit.Model);
+            if (hit.Model != CurrentModel) return;
             SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>() ?? throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
@@ -104,19 +130,20 @@ public class SelectionManager
         }
         else if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))
         {
-            ClearSelectedModel();
+            ClearSelection();
         }
     }
     private void CheckForEdgeSelection(Vector2 screenPosition, bool isDrag)
     {
         EdgeHit? hit = Raycast.GetEdgeHit(
-            SceneHierarchy.Instance.GetModels(HierarchyType.Model), 
+            SceneHierarchy.Instance.GetModels(HierarchyType.Selected), 
             Camera.Instance.ScreenToGlCoords(screenPosition), 
             Camera.Instance.ViewMatrix,
             Camera.Instance.Origin);
 
         if (hit != null)
         {
+            if (hit.Model != CurrentModel) return;
             SelectModel(hit.Model);
             SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>() ?? throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!"); ;
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
@@ -130,21 +157,20 @@ public class SelectionManager
         }
         else if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))
         {
-            ClearSelectedModel();
+            ClearSelection();
         }
     }
 
     private void CheckForFaceSelection(Vector2 screenPosition, bool isDrag)
     {
-        RaycastHit? hit = Camera.Instance.FindRaycastHit(screenPosition);
+        RaycastHit? hit = Camera.Instance.FindRaycastHit(screenPosition, HierarchyType.Selected);
         if (hit != null)
         {
-            SelectModel(hit.Model);
+            if (hit.Model != CurrentModel) return;
+
             SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>() ?? throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
-            {
                 ClearSelection();
-            }
 
             if (!ms.IsFaceSelected(hit.Face))
             {
@@ -157,7 +183,7 @@ public class SelectionManager
         }
         else if(!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))
         {
-            ClearSelectedModel();
+            ClearSelection();
         }
     }
     /// <summary>

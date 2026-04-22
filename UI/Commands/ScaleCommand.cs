@@ -44,12 +44,13 @@ public class ScaleCommand : ICommand
     private TextBlock? _textblock;
     private bool activeAxisOverride;
 
+    private Model _activeModel = null!;
+
     private CommandState Initialize()
     {
-        Model? activeModel = SelectionManager.Instance.CurrentModel;
-        if (activeModel == null) return CommandState.Discard;//Cannot execute command
+        _activeModel = SelectionManager.Instance.CurrentModel ?? throw new InvalidOperationException("_active model cannot be null!");
 
-        SelectionComponent? selection = activeModel.GetComponent<SelectionComponent>();
+        SelectionComponent? selection = _activeModel.GetComponent<SelectionComponent>();
         if (selection is null) return CommandState.Discard;
 
         _selectedIndices = [.. selection.GetSelection<uint>()];
@@ -60,7 +61,7 @@ public class ScaleCommand : ICommand
         int selectedCount = 0;
         foreach (uint index in selection.GetSelection<uint>())
         {
-            Vertex vert = activeModel.GetVertex(index);
+            Vertex vert = _activeModel.GetVertex(index);
             _startingPosition[index] = (vert.Position, (_selectionCenter - vert.Position).Normalized());
             selectedCount++;
         }
@@ -101,10 +102,9 @@ public class ScaleCommand : ICommand
     }
     private void Scale(float amount)
     {
-        Model? model = SelectionManager.Instance.CurrentModel ?? throw new InvalidOperationException("No current model in MoveCommand.MoveSelection");
         if (_selectedIndices == null) throw new InvalidOperationException($"No selection set {nameof(_selectedIndices)}!");
 
-        Vertex[] vertices = model.GetVertexBackingField();
+        Vertex[] vertices = _activeModel.GetVertexBackingField();
 
         foreach (uint index in _selectedIndices)
         {
@@ -112,7 +112,7 @@ public class ScaleCommand : ICommand
             vertices[index].Position = _selectionCenter + (offset * _activeAxis) * amount;
         }
 
-        model.UpdateAllComponents(UpdateType.Locational);
+        _activeModel.UpdateAllComponents(UpdateType.Locational);
     }
 
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)

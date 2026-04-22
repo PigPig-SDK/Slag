@@ -24,6 +24,9 @@ public class SceneHierarchy
 
     public event Action<HierarchyType, Model>? OnModelRemoved;
 
+    //Codesmell. TODO: Refactor selection to be held within core.
+    public List<Model>? SelectedSetReference;
+
     public void AddModel(HierarchyType hierarchyType, Model model)
     {
         model.HierarchyType = hierarchyType;
@@ -40,12 +43,27 @@ public class SceneHierarchy
 
     public IEnumerable<Model> GetModels(HierarchyType hierarchyType)
     {
+        HashSet<Model> printedModels = [];
+        
+        if (hierarchyType.HasFlag(HierarchyType.Selected) && SelectedSetReference is not null)
+        {
+            foreach(Model selectedMesh in SelectedSetReference)
+            {
+                printedModels.Add(selectedMesh);
+                yield return selectedMesh;
+            }
+
+            yield break;
+        }
+
         foreach(HierarchyType hierarchy in _hierarchyCategories.Keys)
         {
             if(hierarchyType.HasFlag(hierarchy))
             {
                 foreach(Model model in _hierarchyCategories[hierarchy])
                 {
+                    if (printedModels.Contains(model)) continue;//Already reported.
+
                     yield return model;
                 }
             }

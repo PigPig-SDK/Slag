@@ -3,6 +3,7 @@ using Core;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using static Avalonia.OpenGL.GlConsts;
 using static UI.ViewModels.GlConstantsExtended;
@@ -37,9 +38,11 @@ public class GLComponent : ModelComponent, IRenderObject
     { 
         get
         {
-            SelectionComponent selectionComponent = Model.GetComponent<SelectionComponent>()!;
-            if(selectionComponent.LastSelection is null) return false;
-            return true;
+            if (SelectionManager.Instance.CurrentModel == Model) return true;
+
+            if (SelectionManager.Instance.CurrentBroadModels.Contains(Model)) return true;
+
+            return false;
         }
     }
 
