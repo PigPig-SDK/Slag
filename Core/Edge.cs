@@ -1,4 +1,6 @@
-﻿namespace Core;
+﻿using OpenTK.Mathematics;
+
+namespace Core;
 
 /// <summary>
 /// A polygon edge
@@ -69,5 +71,18 @@ public class Edge : ICloneable
     public override string ToString()
     {
         return $"[{Vertex1},{Vertex2}]";
+    }
+    /// <summary>
+    /// Asumes a normal based on all faces that use this edge. 
+    /// </summary>
+    public Vector3 GetAssumedNormal()
+    {
+        Vector3 normal = Vector3.Zero;
+        foreach (Face face in Faces)
+        {
+            normal += face.GetNormal();
+        }
+
+        return normal.Normalized();
     }
 }

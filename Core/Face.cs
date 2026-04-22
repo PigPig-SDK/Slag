@@ -1,4 +1,6 @@
-﻿namespace Core;
+﻿using OpenTK.Mathematics;
+
+namespace Core;
 
 /// <summary>
 /// The ParentModel property is ignored in hashcode and Equals
@@ -84,5 +86,20 @@ public class Face : ICloneable
     public override string ToString()
     {
         return $"Indices : {string.Join(",", Indices)}\nEdges : {string.Join(",", Edges)}";
+    }
+
+    public Vector3 GetNormal()
+    {
+        if(ParentModel is null) return Vector3.Zero;
+
+        Vector3 normal = Vector3.Zero;
+        foreach(uint vertex in Indices)
+        {
+            if(ParentModel.GetVertex(vertex).Normal != Vector3.Zero)
+            {
+                normal += ParentModel.GetVertex(vertex).Normal;
+            }
+        }
+        return normal.Normalized();
     }
 }

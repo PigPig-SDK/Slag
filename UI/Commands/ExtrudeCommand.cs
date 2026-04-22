@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core;
+using OpenTK.Mathematics;
 
 
 namespace UI.Commands;
@@ -33,8 +34,9 @@ public class ExtrudeCommand : MementoCommand
         AddFaceBorders(selection, ref selectedIndices, ref edgeWhiteList);
 
         selectedIndices.AddRange(selection.SelectedIndices);
+        
 
-        Extrude(sm.CurrentModel, selectedIndices, edgeWhiteList, out Dictionary<uint, uint> cloneMap);
+        Extrude(sm.CurrentModel, selectedIndices, edgeWhiteList, selection.GetCenter(), out Dictionary<uint, uint> cloneMap);
 
         AdjustConnectedFaces(selection, sm.CurrentModel, cloneMap, edgeWhiteList);
 
@@ -133,7 +135,7 @@ public class ExtrudeCommand : MementoCommand
 
         return (a, b, c, d);
     }
-    public static void Extrude(Model model, HashSet<uint> selectedIndices, HashSet<Edge> edgeWhiteList, out Dictionary<uint, uint> cloneMapping) 
+    public static void Extrude(Model model, HashSet<uint> selectedIndices, HashSet<Edge> edgeWhiteList, Vector3 selectionOrigin, out Dictionary<uint, uint> cloneMapping) 
     {
         cloneMapping = [];
         HashSet<(uint, uint, uint, uint)> faceMap = [];
@@ -148,13 +150,14 @@ public class ExtrudeCommand : MementoCommand
                 cloneMapping.Add(index, cloneIndex);
             }
             model.AddEdge(new(index, cloneIndex), UpdateType.None);//Discards diplicates automatically
-            foreach(uint neighbor in model.VertexEdgeMap[(int)index].ToArray())
+            foreach (uint neighbor in model.VertexEdgeMap[(int)index].ToArray())
             {
                 //Ignore non selected edges
                 if (!selectedIndices.Contains(neighbor)) continue;
                 //Ignore edges that are not whitelisted.
-                if(!edgeWhiteList.Contains(new Edge(index,neighbor))) continue;
-
+                Edge hashEdge = new(index, neighbor);
+                if (!edgeWhiteList.TryGetValue(hashEdge, out Edge? edge)) continue;
+                
                 //Add clone if possible
                 if(!cloneMapping.TryGetValue(neighbor, out uint neighborCloneIndex))
                 {
@@ -167,11 +170,21 @@ public class ExtrudeCommand : MementoCommand
                 //Double check if face data exists before adding it.
                 if (faceMap.Add(sorted))
                 {
-                    //Check 'normal' of face if the normal is flipped, flip the order of the vertices to maintain consistency with the original mesh.
+                    Vector3 cloneLocation = model.GetVertex(cloneIndex).Position;
+                    Vector3 fakecloneLocation =(cloneLocation + (cloneLocation - selectionOrigin).Normalized() * 0.1f);//Nudge toward center.
+                    //Compute normal for new face
+                    Vector3 e1 = model.GetVertex(neighbor).Position - model.GetVertex(index).Position;
+                    Vector3 e2 = fakecloneLocation - model.GetVertex(index).Position;
 
+                    Vector3 newFaceNormalAssumed = Vector3.Cross(e1, e2).Normalized();
+                    Vector3 oldEdgeAssumedNormal = edge.GetAssumedNormal();
 
+                    float dotProduct = Vector3.Dot(newFaceNormalAssumed, oldEdgeAssumedNormal);
 
-                    model.AddFaceWithMembership(UpdateType.None, index, neighbor, neighborCloneIndex, cloneIndex);//Adds edges automatically.
+                    if(dotProduct > 0)
+                        model.AddFaceWithMembership(UpdateType.None, cloneIndex, neighborCloneIndex, neighbor, index);//Flipped
+                    else
+                        model.AddFaceWithMembership(UpdateType.None, index, neighbor, neighborCloneIndex, cloneIndex);//Not flipped
                 }
             }
         }
