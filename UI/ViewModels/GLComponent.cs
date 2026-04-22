@@ -38,8 +38,6 @@ public class GLComponent : ModelComponent, IRenderObject
     { 
         get
         {
-            if (SelectionManager.Instance.CurrentModel == Model) return true;
-
             if (SelectionManager.Instance.CurrentBroadModels.Contains(Model)) return true;
 
             return false;
