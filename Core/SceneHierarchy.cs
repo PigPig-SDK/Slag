@@ -17,8 +17,7 @@ public class SceneHierarchy
             ModelPrefabs.Plane(40, YPlaneName),
             ModelPrefabs.Plane(40, ZPlaneName)] },
         { HierarchyType.Tool, [
-            ModelPrefabs.AxisTriad(),
-            ModelPrefabs.SelectionInstance()]},
+            ModelPrefabs.AxisTriad()]},
     };
 
     public event Action<HierarchyType,Model>? OnModelAdded;

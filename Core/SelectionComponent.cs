@@ -36,11 +36,6 @@ public class SelectionComponent : ModelComponent
 
     public void DeselectAll(UpdateType updateInfo = UpdateType.Selection)
     {
-        foreach (Face face in _selectedFaces)
-        {
-            SelectionMeshInstance.Instance.DeselectFace(face);
-        }
-
         _selectedFaces.Clear();
         _selectedEdges.Clear();
         _selectedIndices.Clear();
@@ -119,7 +114,6 @@ public class SelectionComponent : ModelComponent
     {
         _selectedFaces.Remove(face);
         OnSelectionChanged?.Invoke(false, updateType);
-        SelectionMeshInstance.Instance.DeselectFace(face);
     }
     public void DeselectEdge(Edge edge, UpdateType updateType = UpdateType.Selection)
     {
@@ -132,7 +126,6 @@ public class SelectionComponent : ModelComponent
         _selectedFaces.Add(face);
         LastSelection = face;
         OnSelectionChanged?.Invoke(true, updateType);
-        SelectionMeshInstance.Instance.SelectFace(face);
     }
     /// <summary>
     /// Returns a selection of your desired type. Will translate between selection modes automatically.

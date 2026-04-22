@@ -341,12 +341,4 @@ public static partial class ModelPrefabs
 
         return triad;
     }
-
-    public static Model SelectionInstance()
-    {
-        Model selectionModel = new();
-        selectionModel.ObjectName = "SelectionInstance";
-        selectionModel.AddComponent<SelectionMeshInstance>(new SelectionMeshInstance());
-        return selectionModel;
-    }
 }
