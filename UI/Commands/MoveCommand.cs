@@ -37,14 +37,13 @@ public class MoveCommand : ICommand
     private Vector2 _moveDistance;
     private Vector3? _moveDirectionOverride;
     private Vector3 _selectionCenter = Vector3.Zero;
-    private Model _model = null!;//Null is allowed here.
+    private Model _model = null!;
 
     private CommandState Initialize()
     {
-        Model? activeModel = SelectionManager.Instance.CurrentModel;
-        if (activeModel == null) return CommandState.Discard;//Cannot execute command
+        _model = SelectionManager.Instance.CurrentModel!;
 
-        SelectionComponent? selection = activeModel.GetComponent<SelectionComponent>();
+        SelectionComponent? selection = _model.GetComponent<SelectionComponent>();
         if(selection is null) return CommandState.Discard;
 
         _selectionCenter = selection.GetCenter();
@@ -52,14 +51,9 @@ public class MoveCommand : ICommand
         _cameraMoveDirections = Camera.Instance.GetRealitiveDirections();
         _selectedIndices = [..selection.GetSelection<uint>()];
 
-
-
-        if (SelectionManager.Instance.CurrentModel is null) return CommandState.Discard;
-        _model = SelectionManager.Instance.CurrentModel;
-
         foreach (uint index in _selectedIndices)
         {
-            Vertex vert = activeModel.GetVertex(index);
+            Vertex vert = _model.GetVertex(index);
             _startingPosition[index] = vert.Position;
         }
 
@@ -104,7 +98,7 @@ public class MoveCommand : ICommand
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
         //No model, no command.
-        if (SelectionManager.Instance.CurrentModel == null) return CommandState.Finished;
+        if (SelectionManager.Instance.CurrentModel == null) return CommandState.Discard;
         //Initialization
         if (args.info.HasFlag(CommandInfo.Initialization)) return Initialize();
         //Block keyup inputs
