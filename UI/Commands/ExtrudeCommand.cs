@@ -41,13 +41,6 @@ public class ExtrudeCommand : MementoCommand
         //Finalize
         SelectionManager.Instance.ClearSelection();
 
-        //HashSet<object> selectionEnd = [];
-        //foreach (uint indexOut in cloneMap.Values)
-        //{
-        //    selectionEnd.Add(indexOut);
-        //}
-        //SelectionManager.Instance.SetSelection(selectionEnd);
-
         //Redisplay.
         sm.CurrentModel.UpdateAllComponents(UpdateType.Membership);
         sm.CurrentModel.UpdateAllComponents(UpdateType.Selection);
@@ -174,6 +167,10 @@ public class ExtrudeCommand : MementoCommand
                 //Double check if face data exists before adding it.
                 if (faceMap.Add(sorted))
                 {
+                    //Check 'normal' of face if the normal is flipped, flip the order of the vertices to maintain consistency with the original mesh.
+
+
+
                     model.AddFaceWithMembership(UpdateType.None, index, neighbor, neighborCloneIndex, cloneIndex);//Adds edges automatically.
                 }
             }
