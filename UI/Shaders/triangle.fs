@@ -16,6 +16,7 @@ in vec4 desiredColor;
 in vec4 envSpace;
 in vec2 uv;
 in vec3 posistionLocal;
+in float metaDataBlend;
 
 out vec4 FragColor;
 
@@ -47,12 +48,6 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 void main() 
 {
     vec4 matColor = desiredColor;
-
-    if(!gl_FrontFacing)
-    {
-        matColor = vec4(0.1f, 0.1f, 1.0f, 1.0f);
-    }
-
     //Lighting stage
     if(isFullbright) 
     {
@@ -60,6 +55,14 @@ void main()
     }
     else
     {
+        if(!gl_FrontFacing)
+        {
+            //Pink and black for backfacing.
+            vec2 checker = floor(gl_FragCoord.xy / 20.0);
+            float pattern = mod(checker.x + checker.y, 2.0);
+            matColor = mix(vec4(0.0, 0.0, 0.0, 0.1), vec4(1.0, 0.08, 0.58, 1.0), pattern);
+        }
+
         float shininess = 10000.0;
         vec4 baseColor = (matColor * 0.5 + 0.5);
 
@@ -70,6 +73,7 @@ void main()
         // --- Diffuse ---
         float diff = max(dot(N, L), 0.0);
         vec4 lightColor = vec4(0.972549019607843, 0.772549019607843, 0.545098039215686, 1.0);
+
         vec4 diffuse = diff * lightColor * baseColor; // apply base color
 
         // --- Specular ---
@@ -84,7 +88,15 @@ void main()
         float shadow = ShadowCalculation(envSpace); // 0.0 = in shadow, 1.0 = fully lit
 
         // --- Combine lighting ---
-        FragColor = ambient + (diffuse + specular) * shadow;
+
+        float blendPower = metaDataBlend * metaDataBlend;
+        blendPower = blendPower * blendPower; // 4th power for smoother transition
+
+        FragColor = mix(
+        ambient + (diffuse + specular) * shadow,
+        vec4(1.0, 0.647, 0.0, 1.0) + diffuse + ambient, 
+        min(blendPower,1.0));
+
         FragColor.a = 1.0;
     }
 

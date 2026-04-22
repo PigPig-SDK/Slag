@@ -19,6 +19,7 @@ out vec4 posistion;
 out vec3 posistionLocal;
 out vec4 envSpace;
 out vec2 uv;
+out float metaDataBlend;
 
 void main()
 {
@@ -35,7 +36,7 @@ void main()
         float colorDiff = 0.5;
         desiredColor = (normalize(vec4(dotProduct,dotProduct,dotProduct, 1.0)) * normalDotContribution) + vec4(normalize(offset) * colorDiff, 1.0);
     }
-    
+    metaDataBlend = metadata;
     normal = transpose(inverse(mat3(model_matrix))) * aNormal;
     posistion = model_matrix * vec4(aPos, 1.0);
     gl_Position = projection_matrix * view_matrix * posistion;
