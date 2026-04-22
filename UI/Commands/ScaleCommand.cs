@@ -36,8 +36,8 @@ public class ScaleCommand : ICommand
     private Vector2 _mouseScreenCenter = Vector2.Zero;
     private List<uint>? _selectedIndices;
 
-    private Dictionary<uint, (Vector3 position, Vector3 moveNormal)> _StartingPosition = [];
-    private float _ScaleValue;
+    private Dictionary<uint, (Vector3 position, Vector3 moveNormal)> _startingPosition = [];
+    private float _scaleValue;
 
     //UI stuff..
     private Line? _uiLine;
@@ -61,7 +61,7 @@ public class ScaleCommand : ICommand
         foreach (uint index in selection.GetSelection<uint>())
         {
             Vertex vert = activeModel.GetVertex(index);
-            _StartingPosition[index] = (vert.Position, (_selectionCenter - vert.Position).Normalized());
+            _startingPosition[index] = (vert.Position, (_selectionCenter - vert.Position).Normalized());
             selectedCount++;
         }
         //UI
@@ -99,7 +99,7 @@ public class ScaleCommand : ICommand
             _activeAxis = new Vector3(1, 1, 1);
         }
     }
-    private void Scale(float ammount)
+    private void Scale(float amount)
     {
         Model? model = SelectionManager.Instance.CurrentModel ?? throw new InvalidOperationException("No current model in MoveCommand.MoveSelection");
         if (_selectedIndices == null) throw new InvalidOperationException($"No selection set {nameof(_selectedIndices)}!");
@@ -108,8 +108,10 @@ public class ScaleCommand : ICommand
 
         foreach (uint index in _selectedIndices)
         {
-            vertices[index].Position = _StartingPosition[index].position + ((_StartingPosition[index].moveNormal* ammount) * _activeAxis);
+            Vector3 offset = _startingPosition[index].position - _selectionCenter;
+            vertices[index].Position = _selectionCenter + (offset * _activeAxis) * amount;
         }
+
         model.UpdateAllComponents(UpdateType.Locational);
     }
 
@@ -131,17 +133,17 @@ public class ScaleCommand : ICommand
                 _uiLine.EndPoint = new(mouseInfo.X, mouseInfo.Y);
 
             Vector2 mouseDelta = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y) - _mouseScreenCenter;
-            _ScaleValue = (250 - mouseDelta.Length) * _moveDistanceScale;
+            _scaleValue = mouseDelta.Length * _moveDistanceScale;
 
             if(_textblock is not null)
             {
                 Vector2 textPosition = _mouseScreenCenter + mouseDelta/2;
                 _textblock.IsVisible = true;
                 _textblock!.RenderTransform = new TranslateTransform(textPosition.X, textPosition.Y);
-                _textblock.Text = (_ScaleValue*-1).ToString("F2", CultureInfo.InvariantCulture);
+                _textblock.Text = (_scaleValue).ToString("F2", CultureInfo.InvariantCulture);
             }    
 
-            Scale(_ScaleValue);
+            Scale(_scaleValue);
             if (args.info.HasFlag(CommandInfo.MouseDown))//Accept.
             {
                 CleanUpUi();
@@ -193,7 +195,7 @@ public class ScaleCommand : ICommand
                 return CommandState.Idle;
             case Key.Escape:
                 {
-                    Scale(0.0f);
+                    Scale(1.0f);
                     CleanUpUi();
                     return CommandState.Finished;
                 }
@@ -214,10 +216,10 @@ public class ScaleCommand : ICommand
 
     public void Undo()
     {
-        Scale(0);
+        Scale(1.0f);
     }
     public void Redo()
     {
-        Scale(_ScaleValue);
+        Scale(_scaleValue);
     }
 }
