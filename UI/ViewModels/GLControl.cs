@@ -368,14 +368,12 @@ private void GenerateDefaultFrameBuffer(GlInterface gl)
                             }
                         case RenderMode.Edges:
                             {
-                                if(renderObject.Selected)
-                                    renderObject.RenderEdges(gl);
+                                renderObject.RenderEdges(gl);
                                 break;
                             }
                         case RenderMode.Verts:
                             {
-                                if (renderObject.Selected)
-                                    renderObject.RenderVertices(gl);
+                                renderObject.RenderVertices(gl);
                                 break;
                             }
                     }
