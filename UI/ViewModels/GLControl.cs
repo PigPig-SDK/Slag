@@ -180,31 +180,31 @@ public class GLControl : OpenGlControlBase
         gl.BindTexture(GL_TEXTURE_2D, _frameBufferTexture.Value);
         gl.TexImage2D(GL_TEXTURE_2D, 0, GlConstantsExtended.GL_RGBA, width, height, 0, GlConsts.GL_DEPTH_COMPONENT, GlConstantsExtended.GL_UNSIGNED_INT, IntPtr.Zero);
     }
-private void GenerateDefaultFrameBuffer(GlInterface gl)
-{
-    _defaultFrameBuffer = gl.GenFramebuffer();
-    gl.BindFramebuffer(GL_FRAMEBUFFER, _defaultFrameBuffer.Value);
+    private void GenerateDefaultFrameBuffer(GlInterface gl)
+    {
+        _defaultFrameBuffer = gl.GenFramebuffer();
+        gl.BindFramebuffer(GL_FRAMEBUFFER, _defaultFrameBuffer.Value);
 
-    // Color attachment — all three format args consistent
-    _frameBufferTexture = gl.GenTexture();
-    gl.BindTexture(GL_TEXTURE_2D, _frameBufferTexture.Value);
-    gl.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1024, 1024, 0, GL_RGBA, GL_UNSIGNED_BYTE, IntPtr.Zero);
-    gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    gl.FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                            GL_TEXTURE_2D, _frameBufferTexture.Value, 0);
+        // Color attachment — all three format args consistent
+        _frameBufferTexture = gl.GenTexture();
+        gl.BindTexture(GL_TEXTURE_2D, _frameBufferTexture.Value);
+        gl.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1024, 1024, 0, GL_RGBA, GL_UNSIGNED_BYTE, IntPtr.Zero);
+        gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        gl.FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                GL_TEXTURE_2D, _frameBufferTexture.Value, 0);
 
-    // Depth+stencil — same dimensions as color texture
-    _depthStencilRbo = gl.GenRenderbuffer();
-    gl.BindRenderbuffer(GL_RENDERBUFFER, _depthStencilRbo.Value);
-    gl.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1024, 1024);
-    gl.FramebufferRenderbuffer(GL_FRAMEBUFFER, GlConstantsExtended.GL_DEPTH_STENCIL_ATTACHMENT,
-                               GL_RENDERBUFFER, _depthStencilRbo.Value);
+        // Depth+stencil — same dimensions as color texture
+        _depthStencilRbo = gl.GenRenderbuffer();
+        gl.BindRenderbuffer(GL_RENDERBUFFER, _depthStencilRbo.Value);
+        gl.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1024, 1024);
+        gl.FramebufferRenderbuffer(GL_FRAMEBUFFER, GlConstantsExtended.GL_DEPTH_STENCIL_ATTACHMENT,
+                                   GL_RENDERBUFFER, _depthStencilRbo.Value);
 
-    var status = gl.CheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (status != GL_FRAMEBUFFER_COMPLETE)
-        throw new InvalidOperationException($"Default framebuffer incomplete: {status}");
-}
+        var status = gl.CheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (status != GL_FRAMEBUFFER_COMPLETE)
+            throw new InvalidOperationException($"Default framebuffer incomplete: {status}");
+    }
 
     void CheckAppendingModels(GlInterface gl)
     {
