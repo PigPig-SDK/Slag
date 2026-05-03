@@ -18,7 +18,7 @@ internal class DeleteCommand : MementoCommand
     public override string IconSource => "./Assets/edge.png";
 
     public override bool DisplayToolText => false;
-
+    public override bool AllowInMeshMode => true;
     public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
         CreateState();

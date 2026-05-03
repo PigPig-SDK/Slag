@@ -19,8 +19,10 @@ public class FlipCommand : ICommand
     public string Description => "Flips selected faces";
 
     public bool DisplayToolText => false;
-
+    
     public string IconSource => "avares://Slag/Assets/icons/flip.png";
+
+    public bool AllowInMeshMode => false;
 
     private HashSet<Face> _faces = [];
     private Model? _currentModel;

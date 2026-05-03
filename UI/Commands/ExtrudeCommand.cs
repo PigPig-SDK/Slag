@@ -18,7 +18,7 @@ public class ExtrudeCommand : MementoCommand
     public override bool DisplayToolText => false;
 
     public override string IconSource => "avares://Slag/Assets/icons/extrude.png";
-
+    public override bool AllowInMeshMode => false;
     public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
         SelectionManager sm = SelectionManager.Instance;

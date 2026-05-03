@@ -22,6 +22,7 @@ public abstract class MementoCommand : ICommand
     public Model? Model { get; set; }
 
     public abstract string IconSource {get;}
+    public abstract bool AllowInMeshMode { get; }
 
     protected void CreateState()
     {

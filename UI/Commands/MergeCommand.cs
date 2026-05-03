@@ -18,6 +18,8 @@ public class MergeCommand : MementoCommand
 
     public override string IconSource => "avares://Slag/Assets/icons/merge.png";
 
+    public override bool AllowInMeshMode => false;
+
     public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
         if (SelectionManager.Instance.CurrentModel is null) return CommandState.Discard;

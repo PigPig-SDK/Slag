@@ -30,6 +30,8 @@ public class ScaleCommand : ICommand
 
     public bool DisplayToolText => true;
 
+    public bool AllowInMeshMode => true;
+
     private const float _moveDistanceScale = 0.005f;
     private Vector3 _selectionCenter = new(0, 0, 0);
     private Vector3 _activeAxis = new(1, 1, 1);

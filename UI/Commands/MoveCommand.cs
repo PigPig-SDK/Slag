@@ -26,6 +26,8 @@ public class MoveCommand : ICommand
 
     public string IconSource => "avares://Slag/Assets/icons/move.png";
 
+    public bool AllowInMeshMode => true;
+
     private const float _moveDistanceScale = 0.01f;
     private (Vector3 realitiveRight, Vector3 realitiveUp) _cameraMoveDirections;
     private Vector2? _mouseStartPos;
@@ -35,28 +37,43 @@ public class MoveCommand : ICommand
     private Dictionary<uint, Vector3> _startingPosition = [];
     private List<uint> _selectedIndices = [];
     private Vector2 _moveDistance;
-    private Vector3? _moveDirectionOverride;
     private Vector3 _selectionCenter = Vector3.Zero;
     private Model _model = null!;
 
+    private List<Model> _models = [];
+    private Dictionary<Model, Vector3> _modelsStartingPosition = [];
+    private bool _isModelMove;
     private CommandState Initialize()
     {
-        _model = SelectionManager.Instance.CurrentModel!;
-
-        SelectionComponent? selection = _model.GetComponent<SelectionComponent>();
-        if(selection is null) return CommandState.Discard;
-
-        _selectionCenter = selection.GetCenter();
-
+        _isModelMove = SelectionManager.Instance.CurrentSelectionMode == SelectionMode.Mesh;
         _cameraMoveDirections = Camera.Instance.GetRealitiveDirections();
-        _selectedIndices = [..selection.GetSelection<uint>()];
 
-        foreach (uint index in _selectedIndices)
+        if (_isModelMove == false)
         {
-            Vertex vert = _model.GetVertex(index);
-            _startingPosition[index] = vert.Position;
-        }
+            //No model, no command.
+            if (SelectionManager.Instance.CurrentModel == null) return CommandState.Discard;
 
+            _model = SelectionManager.Instance.CurrentModel!;
+            SelectionComponent? selection = _model.GetComponent<SelectionComponent>();
+            if (selection is null) return CommandState.Discard;
+
+            _selectionCenter = selection.GetCenter();
+            _selectedIndices = [.. selection.GetSelection<uint>()];
+
+            foreach (uint index in _selectedIndices)
+            {
+                Vertex vert = _model.GetVertex(index);
+                _startingPosition[index] = vert.Position;
+            }
+        }
+        else
+        {
+            _models = [.. SelectionManager.Instance.CurrentBroadModels];
+            foreach (Model model in _models)
+            {
+                _modelsStartingPosition.Add(model, model.Position);
+            }
+        }
         return CommandState.Idle;//Continue the command.
     }
 
@@ -71,34 +88,37 @@ public class MoveCommand : ICommand
 
     private void MoveSelection(Vector2 mouseDelta)
     {
-        Vertex[] vertices = _model.GetVertexBackingField();
-
         Vector3 moveDirection = (_cameraMoveDirections.realitiveRight * mouseDelta.X) + (_cameraMoveDirections.realitiveUp * mouseDelta.Y);
         moveDirection *= _moveDistanceScale;
 
-        if(_moveDirectionOverride is not null)
+        if (_isModelMove)
         {
-            moveDirection = _moveDirectionOverride.Value;
+            foreach (Model model in _models)
+            {
+                model.Position = _modelsStartingPosition[model] + (moveDirection * _activeAxis);
+            }
         }
-
-        foreach (uint index in _selectedIndices)
+        else//Move interior of mesh
         {
-            vertices[index].Position = (_startingPosition[index] + (moveDirection * _activeAxis));
+            Vertex[] vertices = _model.GetVertexBackingField();
+
+            foreach (uint index in _selectedIndices)
+            {
+                vertices[index].Position = (_startingPosition[index] + (moveDirection * _activeAxis));
+            }
+
+            Vector3 visualizerPosition = _selectionCenter + (moveDirection * _activeAxis);
+
+            EditVisualizers.Instance.AxisVisualizerY.Position = visualizerPosition * new Vector3(0, 1, 0);
+            EditVisualizers.Instance.AxisVisualizerX.Position = visualizerPosition * new Vector3(0, 0, 1);
+            EditVisualizers.Instance.AxisVisualizerZ.Position = visualizerPosition * new Vector3(1, 0, 0);
+
+            _model.UpdateAllComponents(UpdateType.Locational);
         }
-
-        Vector3 visualizerPosition = _selectionCenter + (moveDirection * _activeAxis);
-
-        EditVisualizers.Instance.AxisVisualizerY.Position = visualizerPosition * new Vector3(0,1,0);
-        EditVisualizers.Instance.AxisVisualizerX.Position = visualizerPosition * new Vector3(0,0,1);
-        EditVisualizers.Instance.AxisVisualizerZ.Position = visualizerPosition * new Vector3(1,0,0);
-
-        _model.UpdateAllComponents(UpdateType.Locational);
     }
 
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
-        //No model, no command.
-        if (SelectionManager.Instance.CurrentModel == null) return CommandState.Discard;
         //Initialization
         if (args.info.HasFlag(CommandInfo.Initialization)) return Initialize();
         //Block keyup inputs
@@ -111,17 +131,6 @@ public class MoveCommand : ICommand
             Vector2 mousePos = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y);
             _mouseStartPos ??= mousePos;
             _moveDistance = mousePos - _mouseStartPos.Value;
-
-            if(args.mouseEvent.KeyModifiers.HasFlag(KeyModifiers.Shift))
-            {
-                RaycastHit? output = Camera.Instance.FindRaycastHit(mousePos);
-                if(output is not null)
-                    _moveDirectionOverride = output.HitPoint;
-            }
-            else
-            {
-                _moveDirectionOverride = null;
-            }
 
             MoveSelection(_moveDistance);
 

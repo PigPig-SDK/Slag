@@ -19,6 +19,7 @@ public interface ICommand
     public string Description { get; }
 
     public bool DisplayToolText { get; }
+    public bool AllowInMeshMode { get; }
 
     public string IconSource { get; }
 

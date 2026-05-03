@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using Core;
+using UI.ViewModels;
 
 namespace UI.Commands;
 
@@ -36,6 +37,7 @@ public class CommandInvoker
     {
         if(CurrentCommand == null)
             return false;
+
         CommandState commandState = CurrentCommand.Execute(args);
 
         if (commandState == CommandState.Discard)
@@ -45,7 +47,8 @@ public class CommandInvoker
             return true;
         }
 
-        if (commandState != CommandState.Idle)
+        if (commandState != CommandState.Idle ||
+            !CurrentCommand.AllowInMeshMode && SelectionManager.Instance.CurrentSelectionMode == SelectionMode.Mesh)
         {
             _undoQueue.Push(CurrentCommand);
             _redoQueue.Clear();

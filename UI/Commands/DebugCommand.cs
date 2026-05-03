@@ -23,6 +23,8 @@ public class DebugCommand : ICommand
 
     public bool DisplayToolText => true;
 
+    public bool AllowInMeshMode => false;
+
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
 

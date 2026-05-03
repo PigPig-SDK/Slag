@@ -31,6 +31,8 @@ public class RotateCommand : ICommand
 
     public bool DisplayToolText => true;
 
+    public bool AllowInMeshMode => true;
+
     private Vector2? _mouseStart;
     private Dictionary<uint, Vector4> _startingPosition = [];
     private float _totalRotation;
