@@ -73,7 +73,7 @@ public class Model
     {
         uint index = (uint)_verticies.Count;
         _verticies.Add(vertex);
-        _vertexEdgeMap.Add(new());
+        _vertexEdgeMap.Add([]);
         UpdateAllComponents(updateType);
         return index;
     }
@@ -226,7 +226,7 @@ public class Model
         {
             face.Triangulate(ref indices);
         }
-        Indices = indices.ToArray();
+        Indices = [.. indices];
     }
 
     public uint[] GetEdgeIndices()
@@ -264,7 +264,7 @@ public class Model
 
     public Vector3 TransformPointByModelMatrix(Vector3 point)
     {
-        Vector4 point4d = new Vector4(point, 1.0f);
+        Vector4 point4d = new(point, 1.0f);
         point4d = GetModelMatrix() * point4d;
         return point4d.Xyz;
     }
@@ -338,7 +338,7 @@ public class Model
     {
         verts = _verticies.BackingField();
         GenerateIndices();
-        indices = new (Indices);
+        indices = [.. Indices];
     }
 
     ~Model() => Dispose();
@@ -395,7 +395,7 @@ public class Model
     public Vector3 ComputeCenterWorldSpace()
     {
         var translated = new Vector4(ComputeCenter(), 1.0f);
-        translated = translated * GetModelMatrix();
+        translated *= GetModelMatrix();
         return translated.Xyz;
     }
 }

@@ -4,19 +4,20 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Media;
 using Core;
-using UI.ViewModels;
-using UI.Views;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using UI.ViewModels;
+using UI.Views;
 
 namespace UI.Commands;
 
 public class RotateCommand : ICommand
 {
     public ICommand? Next { get; set; }
-    private Vector3 _selectionCenter { get; set; }
+    private Vector3 SelectionCenter { get; set; }
 
     public string Name => "Rotate";
     public override string ToString() => Name;
@@ -33,7 +34,7 @@ public class RotateCommand : ICommand
     public bool AllowInMeshMode => true;
 
     private Vector2? _mouseStart;
-    private Dictionary<uint, Vector4> _startingPosition = [];
+    private readonly Dictionary<uint, Vector4> _startingPosition = [];
     private float _totalRotation;
     private float? _initialRotation;
     private Model? _model;
@@ -41,7 +42,7 @@ public class RotateCommand : ICommand
     private Vector3 _rotationUp;
     private Vector3 _rotationRight;
 
-    private float _uiRadius = 200;
+    private readonly float _uiRadius = 200;
 
     private Line? _initialLine;
     private Line? _dynamicLine;
@@ -51,7 +52,7 @@ public class RotateCommand : ICommand
 
     private bool _isModelMove;
     private List<Model> _models = [];
-    private Dictionary<Model, Matrix4> _modelsStartingTranslation = [];
+    private readonly Dictionary<Model, Matrix4> _modelsStartingTranslation = [];
 
 
     private CommandState Initialize()
@@ -70,31 +71,31 @@ public class RotateCommand : ICommand
             SelectionComponent? selection = _model.GetComponent<SelectionComponent>();
             if (selection is null) return CommandState.Discard;
 
-            _selectionCenter = selection.GetCenter();
+            SelectionCenter = selection.GetCenter();
 
             int selectedCount = 0;
             foreach (uint index in selection.GetSelection<uint>())
             {
                 Vertex vert = _model.GetVertex(index);
-                _startingPosition[index] = new Vector4(vert.Position.X - _selectionCenter.X, vert.Position.Y - _selectionCenter.Y, vert.Position.Z - _selectionCenter.Z, 1.0f);
+                _startingPosition[index] = new Vector4(vert.Position.X - SelectionCenter.X, vert.Position.Y - SelectionCenter.Y, vert.Position.Z - SelectionCenter.Z, 1.0f);
                 selectedCount++;
             }
         }
         else
         {
             _models = [.. SelectionManager.Instance.CurrentBroadModels];
-            _selectionCenter = new Vector3(0, 0, 0);
+            SelectionCenter = new Vector3(0, 0, 0);
             foreach(Model model in _models)
             {
-                _selectionCenter += model.ComputeCenterWorldSpace();
+                SelectionCenter += model.ComputeCenterWorldSpace();
             }
-            _selectionCenter /= _models.Count;
+            SelectionCenter /= _models.Count;
             
             foreach (Model model in _models)
             {
                 var modelMatrix = model.GetModelMatrix();
                 modelMatrix = modelMatrix.ClearTranslation();
-                modelMatrix = Matrix4.CreateTranslation(model.Position - _selectionCenter) * modelMatrix;
+                modelMatrix = Matrix4.CreateTranslation(model.Position - SelectionCenter) * modelMatrix;
                 _modelsStartingTranslation.Add(model, modelMatrix);
             }
         }
@@ -126,7 +127,7 @@ public class RotateCommand : ICommand
                 Stroke = SelectionManager.SelectionColor,
                 StrokeThickness = 2,
                 Fill = Brushes.Transparent,
-                StrokeDashArray = new AvaloniaList<double> { 4, 4 },
+                StrokeDashArray = [4, 4],
                 IsVisible = false,
             };
 
@@ -263,9 +264,9 @@ public class RotateCommand : ICommand
             foreach(Model model in _models)
             {
                 Matrix4 locationData = _modelsStartingTranslation[model];
-                locationData = locationData * rotationMatrix;
+                locationData *= rotationMatrix;
 
-                model.Position = _selectionCenter + locationData.ExtractTranslation();
+                model.Position = SelectionCenter + locationData.ExtractTranslation();
                 model.Rotation = locationData.ExtractRotation().ToEulerAngles();
             }
         }
@@ -276,7 +277,7 @@ public class RotateCommand : ICommand
 
             foreach (var pair in _startingPosition)
             {
-                vertices[pair.Key].Position = _selectionCenter + (pair.Value * rotationMatrix).Xyz;
+                vertices[pair.Key].Position = SelectionCenter + (pair.Value * rotationMatrix).Xyz;
             }
             _model.UpdateAllComponents(UpdateType.Locational);
         }

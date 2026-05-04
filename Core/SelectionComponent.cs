@@ -1,19 +1,16 @@
-﻿using Core;
-using OpenTK.Mathematics;
-using System.Linq;
-using System.Collections.Generic;
+﻿using OpenTK.Mathematics;
 
-namespace UI.ViewModels;
+namespace Core;
 
 public class SelectionComponent : ModelComponent
 {
-    private SortedSet<uint> _selectedIndices = [];
+    private readonly SortedSet<uint> _selectedIndices = [];
     public IReadOnlySet<uint> SelectedIndices => _selectedIndices; 
 
-    private HashSet<Face> _selectedFaces = [];
+    private readonly HashSet<Face> _selectedFaces = [];
     public IReadOnlySet<Face> SelectedFaces => _selectedFaces;
 
-    private HashSet<Edge> _selectedEdges = [];
+    private readonly HashSet<Edge> _selectedEdges = [];
     public IReadOnlySet<Edge> SelectedEdges => _selectedEdges;
 
     public object? LastSelection { get; private set; }

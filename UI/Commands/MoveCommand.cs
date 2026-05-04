@@ -34,14 +34,14 @@ public class MoveCommand : ICommand
     private bool _activeAxisOverride;
     private Vector3 _activeAxis = new(1, 1, 1);
 
-    private Dictionary<uint, Vector3> _startingPosition = [];
+    private readonly Dictionary<uint, Vector3> _startingPosition = [];
     private List<uint> _selectedIndices = [];
     private Vector2 _moveDistance;
     private Vector3 _selectionCenter = Vector3.Zero;
     private Model _model = null!;
 
     private List<Model> _models = [];
-    private Dictionary<Model, Vector3> _modelsStartingPosition = [];
+    private readonly Dictionary<Model, Vector3> _modelsStartingPosition = [];
     private bool _isModelMove;
     private CommandState Initialize()
     {
@@ -91,6 +91,8 @@ public class MoveCommand : ICommand
         Vector3 moveDirection = (_cameraMoveDirections.realitiveRight * mouseDelta.X) + (_cameraMoveDirections.realitiveUp * mouseDelta.Y);
         moveDirection *= _moveDistanceScale;
 
+
+
         if (_isModelMove)
         {
             foreach (Model model in _models)
@@ -101,8 +103,7 @@ public class MoveCommand : ICommand
         else//Move interior of mesh
         {
             moveDirection *= _activeAxis;
-
-            Vector4 moveDir4 = new Vector4(moveDirection, 1.0f);
+            Vector4 moveDir4 = new(moveDirection, 1.0f);
             var modelMatrix = _model.GetRotationMatrix();
             moveDir4 = modelMatrix * moveDir4;
             moveDir4 /= moveDir4.W;
@@ -136,7 +137,7 @@ public class MoveCommand : ICommand
         if ((args.info & CommandInfo.MouseEvent) != 0)
         {
             var mouseInfo = args.mouseEvent!.GetPosition(GLControl.Instance);
-            Vector2 mousePos = new Vector2((float)mouseInfo.X, (float)mouseInfo.Y);
+            Vector2 mousePos = new((float)mouseInfo.X, (float)mouseInfo.Y);
             _mouseStartPos ??= mousePos;
             _moveDistance = mousePos - _mouseStartPos.Value;
 

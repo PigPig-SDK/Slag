@@ -187,7 +187,7 @@ public class GLComponent : ModelComponent, IRenderObject
         //Recalculates the model to account for 'sharp' edges
         //ComputeSmoothing(ref indicesList);
 
-        uint[] indices = indicesList.ToArray();
+        uint[] indices = [.. indicesList];
 
         //Manage edges
         ComputeNormals(verts, indices);
@@ -221,8 +221,7 @@ public class GLComponent : ModelComponent, IRenderObject
     {
         if (!model.HasComponent(typeof(GLComponent)))
         {
-            GLComponent? glComponent = model.AddComponent<GLComponent>(new GLComponent()) as GLComponent;
-            if (glComponent == null) return false;
+            if (model.AddComponent<GLComponent>(new GLComponent()) is not GLComponent glComponent) return false;
             glComponent.GenerateBuffers(gl);
             OnBoundToModel?.Invoke(glComponent);
         }
