@@ -100,14 +100,22 @@ public class MoveCommand : ICommand
         }
         else//Move interior of mesh
         {
+            moveDirection *= _activeAxis;
+
+            Vector4 moveDir4 = new Vector4(moveDirection, 1.0f);
+            var modelMatrix = _model.GetRotationMatrix();
+            moveDir4 = modelMatrix * moveDir4;
+            moveDir4 /= moveDir4.W;
+            moveDirection = moveDir4.Xyz;
+
             Vertex[] vertices = _model.GetVertexBackingField();
 
             foreach (uint index in _selectedIndices)
             {
-                vertices[index].Position = (_startingPosition[index] + (moveDirection * _activeAxis));
+                vertices[index].Position = _startingPosition[index] + moveDirection;
             }
 
-            Vector3 visualizerPosition = _selectionCenter + (moveDirection * _activeAxis);
+            Vector3 visualizerPosition = _selectionCenter + moveDirection;
 
             EditVisualizers.Instance.AxisVisualizerY.Position = visualizerPosition * new Vector3(0, 1, 0);
             EditVisualizers.Instance.AxisVisualizerX.Position = visualizerPosition * new Vector3(0, 0, 1);
