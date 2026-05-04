@@ -30,7 +30,6 @@ public class RotateCommand : ICommand
         "[ESC] : Decline changes";
 
     public bool DisplayToolText => true;
-
     public bool AllowInMeshMode => true;
 
     private Vector2? _mouseStart;
@@ -39,8 +38,6 @@ public class RotateCommand : ICommand
     private float? _initialRotation;
     private Model? _model;
     
-    private Vector3 _cameraRotationRight = Vector3.Zero;
-    private Vector3 _cameraRotationUp = Vector3.Zero;
     private Vector3 _rotationUp;
     private Vector3 _rotationRight;
 
@@ -51,10 +48,106 @@ public class RotateCommand : ICommand
     private Ellipse? _outlineElipse;
     private TextBlock? _textblock;
 
+
+    private bool _isModelMove;
+    private List<Model> _models = [];
+    private Dictionary<Model, Matrix4> _modelsStartingTranslation = [];
+
+
+    private CommandState Initialize()
+    {
+        _isModelMove = SelectionManager.Instance.CurrentSelectionMode == ViewModels.SelectionMode.Mesh;
+        //Read camera rotation vector
+        var directions = Camera.Instance.GetRealitiveDirections();
+        _rotationRight = directions.realitiveRight.Normalized();
+        _rotationUp = directions.realitiveUp.Normalized();
+
+        if (_isModelMove == false)
+        {
+            if (SelectionManager.Instance.CurrentModel == null) return CommandState.Discard;
+            _model = SelectionManager.Instance.CurrentModel;
+
+            SelectionComponent? selection = _model.GetComponent<SelectionComponent>();
+            if (selection is null) return CommandState.Discard;
+
+            _selectionCenter = selection.GetCenter();
+
+            int selectedCount = 0;
+            foreach (uint index in selection.GetSelection<uint>())
+            {
+                Vertex vert = _model.GetVertex(index);
+                _startingPosition[index] = new Vector4(vert.Position.X - _selectionCenter.X, vert.Position.Y - _selectionCenter.Y, vert.Position.Z - _selectionCenter.Z, 1.0f);
+                selectedCount++;
+            }
+        }
+        else
+        {
+            _models = [.. SelectionManager.Instance.CurrentBroadModels];
+            _selectionCenter = new Vector3(0, 0, 0);
+            foreach(Model model in _models)
+            {
+                _selectionCenter += model.ComputeCenterWorldSpace();
+            }
+            _selectionCenter /= _models.Count;
+            
+            foreach (Model model in _models)
+            {
+                var modelMatrix = model.GetModelMatrix();
+                modelMatrix = modelMatrix.ClearTranslation();
+                modelMatrix = Matrix4.CreateTranslation(model.Position - _selectionCenter) * modelMatrix;
+                _modelsStartingTranslation.Add(model, modelMatrix);
+            }
+        }
+
+        //UI
+        if (MainWindow.Instance != null)
+        {
+            _initialLine = new()
+            {
+                StartPoint = new(0, 0),
+                EndPoint = new(0, 0),
+                Stroke = SelectionManager.SelectionColor,
+                StrokeThickness = 2,
+                StrokeDashArray = [4, 4],
+                IsVisible = false
+            };
+            _dynamicLine = new()
+            {
+                StartPoint = new(0, 0),
+                EndPoint = new(0, 0),
+                Stroke = SelectionManager.SelectionColor,
+                StrokeThickness = 3,
+                IsVisible = false
+            };
+            _outlineElipse = new Ellipse
+            {
+                Width = _uiRadius,
+                Height = _uiRadius,
+                Stroke = SelectionManager.SelectionColor,
+                StrokeThickness = 2,
+                Fill = Brushes.Transparent,
+                StrokeDashArray = new AvaloniaList<double> { 4, 4 },
+                IsVisible = false,
+            };
+
+            _textblock = new()
+            {
+                Text = "",
+                Foreground = SelectionManager.SelectionColor,
+                FontSize = 14,
+                IsVisible = false,
+            };
+
+            Canvas canvas = MainWindow.Instance.OverlayCanvas;
+            canvas.Children.Add(_initialLine);
+            canvas.Children.Add(_outlineElipse);
+            canvas.Children.Add(_dynamicLine);
+            canvas.Children.Add(_textblock);
+        }
+        return CommandState.Idle;//Continue the command.
+    }
     public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
-        if (SelectionManager.Instance.CurrentModel == null) return CommandState.Discard;
-        
         if(args.info.HasFlag(CommandInfo.Initialization)) return Initialize();
 
         //Is a mouse input
@@ -163,89 +256,30 @@ public class RotateCommand : ICommand
     }
     private void Rotate(float rotationAmmount)
     {
-        if(_model == null) return;
-
         Vector3 normal = Vector3.Cross(_rotationRight, _rotationUp);
-
-        Matrix4 rotationMatrix =  Matrix4.CreateFromAxisAngle(normal, rotationAmmount);
-        Vertex[] vertices = _model.GetVertexBackingField();
-
-        foreach (var pair in _startingPosition)
+        Matrix4 rotationMatrix = Matrix4.CreateFromAxisAngle(normal, rotationAmmount);
+        if (_isModelMove)
         {
-            vertices[pair.Key].Position = _selectionCenter + (pair.Value * rotationMatrix).Xyz;
+            foreach(Model model in _models)
+            {
+                Matrix4 locationData = _modelsStartingTranslation[model];
+                locationData = locationData * rotationMatrix;
+
+                model.Position = _selectionCenter + locationData.ExtractTranslation();
+                model.Rotation = locationData.ExtractRotation().ToEulerAngles();
+            }
         }
-        _model.UpdateAllComponents(UpdateType.Locational);
-    }
-
-    private CommandState Initialize()
-    {
-        _model = SelectionManager.Instance.CurrentModel;
-        if (_model == null) return CommandState.Discard;//Cannot execute command
-
-        SelectionComponent? selection = _model.GetComponent<SelectionComponent>();
-        if (selection is null) return CommandState.Discard;
-
-        _selectionCenter = selection.GetCenter();
-        
-        int selectedCount = 0;
-        foreach (uint index in selection.GetSelection<uint>())
+        else
         {
-            Vertex vert = _model.GetVertex(index);
-            _startingPosition[index] = new Vector4(vert.Position.X - _selectionCenter.X, vert.Position.Y - _selectionCenter.Y, vert.Position.Z - _selectionCenter.Z, 1.0f);
-            selectedCount++;
+            if (_model == null) return;
+            Vertex[] vertices = _model.GetVertexBackingField();
+
+            foreach (var pair in _startingPosition)
+            {
+                vertices[pair.Key].Position = _selectionCenter + (pair.Value * rotationMatrix).Xyz;
+            }
+            _model.UpdateAllComponents(UpdateType.Locational);
         }
-
-        //Read camera rotation vector
-        var directions = Camera.Instance.GetRealitiveDirections();
-        _rotationRight = _cameraRotationRight = directions.realitiveRight.Normalized();
-        _rotationUp = _cameraRotationUp = directions.realitiveUp.Normalized();
-
-        //UI
-        if (MainWindow.Instance != null)
-        {
-            _initialLine = new()
-            {
-                StartPoint = new(0, 0),
-                EndPoint = new(0, 0),
-                Stroke = SelectionManager.SelectionColor,
-                StrokeThickness = 2,
-                StrokeDashArray = [4, 4],
-                IsVisible = false
-            };
-            _dynamicLine = new()
-            {
-                StartPoint = new(0, 0),
-                EndPoint = new(0, 0),
-                Stroke = SelectionManager.SelectionColor,
-                StrokeThickness = 3,
-                IsVisible = false
-            };
-            _outlineElipse = new Ellipse
-            {
-                Width = _uiRadius,
-                Height = _uiRadius,
-                Stroke = SelectionManager.SelectionColor,
-                StrokeThickness = 2,
-                Fill = Brushes.Transparent,
-                StrokeDashArray = new AvaloniaList<double> { 4, 4 },
-                IsVisible = false,
-            };
-
-            _textblock = new()
-            {
-                Text = "",
-                Foreground = SelectionManager.SelectionColor,
-                FontSize = 14,
-                IsVisible=false,
-            };
-
-            Canvas canvas = MainWindow.Instance.OverlayCanvas;
-            canvas.Children.Add(_initialLine);
-            canvas.Children.Add(_outlineElipse);
-            canvas.Children.Add(_dynamicLine);
-            canvas.Children.Add(_textblock);
-        }
-        return CommandState.Idle;//Continue the command.
     }
 
     public void Redo()

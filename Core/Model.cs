@@ -252,7 +252,9 @@ public class Model
     public Matrix4 GetScaleMatrix() => Matrix4.CreateScale(Scale);
 
     public Matrix4 GetTranslationMatrix() => Matrix4.CreateTranslation(Position);
-
+    /// <summary>
+    /// The models Scale,Rotation,Position matrix
+    /// </summary>
     public Matrix4 GetModelMatrix()
     {
         return GetScaleMatrix()
@@ -380,5 +382,20 @@ public class Model
 
         GenerateIndices();
         UpdateAllComponents(UpdateType.Membership);
+    }
+    public Vector3 ComputeCenter()
+    {
+        Vector3 center = new(0);
+        foreach(Vertex vertex in Verticies)
+        {
+            center += vertex.Position;
+        }
+        return center / Verticies.Count;
+    }
+    public Vector3 ComputeCenterWorldSpace()
+    {
+        var translated = new Vector4(ComputeCenter(), 1.0f);
+        translated = translated * GetModelMatrix();
+        return translated.Xyz;
     }
 }
