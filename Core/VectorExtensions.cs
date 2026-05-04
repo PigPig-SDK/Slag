@@ -8,7 +8,7 @@ public static class VectorExtensions
     {
         return MathF.Round(value / step) * step;
     }
-    public static void Snap(this Vector3 vector, float step)
+    public static void Snap(this ref Vector3 vector, float step)
     {
         vector.X = Snap(vector.X, step);
         vector.Y = Snap(vector.Y, step);
