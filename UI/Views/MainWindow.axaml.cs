@@ -197,4 +197,8 @@ public partial class MainWindow : Window
     {
         CommandInvoker.Singleton?.ExecuteRedo();
     }
+    private void GridSizeChanged(object? sender, NumericUpDownValueChangedEventArgs e)
+    {
+        SelectionManager.Instance.SnapValue = (float?)e.NewValue ?? 0;
+    }
 }

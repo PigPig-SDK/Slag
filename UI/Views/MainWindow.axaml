@@ -129,30 +129,52 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-
-                    <ComboBox Grid.Row="0" Grid.Column="0" Width="120"
-                              SelectedIndex="0"
-                              CornerRadius="10"
-                              SelectionChanged="OnRendermodeChanged"
-                              Focusable="False">
-                        <ComboBoxItem Content="All"/>
-                        <ComboBoxItem Content="Solid"/>
-                        <ComboBoxItem Content="Wireframe"/>
-                        <ComboBoxItem Content="Points"/>
-                    </ComboBox>
-
-                    <Button Grid.Row="0" Grid.Column="1" Width="30" Height="30" CornerRadius="10" Background="Transparent" x:Name="vertexButton" Click="OnVertexPressed">
-                        <Image Width="25" MinWidth="0" Source="../Assets/vertex.png"/>
-                    </Button>
-                    <Button Grid.Row="0" Grid.Column="2" Width="30" Height="30" CornerRadius="10" Background="Transparent" x:Name="edgeButton" Click="OnEdgePressed">
-                        <Image Width="25" MinWidth="0" Source="../Assets/edge.png"/>
-                    </Button>
-                    <Button Grid.Row="0" Grid.Column="3" Width="30" Height="30" CornerRadius="10" Background="Transparent" x:Name="faceButton" Click="OnFacePressed">
-                        <Image Width="25" MinWidth="0" Source="../Assets/face.png"/>
-                    </Button>
-                    <Button Grid.Row="0" Grid.Column="4" Width="30" Height="30" CornerRadius="10" Background="Orange" x:Name="objectButton" Click="OnShapePressed">
-                        <Image Width="25" MinWidth="0" Source="../Assets/object.png"/>
-                    </Button>
+                    <StackPanel Orientation="Horizontal" ToolTip.Tip="Mesh Visibility">
+                        <ComboBox Width="120"
+                                  SelectedIndex="0"
+                                  CornerRadius="0 0 10 0"
+                                  SelectionChanged="OnRendermodeChanged"
+                                  Focusable="False">
+                            <ComboBoxItem Content="All"/>
+                            <ComboBoxItem Content="Solid"/>
+                            <ComboBoxItem Content="Wireframe"/>
+                            <ComboBoxItem Content="Points"/>
+                        </ComboBox>
+                        <!-- TODO: Refactor this for less duplication-->
+                        <Button Width="30" Height="30" CornerRadius="0 0 10 10" 
+                                Background="Transparent" x:Name="vertexButton" Click="OnVertexPressed" ToolTip.Tip="Vertex Mode">
+                            <Image Width="25" MinWidth="0" Source="../Assets/vertex.png"/>
+                        </Button>
+                        <Button Width="30" Height="30" CornerRadius="0 0 10 10" 
+                                Background="Transparent" x:Name="edgeButton" Click="OnEdgePressed" ToolTip.Tip="Edge Mode">
+                            <Image Width="25" MinWidth="0" Source="../Assets/edge.png"/>
+                        </Button>
+                        <Button  Width="30" Height="30" CornerRadius="0 0 10 10" 
+                                Background="Transparent" x:Name="faceButton" Click="OnFacePressed" ToolTip.Tip="Face Mode">
+                            <Image Width="25" MinWidth="0" Source="../Assets/face.png"/>
+                        </Button>
+                        <Button Width="30" Height="30" CornerRadius="0 0 10 10" 
+                                Background="Orange" x:Name="objectButton" Click="OnShapePressed" ToolTip.Tip="Object Mode">
+                            <Image Width="25" MinWidth="0" Source="../Assets/object.png"/>
+                        </Button>
+                        <Grid Width="100" Height="30">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <NumericUpDown Grid.Column="0"
+                                           ToolTip.Tip="Vertex Snap Interval"
+                                           Minimum="0"
+                                           Value="0.0"
+                                           Maximum="1024"
+                                           Increment="0.1"
+                                           ShowButtonSpinner="False"
+                                           HorizontalContentAlignment="Center"
+                                           ValueChanged="GridSizeChanged"
+                                           CornerRadius="0 0 10 10"/>
+                            <Image Grid.Column="0" HorizontalAlignment="Left" 
+                                   Width="10" MinWidth="0" Margin="5" Source="../Assets/icons/lock.png"/>
+                        </Grid>
+                    </StackPanel>
                     <Canvas Grid.Row="1">
                         <Grid RowDefinitions="auto,auto,auto">
                             <Label x:Name="CommandTitle" FontFamily="Verdana" Grid.Row="0" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="#80FFA500" FontSize="30" IsVisible="False">Nothing</Label>

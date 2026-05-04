@@ -1,5 +1,4 @@
-﻿using Avalonia.Collections;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -48,8 +47,7 @@ public class RotateCommand : ICommand
     private Line? _dynamicLine;
     private Ellipse? _outlineElipse;
     private TextBlock? _textblock;
-
-
+    private float _snapValue;
     private bool _isModelMove;
     private List<Model> _models = [];
     private readonly Dictionary<Model, Matrix4> _modelsStartingTranslation = [];
@@ -57,6 +55,7 @@ public class RotateCommand : ICommand
 
     private CommandState Initialize()
     {
+        _snapValue = SelectionManager.Instance.SnapValue;
         _isModelMove = SelectionManager.Instance.CurrentSelectionMode == ViewModels.SelectionMode.Mesh;
         //Read camera rotation vector
         var directions = Camera.Instance.GetRealitiveDirections();
@@ -77,7 +76,7 @@ public class RotateCommand : ICommand
             foreach (uint index in selection.GetSelection<uint>())
             {
                 Vertex vert = _model.GetVertex(index);
-                _startingPosition[index] = new Vector4(vert.Position.X - SelectionCenter.X, vert.Position.Y - SelectionCenter.Y, vert.Position.Z - SelectionCenter.Z, 1.0f);
+                _startingPosition[index] = new(vert.Position.X - SelectionCenter.X, vert.Position.Y - SelectionCenter.Y, vert.Position.Z - SelectionCenter.Z, 1.0f); ;
                 selectedCount++;
             }
         }
@@ -277,7 +276,9 @@ public class RotateCommand : ICommand
 
             foreach (var pair in _startingPosition)
             {
-                vertices[pair.Key].Position = SelectionCenter + (pair.Value * rotationMatrix).Xyz;
+                Vector3 desiredPos = SelectionCenter + (pair.Value * rotationMatrix).Xyz;
+                desiredPos.Snap(_snapValue);
+                vertices[pair.Key].Position = desiredPos;
             }
             _model.UpdateAllComponents(UpdateType.Locational);
         }

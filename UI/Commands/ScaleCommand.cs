@@ -45,11 +45,12 @@ public class ScaleCommand : ICommand
     private Line? _uiLine;
     private TextBlock? _textblock;
     private bool activeAxisOverride;
-
+    private float _snapValue;
     private Model _activeModel = null!;
 
     private CommandState Initialize()
     {
+        _snapValue = SelectionManager.Instance.SnapValue;
         _activeModel = SelectionManager.Instance.CurrentModel ?? throw new InvalidOperationException("_active model cannot be null!");
 
         SelectionComponent? selection = _activeModel.GetComponent<SelectionComponent>();
@@ -111,7 +112,9 @@ public class ScaleCommand : ICommand
         foreach (uint index in _selectedIndices)
         {
             Vector3 offset = _startingPosition[index].position - _selectionCenter;
-            vertices[index].Position = _selectionCenter + (offset * _activeAxis) * amount;
+            var endPos = _selectionCenter + (offset * _activeAxis) * amount;
+            endPos.Snap(_snapValue);
+            vertices[index].Position = endPos;
         }
 
         _activeModel.UpdateAllComponents(UpdateType.Locational);

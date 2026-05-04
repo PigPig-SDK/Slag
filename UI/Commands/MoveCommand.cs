@@ -43,11 +43,12 @@ public class MoveCommand : ICommand
     private List<Model> _models = [];
     private readonly Dictionary<Model, Vector3> _modelsStartingPosition = [];
     private bool _isModelMove;
+    private float _snapValue;
     private CommandState Initialize()
     {
         _isModelMove = SelectionManager.Instance.CurrentSelectionMode == SelectionMode.Mesh;
         _cameraMoveDirections = Camera.Instance.GetRealitiveDirections();
-
+        _snapValue = SelectionManager.Instance.SnapValue;
         if (_isModelMove == false)
         {
             //No model, no command.
@@ -91,10 +92,10 @@ public class MoveCommand : ICommand
         Vector3 moveDirection = (_cameraMoveDirections.realitiveRight * mouseDelta.X) + (_cameraMoveDirections.realitiveUp * mouseDelta.Y);
         moveDirection *= _moveDistanceScale;
 
-
-
         if (_isModelMove)
         {
+            moveDirection.Snap(_snapValue);
+
             foreach (Model model in _models)
             {
                 model.Position = _modelsStartingPosition[model] + (moveDirection * _activeAxis);
@@ -113,7 +114,9 @@ public class MoveCommand : ICommand
 
             foreach (uint index in _selectedIndices)
             {
-                vertices[index].Position = _startingPosition[index] + moveDirection;
+                Vector3 newPos = new(_startingPosition[index] + moveDirection);
+                newPos.Snap(_snapValue);
+                vertices[index].Position = newPos;
             }
 
             Vector3 visualizerPosition = _selectionCenter + moveDirection;

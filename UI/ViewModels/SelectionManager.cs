@@ -17,6 +17,8 @@ public class SelectionManager
 
     public static SolidColorBrush SelectionColor => new (new Color(255, 255, 165, 0));
 
+    public float SnapValue { get; set; }
+
     public SelectionMode CurrentSelectionMode
     {
         get => _selectionMode;
