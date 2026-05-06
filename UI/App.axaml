@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="UI.App"
              xmlns:local="using:UI"
+             xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
              RequestedThemeVariant="Dark">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
@@ -11,6 +12,7 @@
   
     <Application.Styles>
         <FluentTheme/>
+        <StyleInclude Source="avares://IconPacks.Avalonia/Icons.axaml" />
 
         <Style Selector="TextBlock">
             <Setter Property="FontFamily" Value="Roboto"/>

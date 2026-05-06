@@ -22,7 +22,6 @@ internal class DeleteCommand : MementoCommand
     public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
     {
         CreateState();
-        
         SelectionManager.Instance.DeleteCurrentSelection();
         return CommandState.Finished;
     }

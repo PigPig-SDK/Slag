@@ -67,7 +67,7 @@ public partial class MainWindow : Window
         var item = (ComboBoxItem)cb.SelectedItem!;
         if (item == null) return;
 
-        var mode = item.Content?.ToString();
+        var mode = item.Tag?.ToString();
         if (mode == null) return;
 
         switch (mode)

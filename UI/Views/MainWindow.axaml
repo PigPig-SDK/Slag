@@ -7,6 +7,7 @@
         xmlns:openglavaloniatest="using:UI"
         xmlns:local="clr-namespace:UI.ViewModels"
         mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500" 
+        xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
         x:Class="UI.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/slagIcon.ico"
@@ -130,15 +131,35 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal" ToolTip.Tip="Mesh Visibility">
-                        <ComboBox Width="120"
+                        <ComboBox Width="140"
                                   SelectedIndex="0"
                                   CornerRadius="0 0 10 0"
                                   SelectionChanged="OnRendermodeChanged"
                                   Focusable="False">
-                            <ComboBoxItem Content="All"/>
-                            <ComboBoxItem Content="Solid"/>
-                            <ComboBoxItem Content="Wireframe"/>
-                            <ComboBoxItem Content="Points"/>
+                            <ComboBoxItem Tag="All">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <iconPacks:PackIconBootstrapIcons Kind="TriangleHalf" Width="16" Height="16"/>
+                                        <TextBlock Text="All" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                            </ComboBoxItem>
+                            <ComboBoxItem Tag="Solid">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <iconPacks:PackIconBootstrapIcons Kind="TriangleFill" Width="16" Height="16"/>
+                                        <TextBlock Text="Solid" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                            </ComboBoxItem>
+                            <ComboBoxItem Tag="Wireframe">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <iconPacks:PackIconBootstrapIcons Kind="Triangle" Width="16" Height="16"/>
+                                        <TextBlock Text="Wireframe" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                            </ComboBoxItem>
+                            <ComboBoxItem Tag="Points">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <iconPacks:PackIconBootstrapIcons Kind="Circle" Width="16" Height="16"/>
+                                        <TextBlock Text="Points" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                            </ComboBoxItem>
                         </ComboBox>
                         <!-- TODO: Refactor this for less duplication-->
                         <Button Width="30" Height="30" CornerRadius="0 0 10 10" 
