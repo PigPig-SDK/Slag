@@ -8,7 +8,6 @@ using System.Reflection;
 
 namespace UI.ViewModels;
 
-
 public class SelectionManager
 {
     public static SelectionManager Instance { get; } = new();
@@ -34,7 +33,7 @@ public class SelectionManager
     /// <summary>
     /// Broad models are 'models selected not in object mode'
     /// </summary>
-    public IReadOnlyList<Model> CurrentBroadModels => _currentBroadModels.AsReadOnly();
+    public IReadOnlyList<Model> CurrentBroadModels => _currentBroadModels;
 
     private SelectionManager()
     {

@@ -38,7 +38,7 @@
                 <Button HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         ToolTip.Tip="Copy"
-                        Click="DeleteModelClick">
+                        Click="CopyModel">
                     <iconPacks:PackIconBootstrapIcons Kind="Copy" Width="16" Height="16"/>
                 </Button>
             </StackPanel>

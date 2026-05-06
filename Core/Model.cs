@@ -39,6 +39,9 @@ public class Model
     public Model(Model clone)
     {
         EmplaceData(clone);
+        Position = clone.Position;
+        Rotation = clone.Rotation;
+        Scale = clone.Scale;
     }
 
     public Model() { }

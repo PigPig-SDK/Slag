@@ -1,4 +1,5 @@
 ﻿using Avalonia.Input;
+using Core;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -46,6 +47,20 @@ public class InputManager
                 {
                     if (UserControlMode.HasFlag(UserControlMode.Ctrl))
                         CommandInvoker.Singleton.ExecuteRedo();
+                    break;
+                }
+            case Key.V:
+                {
+                    if (UserControlMode.HasFlag(UserControlMode.Ctrl) 
+                        && SelectionManager.Instance.CurrentSelectionMode == SelectionMode.Mesh)
+                        ClipBoard.Instance.Paste();
+                    break;
+                }
+            case Key.C:
+                {
+                    if (UserControlMode.HasFlag(UserControlMode.Ctrl)
+                        && SelectionManager.Instance.CurrentSelectionMode == SelectionMode.Mesh)
+                        ClipBoard.Instance.Copy(SelectionManager.Instance.CurrentBroadModels);
                     break;
                 }
             default:

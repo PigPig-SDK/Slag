@@ -4,9 +4,11 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Core;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.Intrinsics.Arm;
 using UI.Commands;
+using UI.ViewModels;
 
 
 namespace UI;
@@ -77,8 +79,8 @@ public partial class HierarchyModel : UserControl
     {
         if (Model == null) return;
         var parentWindow = TopLevel.GetTopLevel(this) as Window;
-        if(parentWindow == null) return;
-        var dialog = new ConfirmDialog("Delete object","You cannot undo a delete, Your undo history will be reset!");
+        if (parentWindow == null) return;
+        var dialog = new ConfirmDialog("Delete object", "You cannot undo a delete, Your undo history will be reset!");
         await dialog.ShowDialog(parentWindow).ConfigureAwait(true);
 
         if (dialog.Confirmed)
@@ -158,5 +160,12 @@ public partial class HierarchyModel : UserControl
             rejectKey = false;
 
         e.Handled = rejectKey;
+    }
+
+    private void CopyModel(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (Model is null) return;//Do nothing!
+        List<Model> meshInstance = [Model];
+        ClipBoard.Instance.Copy(meshInstance);
     }
 }
