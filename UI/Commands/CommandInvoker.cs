@@ -81,7 +81,11 @@ public class CommandInvoker
         _redoQueue.Push(command);
         return true;
     }
-
+    public void ClearUndoRedoStacks()
+    {
+        _undoQueue.Clear();
+        _redoQueue.Clear();
+    }
     public void UpdateCommandInfo(ICommand cmd)
     {
         CommandTextUpdated?.Invoke(cmd);

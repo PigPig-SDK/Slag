@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
              x:Class="UI.HierarchyModel">
     <Grid Background="Transparent" Margin="5">
         <Expander CornerRadius="10,10,0,0"
@@ -27,11 +28,20 @@
             <Grid RowDefinitions="Auto,*,*,*,*,*" RowSpacing="10">
             
             <!-- Top: Delete button -->
-            <Button Grid.Row="0"
-                    HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Center"
-                    Content="Delete"
-                    Click="DeleteModelClick"/>
+            <StackPanel Spacing="5" Orientation="Horizontal" Grid.Row="0">
+                <Button HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        ToolTip.Tip="Delete"
+                        Click="DeleteModelClick">
+                    <iconPacks:PackIconBootstrapIcons Kind="Trash2Fill" Width="16" Height="16"/>
+                </Button>
+                <Button HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        ToolTip.Tip="Copy"
+                        Click="DeleteModelClick">
+                    <iconPacks:PackIconBootstrapIcons Kind="Copy" Width="16" Height="16"/>
+                </Button>
+            </StackPanel>
             <Separator Grid.Row="1"/>
             <!-- Bottom: position stuff -->
             <Grid Grid.Row="2" RowDefinitions="Auto,Auto"

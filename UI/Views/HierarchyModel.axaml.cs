@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
@@ -7,6 +6,7 @@ using Core;
 using System;
 using System.Globalization;
 using System.Runtime.Intrinsics.Arm;
+using UI.Commands;
 
 
 namespace UI;
@@ -73,11 +73,19 @@ public partial class HierarchyModel : UserControl
         ShownImage.IsVisible = !Model.Hidden;
     }
 
-    private void DeleteModelClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void DeleteModelClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (Model == null) return;
+        var parentWindow = TopLevel.GetTopLevel(this) as Window;
+        if(parentWindow == null) return;
+        var dialog = new ConfirmDialog("Delete object","You cannot undo a delete, Your undo history will be reset!");
+        await dialog.ShowDialog(parentWindow).ConfigureAwait(true);
 
-        SceneHierarchy.Instance.RemoveModel(HierarchyType.Model, Model!);
+        if (dialog.Confirmed)
+        {
+            CommandInvoker.Singleton.ClearUndoRedoStacks();//TODO: Properly fix commands!
+            SceneHierarchy.Instance.RemoveModel(HierarchyType.Model, Model!);
+        }
     }
 
     private void OnPositionTextChanged(object? sender, TextChangedEventArgs e)
