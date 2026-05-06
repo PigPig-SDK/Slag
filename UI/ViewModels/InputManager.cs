@@ -63,6 +63,13 @@ public class InputManager
                         ClipBoard.Instance.Copy(SelectionManager.Instance.CurrentBroadModels);
                     break;
                 }
+            case Key.A:
+                {
+                    if (!UserControlMode.HasFlag(UserControlMode.Ctrl)) return;
+
+                    SelectionManager.Instance.SelectAll();
+                    break;
+                }
             default:
                 {
                     if(_keyBinds.TryGetValue(e.Key, out Type? value))

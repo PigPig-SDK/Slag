@@ -53,10 +53,14 @@ public class SelectionManager
     {
         if (CurrentModel == null || CurrentSelectionMode == oldValue) return;
 
+        if (oldValue == SelectionMode.Mesh && CurrentSelectionMode != SelectionMode.Mesh)//Switching from mesh to other
+            CurrentModel = _currentBroadModels.LastOrDefault();
+
         if (CurrentSelectionMode == SelectionMode.Mesh)//Object mode to model editing mode.
         {
             ClearSelection();
         }
+
     }
 
     public void SelectModel(Model model)
@@ -233,5 +237,65 @@ public class SelectionManager
             else if (obj is Face face) ms.SelectFace(face, UpdateType.Ignore);
         }
         ms.BroadcastMassUpdate(UpdateType.Selection);
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>True if selection was updated, Else false</returns>
+    /// <remarks>Use the fact this returns a bool to implement unselect all</remarks>
+    public bool SelectAll()
+    {
+        if (CurrentSelectionMode == SelectionMode.Mesh)
+        {
+            int oldSelectCount = _currentBroadModels.Count;
+
+            _currentBroadModels.Clear();
+            foreach(Model model in SceneHierarchy.Instance.GetModels(HierarchyType.Model))
+                _currentBroadModels.Add(model);
+
+            return oldSelectCount != _currentBroadModels.Count;
+        }
+        else
+        {
+            if (CurrentModel is null) return false;//Cannot select anything. This return type is questionable.
+            SelectionComponent? selection = CurrentModel.GetComponent<SelectionComponent>();
+            if(selection == null) return false;
+            
+            //the rule for refactoring is 3 repeats. Pray for me.
+            switch(CurrentSelectionMode)
+            {
+                case SelectionMode.Edge:
+                    int oldSelectCount = selection.SelectedEdges.Count;
+                    selection.DeselectAll(UpdateType.Ignore);
+                    foreach(Edge edge in  selection.Model.Edges)
+                    {
+                        selection.SelectEdge(edge, UpdateType.Ignore);
+                    }
+                    selection.BroadcastMassUpdate(UpdateType.Selection);
+
+                    return selection.SelectedEdges.Count != oldSelectCount;
+                case SelectionMode.Face:
+                    oldSelectCount = selection.SelectedFaces.Count;
+                    selection.DeselectAll(UpdateType.Ignore);
+                    foreach (Face face in selection.Model.Faces)
+                    {
+                        selection.SelectFace(face, UpdateType.Ignore);
+                    }
+                    selection.BroadcastMassUpdate(UpdateType.Selection);
+
+                    return selection.SelectedFaces.Count != oldSelectCount;
+                case SelectionMode.Vertex:
+                    oldSelectCount = selection.SelectedIndices.Count;
+                    selection.DeselectAll(UpdateType.Ignore);
+                    foreach(uint index in CurrentModel.Indices)
+                    {
+                        selection.SelectIndex(index, UpdateType.Ignore);
+                    }
+                    selection.BroadcastMassUpdate(UpdateType.Selection);
+
+                    return selection.SelectedFaces.Count != oldSelectCount;
+            }
+        }
+        throw new NotImplementedException("Due to a new implementation, selection has broken!");
     }
 }
