@@ -267,6 +267,7 @@ public static partial class ModelPrefabs
         {
             bottomIndices[i] = i + 1;
         }
+        bottomIndices = bottomIndices.Reverse().ToArray();
         cone.AddFace(bottomIndices);
 
         return cone;
