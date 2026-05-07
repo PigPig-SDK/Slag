@@ -100,7 +100,7 @@ public class GLComponent : ModelComponent, IRenderObject
     {
         if (update.HasFlag(UpdateType.Ignore)) return;
 
-        GLControl.Instance.ModelActions.Push(SelectonMassUpdate);
+        GLControl.Instance.ModelActions.Enqueue(SelectonMassUpdate);
     }
 
     private void OnSelectionChanged(bool isSelected, UpdateType update)
@@ -132,7 +132,7 @@ public class GLComponent : ModelComponent, IRenderObject
 
         //TRIANGLE
         gl.BindVertexArray(_triangleArrayObject!.Value);
-        InitializeTrangleBuffers(gl);
+        PopulateTrangleBuffers(gl);
         SetLocationsInsideVAO(gl);
 
         //EDGE
@@ -175,7 +175,7 @@ public class GLComponent : ModelComponent, IRenderObject
         _edgeIndicesCount = edgeIndices.Length;
     }
 
-    public unsafe void InitializeTrangleBuffers(GlInterface gl)
+    public unsafe void PopulateTrangleBuffers(GlInterface gl)
     {
         gl.BindVertexArray(_triangleArrayObject!.Value);
 
@@ -296,14 +296,14 @@ public class GLComponent : ModelComponent, IRenderObject
     {
         if((info & (UpdateType.Locational)) != 0)
         {
-            GLControl.Instance.ModelActions.Push(UpdateModel);
+            GLControl.Instance.ModelActions.Enqueue(UpdateModel);
         }
 
         //Redraw requested.
         if((info & UpdateType.Membership) != 0)
         {
-            GLControl.Instance.ModelActions.Push(InitializeTrangleBuffers);
-            GLControl.Instance.ModelActions.Push(UpdateEdgeBuffers);
+            GLControl.Instance.ModelActions.Enqueue(PopulateTrangleBuffers);
+            GLControl.Instance.ModelActions.Enqueue(UpdateEdgeBuffers);
         }
     }
 

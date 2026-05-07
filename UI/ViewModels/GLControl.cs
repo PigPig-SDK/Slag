@@ -34,7 +34,7 @@ public class GLControl : OpenGlControlBase
     /// <summary>
     /// This stack exists so that OpenGL Actions are all executed on the main thread
     /// </summary>
-    public Stack<Action<GlInterface>> ModelActions { get; private set; } = new();
+    public Queue<Action<GlInterface>> ModelActions { get; private set; } = new();
 
     private readonly ShaderProgram _triangleShaderProgram = new();
     private readonly ShaderProgram _edgeShaderProgram = new();
@@ -342,7 +342,7 @@ public class GLControl : OpenGlControlBase
     {
         while (ModelActions.Count > 0)
         {
-            var action = ModelActions.Pop();
+            var action = ModelActions.Dequeue();
             action.Invoke(gl);
         }
     }
