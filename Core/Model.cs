@@ -401,4 +401,36 @@ public class Model
         translated *= GetModelMatrix();
         return translated.Xyz;
     }
+    /// <summary>
+    /// Given a Face or Edge, the proper object is returned.
+    /// Allows a dummy Edge() or dummy Face() to yield a valid Edge/Face.
+    /// 
+    /// This exists because Face and Edge have neighbor metadata that dummy instances fail to capture.
+    /// </summary>
+    /// <remarks>This is an O(n) operation! Where N is #Faces or #Edges</remarks>
+    public bool Lookup<T>(T data, out T? found) where T : class
+    {
+        found = null;
+        if (data is Face face)
+        {
+            foreach (Face faceLookup in Faces)
+            {
+                if (!faceLookup.Equals(faceLookup)) continue;
+
+                found = (T?)(object)faceLookup;
+                return true;
+            }
+        }
+        else if (data is Edge edge)
+        {
+            foreach(Edge edgeLookup in Edges)
+            {
+                if (!edgeLookup.Equals(edge)) continue;
+
+                found = (T?)(object)edgeLookup;
+                return true;
+            }
+        }
+        return false;
+    }
 }

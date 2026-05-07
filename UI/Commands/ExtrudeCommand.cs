@@ -58,7 +58,11 @@ public class ExtrudeCommand : MementoCommand
             else if(selected is Edge edge)
             {
                 if (cloneMap.TryGetValue(edge.Vertex1, out uint vert1) && cloneMap.TryGetValue(edge.Vertex2, out uint vert2))
-                    selection.SelectEdge(new Edge(vert1, vert2), UpdateType.Ignore);
+                {
+                    sm.CurrentModel.Lookup(new Edge(vert1, vert2), out Edge? found);
+                    if (found is not null)
+                        selection.SelectEdge(found, UpdateType.Ignore);
+                }
             }
         }
 
