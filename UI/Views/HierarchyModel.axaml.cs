@@ -80,7 +80,7 @@ public partial class HierarchyModel : UserControl
         if (Model == null) return;
         var parentWindow = TopLevel.GetTopLevel(this) as Window;
         if (parentWindow == null) return;
-        var dialog = new ConfirmDialog("Delete object", "You cannot undo a delete, Your undo history will be reset!");
+        var dialog = new ConfirmDialog("Delete object", "Your undo history will be reset!");
         await dialog.ShowDialog(parentWindow).ConfigureAwait(true);
 
         if (dialog.Confirmed)
