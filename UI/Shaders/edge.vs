@@ -8,6 +8,7 @@ uniform vec3 camera_location;
 uniform mat4 model_matrix;
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
+uniform bool selectionHidden;
 
 out vec4 color;
 
@@ -17,7 +18,7 @@ void main()
     pos.z -= 0.0001 + metadata;//Improper fix for making edges appear ontop of models (lol)
     gl_Position = pos;
 
-    if(metadata == 1.0)
+    if(metadata == 1.0 && selectionHidden == false)
         color = vec4(1.0, 0.647, 0.0, 1.0);
     else
         color = vec4(1.0);

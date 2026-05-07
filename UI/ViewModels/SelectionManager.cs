@@ -62,7 +62,12 @@ public class SelectionManager
         {
             ClearSelection();
         }
-
+        else
+        {
+            var selection = GetSelectionComponent();
+            if (selection is null) return;
+            selection.DeselectAll();
+        }
     }
 
     public void SelectModel(Model model)

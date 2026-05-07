@@ -123,8 +123,14 @@ public class GLControl : OpenGlControlBase
         Console.WriteLine($"Renderer: {gl.GetString(GL_RENDERER)} Version: {gl.GetString(GL_VERSION)}");
 
         _triangleShaderProgram.GenerateShaderProgram(gl, TriangleVertexShader, TriangleFragmentShader);
+        _triangleShaderProgram.IsSelectionHidden = () => !SelectionManager.Instance.CurrentSelectionMode.HasFlag(SelectionMode.Face);
+
         _edgeShaderProgram.GenerateShaderProgram(gl, EdgeVertexShader, EdgeFragmentShader);
+        _edgeShaderProgram.IsSelectionHidden = () => !SelectionManager.Instance.CurrentSelectionMode.HasFlag(SelectionMode.Edge);
+
         _vertexShaderProgram.GenerateShaderProgram(gl, VertexVertexShader, VertexFragmentShader);
+        _vertexShaderProgram.IsSelectionHidden = () => !SelectionManager.Instance.CurrentSelectionMode.HasFlag(SelectionMode.Vertex);
+
         _depthShaderProgram.GenerateShaderProgram(gl, DepthVertexShader, DepthFragmentShader);
         _outlineShaderProgram.GenerateShaderProgram(gl, OutlineVertexShader, OutlineFragmentShader);
 

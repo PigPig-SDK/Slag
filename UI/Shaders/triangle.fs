@@ -9,6 +9,7 @@ uniform sampler2D shadowMap;
 uniform vec3 sunAngle;
 uniform bool isFullbright;
 uniform bool useTilemap;
+uniform bool selectionHidden;
 
 in vec3 normal;
 in vec4 posistion;
@@ -88,12 +89,14 @@ void main()
         float shadow = ShadowCalculation(envSpace); // 0.0 = in shadow, 1.0 = fully lit
 
         // --- Combine lighting ---
-
         float blendPower = metaDataBlend * metaDataBlend;
         blendPower = blendPower * blendPower; // 4th power for smoother transition
+        if(selectionHidden)
+        {
+            blendPower = 0.0;
+        }
 
-        FragColor = mix(
-        ambient + (diffuse + specular) * shadow,
+        FragColor = mix(ambient + (diffuse + specular) * shadow,
         vec4(1.0, 0.647, 0.0, 1.0) + diffuse + ambient, 
         min(blendPower,1.0));
 

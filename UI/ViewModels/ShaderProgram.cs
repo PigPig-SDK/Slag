@@ -12,7 +12,9 @@ public class ShaderProgram
 
     public int ModelMatrixLocation { get; set; }
 
-    private int _projectionMatrixLoc, _viewMatrixLoc, _cameraLocationLoc, _envMatrix, _shadowMap, _sunAngle;
+    private int _projectionMatrixLoc, _viewMatrixLoc, _cameraLocationLoc, _envMatrix, _shadowMap, _sunAngle, _hideSelection;
+
+    public Func<bool>? IsSelectionHidden { get; set; }
 
     public void GenerateShaderProgram(GlInterface gl, string vertexShader, string fragmentShader)
     {
@@ -38,6 +40,7 @@ public class ShaderProgram
         _envMatrix = gl.GetUniformLocationString(ProgramID, "env_matrix");
         _shadowMap = gl.GetUniformLocationString(ProgramID, "shadowMap");
         _sunAngle = gl.GetUniformLocationString(ProgramID, "sunAngle");
+        _hideSelection = gl.GetUniformLocationString(ProgramID, "selectionHidden");
     }
 
     public unsafe void UseProgram(GlInterface gl, Matrix4 view, Matrix4 projection, Vector3 cameraLocation, Matrix4 envMatrix, int shadowmap, Vector3 sunAngle)
@@ -53,6 +56,14 @@ public class ShaderProgram
         gl.BindTexture(GL_TEXTURE_2D, shadowmap);
         gl.Uniform1i(_shadowMap, 0);
         gl.Uniform3f(_sunAngle, sunAngle.X, sunAngle.Y, sunAngle.Z);
+
+        gl.Uniform1i(_hideSelection, (IsSelectionHiddenCompute()) ? 1 : 0);
+    }
+
+    private bool IsSelectionHiddenCompute()
+    {
+        if (IsSelectionHidden is null) return false;//Selection not hidden
+        return IsSelectionHidden.Invoke();
     }
 
     public unsafe int GetUniformLocation(GlInterface gl, string name)
