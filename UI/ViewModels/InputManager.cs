@@ -24,6 +24,9 @@ public class InputManager
         {Key.Delete, typeof(DeleteCommand)},
     };
 
+    public DateTime LastRightClick { get; private set; }
+    public DateTime LastLeftClick { get; private set; }
+
     //TOTO: REFACTOR THIS.
     public void OnKeyDown(object? sender, KeyEventArgs e)
     {
@@ -104,6 +107,7 @@ public class InputManager
         if (CommandInvoker.Singleton.ExecuteCommandStep((null, e, CommandInfo.MouseUp))) return;
 
         Camera.Instance.OnMouseUp(sender, e);
+        
     }
 
     public void OnPointerMove(object? sender, PointerEventArgs e)
@@ -123,9 +127,15 @@ public class InputManager
 
     public void OnMouseDown(object? sender, PointerPressedEventArgs e)
     {
+        PointerPointProperties properties = e.GetCurrentPoint(GLControl.Instance).Properties;
+
+        if (properties.IsLeftButtonPressed)
+            LastLeftClick = DateTime.Now;
+        if (properties.IsRightButtonPressed)
+            LastRightClick = DateTime.Now;
+
         if (CommandInvoker.Singleton.ExecuteCommandStep((null, e, CommandInfo.MouseDown))) return;
 
-        PointerPointProperties properties = e.GetCurrentPoint(GLControl.Instance).Properties;
         if (properties.IsRightButtonPressed)
         {
             Vector2 screenLocation = e.GetScreenPos();

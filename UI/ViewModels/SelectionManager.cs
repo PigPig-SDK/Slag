@@ -1,4 +1,5 @@
 ﻿using Avalonia.Media;
+using AvaloniaEdit.Editing;
 using Core;
 using OpenTK.Mathematics;
 using System;
@@ -12,6 +13,7 @@ public class SelectionManager
 {
     public static SelectionManager Instance { get; } = new();
 
+    private const int _selectionDragDelay = 150;
     private SelectionMode _selectionMode = SelectionMode.Mesh;
 
     public static SolidColorBrush SelectionColor => new (new Color(255, 255, 165, 0));
@@ -128,7 +130,7 @@ public class SelectionManager
                 ClearSelection();
 
             //Select
-            if (!ms.IsVertexSelected(hit.VertexIndex))
+            if (!ms.IsVertexSelected(hit.VertexIndex) && IsSelectionValid(isDrag))
                 ms.SelectIndex(hit.VertexIndex, UpdateType.Selection);
             else if (!isDrag)//Deselect
                 ms.DeselectIndex(hit.VertexIndex, UpdateType.Selection);
@@ -154,7 +156,7 @@ public class SelectionManager
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
 
-            if(!ms.IsEdgeSelected(hit.Edge))
+            if(!ms.IsEdgeSelected(hit.Edge) && IsSelectionValid(isDrag))
                 ms.SelectEdge(hit.Edge, UpdateType.Selection);
             else if(!isDrag)
                 ms.DeselectEdge(hit.Edge, UpdateType.Selection);
@@ -165,7 +167,15 @@ public class SelectionManager
             ClearSelection();
         }
     }
-
+    /// <summary>
+    /// This function exists to give users a 'breif second of lax drag selection'
+    /// This is to allow de-selections to occur while the user is still dragging their mouse.
+    /// </summary>
+    private static bool IsSelectionValid(bool isDrag)
+    {
+        return !isDrag || 
+            isDrag && (DateTime.Now - InputManager.Singleton.LastRightClick).Milliseconds > _selectionDragDelay;
+    }
     private void CheckForFaceSelection(Vector2 screenPosition, bool isDrag)
     {
         RaycastHit? hit = Camera.Instance.FindRaycastHit(screenPosition, HierarchyType.Selected);
@@ -177,7 +187,7 @@ public class SelectionManager
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
 
-            if (!ms.IsFaceSelected(hit.Face))
+            if (!ms.IsFaceSelected(hit.Face) && IsSelectionValid(isDrag))
             {
                 ms.SelectFace(hit!.Face, UpdateType.Selection);
             }
