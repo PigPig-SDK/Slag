@@ -55,6 +55,11 @@ public class ExtrudeCommand : MementoCommand
                 if(faceCloneMap.TryGetValue(face, out Face? value))
                     selection.SelectFace(value, UpdateType.Ignore);//Select the clone instead.
             }
+            else if(selected is Edge edge)
+            {
+                if (cloneMap.TryGetValue(edge.Vertex1, out uint vert1) && cloneMap.TryGetValue(edge.Vertex2, out uint vert2))
+                    selection.SelectEdge(new Edge(vert1, vert2), UpdateType.Ignore);
+            }
         }
 
         selection.Model.UpdateAllComponents(UpdateType.Membership);
