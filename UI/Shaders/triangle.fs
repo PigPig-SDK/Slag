@@ -48,24 +48,31 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 void main() 
 {
-    vec4 matColor = desiredColor;
+    float blendPower = metaDataBlend * metaDataBlend;
+    blendPower = blendPower * blendPower; // 4th power for smoother transition
+    vec4 baseColor = (desiredColor * 0.5 + 0.5);//Pastel colors only!
+    if(selectionHidden)
+    {
+        blendPower = 0.0;
+    }
+    if(!gl_FrontFacing && !useTilemap)
+    {
+        //Pink and black for backfacing.
+        vec2 checker = floor(gl_FragCoord.xy / 20.0);
+        float pattern = mod(checker.x + checker.y, 2.0);
+        baseColor = mix(vec4(0.85, 0.95, 0.9, 0.2), vec4(1.0, 0.7, 0.75, 1.0), pattern);
+    }
+
     //Lighting stage
     if(isFullbright) 
     {
-        FragColor = matColor;
+        FragColor = mix(baseColor,
+        vec4(1.0, 0.647, 0.0, 1.0), 
+        min(blendPower,1.0));
     }
     else
     {
-        if(!gl_FrontFacing)
-        {
-            //Pink and black for backfacing.
-            vec2 checker = floor(gl_FragCoord.xy / 20.0);
-            float pattern = mod(checker.x + checker.y, 2.0);
-            matColor = mix(vec4(0.0, 0.0, 0.0, 0.1), vec4(1.0, 0.08, 0.58, 1.0), pattern);
-        }
-
         float shininess = 10000.0;
-        vec4 baseColor = (matColor * 0.5 + 0.5);
 
         vec3 N = normalize(normal);
         vec3 L = normalize(sunAngle);  // make sure L is normalized
@@ -89,13 +96,6 @@ void main()
         float shadow = ShadowCalculation(envSpace); // 0.0 = in shadow, 1.0 = fully lit
 
         // --- Combine lighting ---
-        float blendPower = metaDataBlend * metaDataBlend;
-        blendPower = blendPower * blendPower; // 4th power for smoother transition
-        if(selectionHidden)
-        {
-            blendPower = 0.0;
-        }
-
         FragColor = mix(ambient + (diffuse + specular) * shadow,
         vec4(1.0, 0.647, 0.0, 1.0) + diffuse + ambient, 
         min(blendPower,1.0));

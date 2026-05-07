@@ -235,7 +235,7 @@ public class GLComponent : ModelComponent, IRenderObject
 
         program.SetColorUniform(gl, program.GetUniformLocation(gl, "color"), Color ?? new Color4(1, 1, 1, 1));
         gl.Uniform1i(program.GetUniformLocation(gl, "useColor"), (Color is null)? 0 : 1);
-        gl.Uniform1i(program.GetUniformLocation(gl, "isFullbright"), (IsFullbright) ? 1 : 0);
+        gl.Uniform1i(program.GetUniformLocation(gl, "isFullbright"), (IsFullbright || !SunControls.IsEnabled) ? 1 : 0);
         gl.Uniform1i(program.GetUniformLocation(gl, "useTilemap"), (UseTilemapRendering) ? 1 : 0);
 
         gl.BindVertexArray(_triangleArrayObject!.Value);

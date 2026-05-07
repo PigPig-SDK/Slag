@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
+
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="40"
+             x:Class="UI.SunEditView">
+      <StackPanel Orientation="Horizontal" 
+      HorizontalAlignment="Stretch">
+    <Button HorizontalAlignment="Stretch"
+            Focusable="False" Margin="5"
+            Click="ToggleSun"
+            CornerRadius="15" ToolTip.Tip="Toggle Sun">
+            <Grid>
+                <iconPacks:PackIconBootstrapIcons Kind="Sun" Width="16" Height="16"/>
+                <iconPacks:PackIconBootstrapIcons x:Name="sunActiveIcon" Kind="SunFill" Width="16" Height="16"/>
+            </Grid>
+          </Button>
+      </StackPanel>
+</UserControl>

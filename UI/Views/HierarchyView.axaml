@@ -1,60 +1,64 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
+             xmlns:ui="using:UI"
              x:Class="UI.ViewModels.HierarchyView">
         <Grid RowDefinitions="Auto,Auto,*">
-            <Button Grid.Row="0"
-                    HorizontalAlignment="Stretch" 
-                    Focusable="False" 
-                    Margin="5"
-                    CornerRadius="15"
-                    Click="OnAddObjectButtonClick" ToolTip.Tip="Add Object">
-                <Image Source="../Assets/addObject.png" Height="20"/>
-                <Button.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Click="OnAddCubePressed">
-                            <MenuItem.Header>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <iconPacks:PackIconBoxIcons Kind="SolidCube" Width="16" Height="16"/>
-                                    <TextBlock Text="Cube" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem Click="OnAddSpherePressed">
-                             <MenuItem.Header>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <iconPacks:PackIconBootstrapIcons Kind="CircleFill" Width="16" Height="16"/>
-                                    <TextBlock Text="Sphere" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem Click="OnAddCylinderPressed">
-                             <MenuItem.Header>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <iconPacks:PackIconBoxIcons Kind="SolidCylinder" Width="16" Height="16"/>
-                                    <TextBlock Text="Cylinder" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem Click="OnAddConePressed">
-                             <MenuItem.Header>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <iconPacks:PackIconBootstrapIcons Kind="TriangleFill" Width="16" Height="16"/>
-                                    <TextBlock Text="Cone" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem Click="OnAddTorusPressed">
-                             <MenuItem.Header>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <iconPacks:PackIconBootstrapIcons Kind="RecordCircleFill" Width="16" Height="16"/>
-                                    <TextBlock Text="Torus" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
-                    </ContextMenu>
-                </Button.ContextMenu>
-            </Button>
+            <StackPanel Grid.Row="0">
+                <Button
+                        HorizontalAlignment="Stretch" 
+                        Focusable="False" 
+                        Margin="5"
+                        CornerRadius="15"
+                        Click="OnAddObjectButtonClick" ToolTip.Tip="Add Object">
+                    <Image Source="../Assets/addObject.png" Height="20"/>
+                    <Button.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Click="OnAddCubePressed">
+                                <MenuItem.Header>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <iconPacks:PackIconBoxIcons Kind="SolidCube" Width="16" Height="16"/>
+                                        <TextBlock Text="Cube" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </MenuItem.Header>
+                            </MenuItem>
+                            <MenuItem Click="OnAddSpherePressed">
+                                 <MenuItem.Header>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <iconPacks:PackIconBootstrapIcons Kind="CircleFill" Width="16" Height="16"/>
+                                        <TextBlock Text="Sphere" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </MenuItem.Header>
+                            </MenuItem>
+                            <MenuItem Click="OnAddCylinderPressed">
+                                 <MenuItem.Header>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <iconPacks:PackIconBoxIcons Kind="SolidCylinder" Width="16" Height="16"/>
+                                        <TextBlock Text="Cylinder" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </MenuItem.Header>
+                            </MenuItem>
+                            <MenuItem Click="OnAddConePressed">
+                                 <MenuItem.Header>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <iconPacks:PackIconBootstrapIcons Kind="TriangleFill" Width="16" Height="16"/>
+                                        <TextBlock Text="Cone" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </MenuItem.Header>
+                            </MenuItem>
+                            <MenuItem Click="OnAddTorusPressed">
+                                 <MenuItem.Header>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <iconPacks:PackIconBootstrapIcons Kind="RecordCircleFill" Width="16" Height="16"/>
+                                        <TextBlock Text="Torus" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </MenuItem.Header>
+                            </MenuItem>
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                </Button>
+                <ui:SunEditView/>
+            </StackPanel>
             <Separator Grid.Row="1"/>
             <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel x:Name="HierarchyStack"/>
