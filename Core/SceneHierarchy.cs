@@ -24,8 +24,10 @@ public class SceneHierarchy
 
     public event Action<HierarchyType, Model>? OnModelRemoved;
 
-    //Codesmell. TODO: Refactor selection to be held within core.
-    public List<Model>? SelectedSetReference;
+    /// <summary>
+    /// Whatever UI is used should override this set.
+    /// </summary>
+    public IEnumerable<Model>? SelectedSetReference { get; set; }
 
     public void AddModel(HierarchyType hierarchyType, Model model)
     {

@@ -26,27 +26,32 @@ public class SelectionManager
         set {
             SelectionMode oldValue = _selectionMode;
             _selectionMode = value;
+
             AdjustSelection(oldValue);
-            if(oldValue != _selectionMode)//Actual change.
+            if(oldValue != _selectionMode)
                 OnSelectionChanged?.Invoke(_selectionMode);
         }
     }
 
     public Model? CurrentModel { get; private set; }
-    private readonly List<Model> _currentBroadModels = [];
+    private readonly HashSet<Model> _currentBroadModels = [];
     /// <summary>
     /// Broad models are 'models selected not in object mode'
     /// </summary>
-    public IReadOnlyList<Model> CurrentBroadModels => _currentBroadModels;
+    public IReadOnlySet<Model> CurrentBroadModels => _currentBroadModels;
 
-    public event Action<SelectionMode> OnSelectionChanged;
+    public event Action<SelectionMode>? OnSelectionChanged;
 
     private SelectionManager()
     {
         SceneHierarchy.Instance.OnModelRemoved += OnModelDeleted;
-        SceneHierarchy.Instance.SelectedSetReference = _currentBroadModels;
+        SceneHierarchy.Instance.SelectedSetReference = SelectedModels();
     }
-
+    private IEnumerable<Model> SelectedModels()
+    {
+        foreach(Model m in _currentBroadModels)
+            yield return m;
+    }
     private void OnModelDeleted(HierarchyType hierarchyType, Model obj)
     {
         if(obj == CurrentModel)
@@ -78,13 +83,14 @@ public class SelectionManager
     {
         if (CurrentModel == model) return;
 
-        ClearSelectedModel();
+        _currentBroadModels.Add(model);
         CurrentModel = model;
     }
 
     private void ClearSelectedModel()
     {
         ClearSelection();
+        _currentBroadModels.Clear();
         CurrentModel = null;
     }
 
@@ -116,13 +122,12 @@ public class SelectionManager
         if (hit != null)
         {
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
-                _currentBroadModels.Clear();
-            _currentBroadModels.Add(hit.Model);
+                ClearSelectedModel();
             SelectModel(hit.Model);
         }
         else if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))
         {
-            _currentBroadModels.Clear();
+            ClearSelectedModel();
         }
     }
 
@@ -164,7 +169,6 @@ public class SelectionManager
         if (hit != null)
         {
             if (hit.Model != CurrentModel) return;
-            SelectModel(hit.Model);
             SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>() ?? throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!"); ;
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();

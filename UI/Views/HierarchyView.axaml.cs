@@ -116,6 +116,10 @@ public partial class HierarchyView : UserControl
             SceneHierarchy.Instance.RemoveModel(HierarchyType.Model, model);
             model = null;
         }
+        else
+        {
+            SelectionManager.Instance.SelectModel(model);
+        }
     }
 
     private void OnAddSpherePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -205,6 +209,10 @@ public partial class HierarchyView : UserControl
         {
             SceneHierarchy.Instance.RemoveModel(HierarchyType.Model, model);
             model = null;
+        }
+        else
+        {
+            SelectionManager.Instance.SelectModel(model);
         }
     }
 
