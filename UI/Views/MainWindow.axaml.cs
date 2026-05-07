@@ -37,6 +37,12 @@ public partial class MainWindow : Window
         Instance = this;
         CommandInvoker.Singleton.CommandTextUpdated += Singleton_CommandExecuted;
         SelectionModeChange(SelectionManager.Instance.CurrentSelectionMode);
+        SelectionManager.Instance.OnSelectionChanged += SelectionModeChanged;
+    }
+
+    private void SelectionModeChanged(ViewModels.SelectionMode currentSelection)
+    {
+        SelectionModeChange(currentSelection);
     }
 
     private void Singleton_CommandExecuted(ICommand? obj)

@@ -73,6 +73,18 @@ public class InputManager
                     SelectionManager.Instance.SelectAll();
                     break;
                 }
+            case Key.D1:
+                SelectionManager.Instance.CurrentSelectionMode = SelectionMode.Vertex;
+                break;
+            case Key.D2:
+                SelectionManager.Instance.CurrentSelectionMode = SelectionMode.Edge;
+                break;
+            case Key.D3:
+                SelectionManager.Instance.CurrentSelectionMode = SelectionMode.Face;
+                break;
+            case Key.D4:
+                SelectionManager.Instance.CurrentSelectionMode = SelectionMode.Mesh;
+                break;
             default:
                 {
                     if(_keyBinds.TryGetValue(e.Key, out Type? value))

@@ -27,6 +27,8 @@ public class SelectionManager
             SelectionMode oldValue = _selectionMode;
             _selectionMode = value;
             AdjustSelection(oldValue);
+            if(oldValue != _selectionMode)//Actual change.
+                OnSelectionChanged?.Invoke(_selectionMode);
         }
     }
 
@@ -36,6 +38,8 @@ public class SelectionManager
     /// Broad models are 'models selected not in object mode'
     /// </summary>
     public IReadOnlyList<Model> CurrentBroadModels => _currentBroadModels;
+
+    public event Action<SelectionMode> OnSelectionChanged;
 
     private SelectionManager()
     {
