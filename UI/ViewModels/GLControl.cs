@@ -154,7 +154,7 @@ public class GLControl : OpenGlControlBase
         gl.BindFramebuffer(GL_FRAMEBUFFER, _shadowmapFrameBuffer.Value);
         _depthMap = gl.GenTexture();
         gl.BindTexture(GL_TEXTURE_2D, _depthMap.Value);
-        gl.TexImage2D(GL_TEXTURE_2D, 0, GlConstantsExtended.GL_DEPTH_COMPONENT24, SunControls._shadowWidth, SunControls._shadowHeight, 0, GlConsts.GL_DEPTH_COMPONENT, GlConstantsExtended.GL_UNSIGNED_INT, IntPtr.Zero);
+        gl.TexImage2D(GL_TEXTURE_2D, 0, GlConstantsExtended.GL_DEPTH_COMPONENT24, SunControls.ShadowMapWidth, SunControls.ShadowMapHeight, 0, GlConsts.GL_DEPTH_COMPONENT, GlConstantsExtended.GL_UNSIGNED_INT, IntPtr.Zero);
 
         gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -240,13 +240,13 @@ public class GLControl : OpenGlControlBase
 
         //World rendering
         gl.BindFramebuffer(GlConsts.GL_FRAMEBUFFER, _shadowmapFrameBuffer!.Value);
-        gl.Viewport(0, 0, SunControls._shadowWidth, SunControls._shadowHeight);
+        gl.Viewport(0, 0, SunControls.ShadowMapWidth, SunControls.ShadowMapHeight);
         gl.ClearColor(0.0f,0.0f,0.0f,1.0f);
         gl.Clear(GlConsts.GL_DEPTH_BUFFER_BIT);
 
         //Camera controls
-        Matrix4 view = Matrix4.LookAt(_camera.LookAt + (SunControls.SunAngle * SunControls._sunDistance), _camera.LookAt, new Vector3(0, 1, 0));
-        Aspect = (float)(SunControls._shadowWidth / (double)SunControls._shadowHeight);
+        Matrix4 view = Matrix4.LookAt(_camera.LookAt + (SunControls.SunAngle * SunControls.SunClippingDistance), _camera.LookAt, new Vector3(0, 1, 0));
+        Aspect = (float)(SunControls.ShadowMapWidth / (double)SunControls.ShadowMapHeight);
         float near_plane = 0.1f, far_plane = 200.0f;
         Matrix4.CreateOrthographic(30.0f, 30.0f, near_plane, far_plane, out Matrix4 proj);
         LightSpaceMatrix = view * proj;
