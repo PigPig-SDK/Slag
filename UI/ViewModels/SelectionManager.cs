@@ -119,6 +119,8 @@ public class SelectionManager
 
     private void CheckForVertexSelection(Vector2 screenPosition, bool isDrag)
     {
+        if (!IsSelectionTimingValid(isDrag)) return;
+
         VertexHit? hit = Raycast.GetVertexHit(SceneHierarchy.Instance.GetModels(HierarchyType.Selected),
             Camera.Instance.ScreenToGlCoords(screenPosition), Camera.Instance.ViewMatrix);
 
@@ -130,7 +132,7 @@ public class SelectionManager
                 ClearSelection();
 
             //Select
-            if (!ms.IsVertexSelected(hit.VertexIndex) && IsSelectionValid(isDrag))
+            if (!ms.IsVertexSelected(hit.VertexIndex))
                 ms.SelectIndex(hit.VertexIndex, UpdateType.Selection);
             else if (!isDrag)//Deselect
                 ms.DeselectIndex(hit.VertexIndex, UpdateType.Selection);
@@ -142,6 +144,8 @@ public class SelectionManager
     }
     private void CheckForEdgeSelection(Vector2 screenPosition, bool isDrag)
     {
+        if (!IsSelectionTimingValid(isDrag)) return;
+
         EdgeHit? hit = Raycast.GetEdgeHit(
             SceneHierarchy.Instance.GetModels(HierarchyType.Selected), 
             Camera.Instance.ScreenToGlCoords(screenPosition), 
@@ -156,7 +160,7 @@ public class SelectionManager
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
 
-            if(!ms.IsEdgeSelected(hit.Edge) && IsSelectionValid(isDrag))
+            if(!ms.IsEdgeSelected(hit.Edge))
                 ms.SelectEdge(hit.Edge, UpdateType.Selection);
             else if(!isDrag)
                 ms.DeselectEdge(hit.Edge, UpdateType.Selection);
@@ -171,13 +175,15 @@ public class SelectionManager
     /// This function exists to give users a 'breif second of lax drag selection'
     /// This is to allow de-selections to occur while the user is still dragging their mouse.
     /// </summary>
-    private static bool IsSelectionValid(bool isDrag)
+    private static bool IsSelectionTimingValid(bool isDrag)
     {
         return !isDrag || 
             isDrag && (DateTime.Now - InputManager.Singleton.LastRightClick).Milliseconds > _selectionDragDelay;
     }
     private void CheckForFaceSelection(Vector2 screenPosition, bool isDrag)
     {
+        if (!IsSelectionTimingValid(isDrag)) return;
+
         RaycastHit? hit = Camera.Instance.FindRaycastHit(screenPosition, HierarchyType.Selected);
         if (hit != null)
         {
@@ -187,7 +193,7 @@ public class SelectionManager
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
 
-            if (!ms.IsFaceSelected(hit.Face) && IsSelectionValid(isDrag))
+            if (!ms.IsFaceSelected(hit.Face))
             {
                 ms.SelectFace(hit!.Face, UpdateType.Selection);
             }
