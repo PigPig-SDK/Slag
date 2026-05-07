@@ -1,11 +1,12 @@
 ﻿using Avalonia.Input;
+using Avalonia.Styling;
 using AvaloniaEdit.Utils;
-using UI.ViewModels;
+using Core;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Core;
-using OpenTK.Mathematics;
+using UI.ViewModels;
 
 
 namespace UI.Commands;
@@ -29,24 +30,35 @@ public class ExtrudeCommand : MementoCommand
 
         HashSet<uint> selectedIndices = [];
         HashSet<Edge> edgeWhiteList = [];
+        HashSet<object> endingSelection = [..selection.SelectionBucket().ToList()];
 
         //If faces are selected, find border
         AddFaceBorders(selection, ref selectedIndices, ref edgeWhiteList);
 
         selectedIndices.AddRange(selection.SelectedIndices);
-        
 
         Extrude(sm.CurrentModel, selectedIndices, edgeWhiteList, selection.GetCenter(), out Dictionary<uint, uint> cloneMap);
 
-        AdjustConnectedFaces(selection, sm.CurrentModel, cloneMap, edgeWhiteList);
+        AdjustConnectedFaces(selection, sm.CurrentModel, cloneMap, edgeWhiteList, out Dictionary<Face,Face> faceCloneMap);
 
         //Finalize
-        SelectionManager.Instance.ClearSelection();
+        selection.DeselectAll();
+        foreach (object selected in endingSelection)
+        {
+            if(selected is uint index)
+            {
+                if (cloneMap.TryGetValue(index, out uint value))
+                    selection.SelectIndex(value, UpdateType.Ignore);//Select the clone instead.
+            }
+            else if(selected is Face face)
+            {
+                if(faceCloneMap.TryGetValue(face, out Face? value))
+                    selection.SelectFace(value, UpdateType.Ignore);//Select the clone instead.
+            }
+        }
 
-        //Redisplay.
-        sm.CurrentModel.UpdateAllComponents(UpdateType.Membership);
-        sm.CurrentModel.UpdateAllComponents(UpdateType.Selection);
-
+        selection.Model.UpdateAllComponents(UpdateType.Membership);
+        selection.BroadcastMassUpdate(UpdateType.Selection);
         return CommandState.Finished;
     }
     /// <summary>
@@ -75,8 +87,11 @@ public class ExtrudeCommand : MementoCommand
             }
         }
     }
-    private static void AdjustConnectedFaces(SelectionComponent selection, Model model, Dictionary<uint, uint> cloneMap, HashSet<Edge> edgeWhiteList)
+    private static void AdjustConnectedFaces(SelectionComponent selection, Model model, 
+        Dictionary<uint, uint> cloneMap, HashSet<Edge> edgeWhiteList, 
+        out Dictionary<Face, Face> faceMap)
     {
+        faceMap = [];
         HashSet<Edge> edgesToRemove = [];
 
         foreach(Face face in selection.SelectedFaces)
@@ -118,7 +133,9 @@ public class ExtrudeCommand : MementoCommand
                     newFaceIndices[i] = cloneMap[newFaceIndices[i]];//Remap to new index.
             }
             //Throw back into mesh
-            model.AddFace(new Face(newFaceIndices), UpdateType.Ignore);
+            Face newFace = new Face(newFaceIndices);
+            model.AddFace(newFace, UpdateType.Ignore);
+            faceMap.Add(face, newFace);
         }
 
         //Remove 'floating' undesirable edges.
