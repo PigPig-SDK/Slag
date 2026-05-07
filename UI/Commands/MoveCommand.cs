@@ -17,7 +17,7 @@ public class MoveCommand : ICommand
     public override string ToString() => Name;
 
     public string Description =>
-        "[X, Y, Z] : Specify a move axis\n" +
+        "[X, Y, Z, N] : Specify a move axis/normal\n" +
         "[SHIFT] : Snap to cursor" +
         "[G, Click] : Accept changes\n" +
         "[ESC] : Decline changes";
@@ -33,6 +33,9 @@ public class MoveCommand : ICommand
     private Vector2? _mouseStartPos;
     private bool _activeAxisOverride;
     private Vector3 _activeAxis = new(1, 1, 1);
+
+    private bool _useNormal;
+    private Vector3 _normal = new(0, 0, 0);
 
     private readonly Dictionary<uint, Vector3> _startingPosition = [];
     private List<uint> _selectedIndices = [];
@@ -61,6 +64,8 @@ public class MoveCommand : ICommand
             _selectionCenter = selection.GetCenter();
             _selectedIndices = [.. selection.GetSelection<uint>()];
 
+            ComputeSelectionNormal(selection);
+
             foreach (uint index in _selectedIndices)
             {
                 Vertex vert = _model.GetVertex(index);
@@ -78,6 +83,27 @@ public class MoveCommand : ICommand
         return CommandState.Idle;//Continue the command.
     }
 
+    private void ComputeSelectionNormal(SelectionComponent selection)
+    {
+        int totalSum = 0;
+        foreach(Face face in selection.SelectedFaces)
+        {
+            _normal += face.GetNormal();
+            totalSum++;
+        }
+
+        foreach(Edge edge in selection.SelectedEdges)
+        {
+            _normal += edge.GetAssumedNormal();
+            totalSum++;
+        }
+
+        if (totalSum == 0) return;//Erm. bazinga?
+
+        _normal/= totalSum;
+        _normal.Normalize();
+    }
+
     static void CleanUp()
     {
         foreach(Model model in EditVisualizers.Instance.AllVisualizers)
@@ -90,7 +116,11 @@ public class MoveCommand : ICommand
     private void MoveSelection(Vector2 mouseDelta)
     {
         Vector3 moveDirection = (_cameraMoveDirections.realitiveRight * mouseDelta.X) + (_cameraMoveDirections.realitiveUp * mouseDelta.Y);
+        if (_useNormal)
+            moveDirection = _normal * mouseDelta.Length;
+
         moveDirection *= _moveDistanceScale;
+
 
         if (_isModelMove)
         {
@@ -197,6 +227,13 @@ public class MoveCommand : ICommand
                 }
                 ActiveAxisZeroCheck();
                 return CommandState.Idle;
+            case Key.N:
+                {
+                    //Cannot use normal mode without a valid normal.
+                    if(_normal.LengthSquared == 0) return CommandState.Idle;
+                    _useNormal = !_useNormal;
+                    return CommandState.Idle;
+                }
             case Key.Escape:
                 {
                     MoveSelection(Vector2.Zero);
