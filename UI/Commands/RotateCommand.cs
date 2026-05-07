@@ -286,11 +286,15 @@ public class RotateCommand : ICommand
 
     public void Redo()
     {
+
         Rotate(_totalRotation);
     }
 
     public void Undo()
     {
+        float snapValueCached = _snapValue;
+        _snapValue = 0;
         Rotate(0);
+        _snapValue = snapValueCached;
     }
 }

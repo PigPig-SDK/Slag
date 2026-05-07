@@ -221,7 +221,10 @@ public class ScaleCommand : ICommand
 
     public void Undo()
     {
+        float snapValueCached = _snapValue;
+        _snapValue = 0;
         Scale(1.0f);
+        _snapValue = snapValueCached;
     }
     public void Redo()
     {

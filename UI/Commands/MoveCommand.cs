@@ -221,7 +221,10 @@ public class MoveCommand : ICommand
     }
     public void Undo()
     {
+        float snapValueCached = _snapValue;
+        _snapValue = 0;
         MoveSelection(Vector2.Zero);
+        _snapValue = snapValueCached;
     }
 
     public void Redo()
