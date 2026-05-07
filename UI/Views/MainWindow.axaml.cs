@@ -8,6 +8,7 @@ using UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Avalonia.Media;
 
 namespace UI.Views;
 
@@ -28,11 +29,14 @@ public partial class MainWindow : Window
             _instance = value;
         }
     }
+    private Brush _deselectedBrush = new SolidColorBrush(Color.FromArgb(100,0,0,0));
+
     public MainWindow()
     {
         InitializeComponent();
         Instance = this;
         CommandInvoker.Singleton.CommandTextUpdated += Singleton_CommandExecuted;
+        SelectionModeChange(SelectionManager.Instance.CurrentSelectionMode);
     }
 
     private void Singleton_CommandExecuted(ICommand? obj)
@@ -99,10 +103,10 @@ public partial class MainWindow : Window
     {
         SelectionManager.Instance.CurrentSelectionMode = mode;
 
-        faceButton.Background = (mode == ViewModels.SelectionMode.Face) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
-        vertexButton.Background = (mode == ViewModels.SelectionMode.Vertex) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
-        objectButton.Background = (mode == ViewModels.SelectionMode.Mesh) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
-        edgeButton.Background = (mode == ViewModels.SelectionMode.Edge) ? Avalonia.Media.Brushes.Orange : Avalonia.Media.Brushes.Transparent;
+        faceButton.Background = (mode == ViewModels.SelectionMode.Face) ? Avalonia.Media.Brushes.Orange : _deselectedBrush;
+        vertexButton.Background = (mode == ViewModels.SelectionMode.Vertex) ? Avalonia.Media.Brushes.Orange : _deselectedBrush;
+        objectButton.Background = (mode == ViewModels.SelectionMode.Mesh) ? Avalonia.Media.Brushes.Orange : _deselectedBrush;
+        edgeButton.Background = (mode == ViewModels.SelectionMode.Edge) ? Avalonia.Media.Brushes.Orange : _deselectedBrush;
     }
 
     private async void OnFileOpen(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

@@ -7,14 +7,14 @@ xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
              mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="40"
              x:Class="UI.SunEditView">
       <StackPanel Orientation="Horizontal" 
-      HorizontalAlignment="Stretch">
-    <Button HorizontalAlignment="Stretch"
-            Focusable="False" Margin="5"
+      HorizontalAlignment="Center">
+    <Button HorizontalAlignment="Center"
+            Focusable="False"
             Click="ToggleSun"
             CornerRadius="15" ToolTip.Tip="Toggle Sun">
             <Grid>
-                <iconPacks:PackIconBootstrapIcons Kind="Sun" Width="16" Height="16"/>
-                <iconPacks:PackIconBootstrapIcons x:Name="sunActiveIcon" Kind="SunFill" Width="16" Height="16"/>
+                <iconPacks:PackIconBootstrapIcons Kind="Sun" Width="20" Height="20"/>
+                <iconPacks:PackIconBootstrapIcons x:Name="sunActiveIcon" Kind="SunFill" Width="20" Height="20"/>
             </Grid>
           </Button>
       </StackPanel>

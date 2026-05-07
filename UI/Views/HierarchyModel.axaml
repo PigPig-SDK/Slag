@@ -28,7 +28,7 @@
             <Grid RowDefinitions="Auto,*,*,*,*,*" RowSpacing="10">
             
             <!-- Top: Delete button -->
-            <StackPanel Spacing="5" Orientation="Horizontal" Grid.Row="0">
+            <StackPanel Spacing="5" Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="0">
                 <Button HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         ToolTip.Tip="Delete"

@@ -117,8 +117,8 @@
 
             <!-- OpenGL view -->
             <local:GLControl Grid.Column="2" VerticalAlignment="Stretch"/>
-            <Canvas Name="OverlayCanvas" ClipToBounds="True" IsHitTestVisible="False" Grid.Column="2" VerticalAlignment="Stretch"/>
-                <Grid Grid.Column="2">
+            <Canvas Name="OverlayCanvas" ClipToBounds="True" IsHitTestVisible="False" Grid.Column="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                <Grid Grid.Column="2" HorizontalAlignment="Stretch">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
@@ -130,10 +130,11 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Horizontal" ToolTip.Tip="Mesh Visibility">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <ComboBox Width="140"
                                   SelectedIndex="0"
                                   CornerRadius="0 0 10 0"
+                                  ToolTip.Tip="Mesh Visibility"
                                   SelectionChanged="OnRendermodeChanged"
                                   Focusable="False">
                             <ComboBoxItem Tag="All">
@@ -161,24 +162,7 @@
                                     </StackPanel>
                             </ComboBoxItem>
                         </ComboBox>
-                        <!-- TODO: Refactor this for less duplication-->
-                        <Button Width="30" Height="30" CornerRadius="0 0 10 10" 
-                                Background="Transparent" x:Name="vertexButton" Click="OnVertexPressed" ToolTip.Tip="Vertex Mode">
-                            <Image Width="25" MinWidth="0" Source="../Assets/vertex.png"/>
-                        </Button>
-                        <Button Width="30" Height="30" CornerRadius="0 0 10 10" 
-                                Background="Transparent" x:Name="edgeButton" Click="OnEdgePressed" ToolTip.Tip="Edge Mode">
-                            <Image Width="25" MinWidth="0" Source="../Assets/edge.png"/>
-                        </Button>
-                        <Button  Width="30" Height="30" CornerRadius="0 0 10 10" 
-                                Background="Transparent" x:Name="faceButton" Click="OnFacePressed" ToolTip.Tip="Face Mode">
-                            <Image Width="25" MinWidth="0" Source="../Assets/face.png"/>
-                        </Button>
-                        <Button Width="30" Height="30" CornerRadius="0 0 10 10" 
-                                Background="Orange" x:Name="objectButton" Click="OnShapePressed" ToolTip.Tip="Object Mode">
-                            <Image Width="25" MinWidth="0" Source="../Assets/object.png"/>
-                        </Button>
-                        <Grid Width="100" Height="30">
+                        <Grid Height="30">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
@@ -195,6 +179,27 @@
                             <Image Grid.Column="0" HorizontalAlignment="Left" 
                                    Width="10" MinWidth="0" Margin="5" Source="../Assets/icons/lock.png"/>
                         </Grid>
+                        <!-- TODO: Refactor this for less duplication-->
+                        <Button Width="32" Height="32" CornerRadius="0 0 10 10"
+                                 BorderBrush="#A3A3A3"
+                                 x:Name="vertexButton" Click="OnVertexPressed" ToolTip.Tip="Vertex Mode">
+                            <Image Width="25" MinWidth="0" Source="../Assets/vertex.png"/>
+                        </Button>
+                        <Button Width="32" Height="32" CornerRadius="0 0 10 10"
+                                 BorderBrush="#A3A3A3"
+                                 x:Name="edgeButton" Click="OnEdgePressed" ToolTip.Tip="Edge Mode">
+                            <Image Width="25" MinWidth="0" Source="../Assets/edge.png"/>
+                        </Button>
+                        <Button Width="32" Height="32" CornerRadius="0 0 10 10"
+                                 BorderBrush="#A3A3A3"
+                                 x:Name="faceButton" Click="OnFacePressed" ToolTip.Tip="Face Mode">
+                            <Image Width="25" MinWidth="0" Source="../Assets/face.png"/>
+                        </Button>
+                        <Button Width="32" Height="32" CornerRadius="0 0 10 10"
+                                 BorderBrush="#A3A3A3"
+                                 x:Name="objectButton" Click="OnShapePressed" ToolTip.Tip="Object Mode">
+                            <Image Width="25" MinWidth="0" Source="../Assets/object.png"/>
+                        </Button>
                     </StackPanel>
                     <Canvas Grid.Row="1">
                         <Grid RowDefinitions="auto,auto,auto">
