@@ -76,6 +76,8 @@ public class CommandInvoker
     public bool ExecuteUndo()
     {
         if(_undoQueue.Count <= 0) return false;
+        SelectionManager.Instance.ClearSelection();
+
         ICommand command = _undoQueue.Pop();
         command.Undo();
         _redoQueue.Push(command);
