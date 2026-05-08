@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using System.Globalization;
 
 namespace Core;
 
@@ -13,6 +14,9 @@ public static class OBJFile
     private const string MaterialToken = "usemtl";
     private const string GroupToken = "g";
     private const string SmoothToken = "s";
+    private const string locationalToken = "slagPOS";
+    private const string rotateToken = "slagROT";
+    private const string sizeToken = "slagSIZ";
 
     private static bool StreamReaderContainsMultipleObjects(StreamReader reader)
     {
@@ -41,8 +45,11 @@ public static class OBJFile
         foreach(Model model in SceneHierarchy.Instance.GetModels(HierarchyType.Model))
         {
             writer.WriteLine($"{ObjectToken} {model.ObjectName}");
+            writer.WriteLine($"{sizeToken} {model.Scale.X} {model.Scale.Y} {model.Scale.Z}");
+            writer.WriteLine($"{rotateToken} {model.Rotation.X} {model.Rotation.Y} {model.Rotation.Z}");
+            writer.WriteLine($"{locationalToken} {model.Position.X} {model.Position.Y} {model.Position.Z}");
             //Write all verts to list
-            foreach(Vertex v in model.Verticies)
+            foreach (Vertex v in model.Verticies)
                 writer.WriteLine($"{VertexToken} {v.Position.X} {v.Position.Y} {v.Position.Z}");
             //Write normals
             foreach (Vertex v in model.Verticies)
@@ -206,7 +213,24 @@ public static class OBJFile
                             list[^1].AddFace(faceData);
                             break;
                         }
-                        ///Unused tokens.
+                    case locationalToken:
+                        goto case sizeToken;
+                    case rotateToken:
+                        goto case sizeToken;
+                    case sizeToken:
+                        if (tokens.Length != 4) throw new InvalidDataException($"Face data not valid on line : {lineCount}\n{data}");
+                        float posX = float.Parse(tokens[1], CultureInfo.InvariantCulture);
+                        float posY = float.Parse(tokens[2], CultureInfo.InvariantCulture);
+                        float posZ = float.Parse(tokens[3], CultureInfo.InvariantCulture);
+                        Vector3 vector = new Vector3(posX, posY, posZ);
+                        if(tokens[0] == sizeToken)
+                            list[^1].Scale = vector;
+                        else if(tokens[0] == rotateToken)
+                            list[^1].Rotation = vector;
+                        else if( tokens[0] == locationalToken)
+                            list[^1].Position = vector;
+                        break;
+                    ///Unused tokens.
                     case NormalToken:
                     case MaterialLibToken:
                     case MaterialToken:
