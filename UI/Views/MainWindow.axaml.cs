@@ -38,6 +38,8 @@ public partial class MainWindow : Window
         CommandInvoker.Singleton.CommandTextUpdated += Singleton_CommandExecuted;
         SelectionModeChange(SelectionManager.Instance.CurrentSelectionMode);
         SelectionManager.Instance.OnSelectionChanged += SelectionModeChanged;
+        Width = 700;
+        Height = 700;
     }
 
     private void SelectionModeChanged(ViewModels.SelectionMode currentSelection)
@@ -131,7 +133,7 @@ public partial class MainWindow : Window
                     Patterns = new[] { "*.obj" },
                 } },
             AllowMultiple = true
-        });
+        }).ConfigureAwait(true);
 
         for (int i = 0; i < files.Count; i++)
         {
@@ -157,7 +159,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void OnFileSave(object? sender, RoutedEventArgs e)
+    public async void OnFileSave(object? sender, RoutedEventArgs e)
     {
         var topLevel = TopLevel.GetTopLevel(this);
         if (topLevel == null)
@@ -182,15 +184,18 @@ public partial class MainWindow : Window
                 }
             ],
             ShowOverwritePrompt = true
-        });
+        }).ConfigureAwait(true);
 
         if (file == null) return;//User didnt make a selection
+        
+        Stream stream = await file.OpenWriteAsync().ConfigureAwait(true);
+        
 
-        Stream stream = await file.OpenWriteAsync();
         try
         {
             using StreamWriter streamWriter = new(stream);
             OBJFile.SaveOBJ(streamWriter);
+            OBJFile.LastSaveLocation = file.Path.OriginalString;
         }
         catch (InvalidDataException exception)
         {

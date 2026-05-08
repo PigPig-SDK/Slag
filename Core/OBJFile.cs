@@ -18,6 +18,8 @@ public static class OBJFile
     private const string rotateToken = "slagROT";
     private const string sizeToken = "slagSIZ";
 
+    public static string? LastSaveLocation { get; set; }
+
     private static bool StreamReaderContainsMultipleObjects(StreamReader reader)
     {
         string? line = "";
@@ -249,5 +251,17 @@ public static class OBJFile
             Console.WriteLine($"An error occurred while reading the file: {e.Message}");
         }
         return list;
+    }
+
+    public static bool TrySaveOBJ()
+    {
+        if(LastSaveLocation is null)
+        {
+            return false;
+        }
+        Uri uri = new Uri(LastSaveLocation);
+        using var writer = new StreamWriter(uri.LocalPath);
+        SaveOBJ(writer);
+        return true;
     }
 }

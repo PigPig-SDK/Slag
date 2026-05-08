@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using UI.Commands;
+using UI.Views;
 
 
 namespace UI.ViewModels;
@@ -84,6 +85,13 @@ public class InputManager
                 break;
             case Key.D4:
                 SelectionManager.Instance.CurrentSelectionMode = SelectionMode.Mesh;
+                break;
+            case Key.S:
+                if (!UserControlMode.HasFlag(UserControlMode.Ctrl)) goto default;//Let command handle it... We only care about CTRL+S
+                if(!OBJFile.TrySaveOBJ())
+                {
+                    MainWindow.Instance.OnFileSave(null, e);
+                }
                 break;
             default:
                 {
