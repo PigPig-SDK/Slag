@@ -24,7 +24,7 @@ public partial class HierarchyView : UserControl
         InitializeComponent();
         foreach (Model model in SceneHierarchy.Instance.GetModels(HierarchyType.Model))
         {
-            OnModelAdded(HierarchyType.Model,model);
+            OnModelAdded(HierarchyType.Model, model);
         }
         DetachedFromVisualTree += OnDetach;
         AttachedToVisualTree += OnAttach;
@@ -54,7 +54,7 @@ public partial class HierarchyView : UserControl
         _Mapping.Remove(model);
     }
 
-    private void OnModelAdded(HierarchyType hierarchyType,Model model)
+    private void OnModelAdded(HierarchyType hierarchyType, Model model)
     {
         HierarchyModel modelView = new HierarchyModel { Model = model };
         HierarchyStack.Children.Add(modelView);
@@ -70,12 +70,20 @@ public partial class HierarchyView : UserControl
         }
     }
 
+    private void OnAddPlanePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        Model plane = ModelPrefabs.Plane(1.0f);
+        SceneHierarchy.Instance.AddModel(HierarchyType.Model, plane);
+        SelectionManager.Instance.SelectModel(plane);
+    }
     private void OnAddCubePressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        SceneHierarchy.Instance.AddModel(HierarchyType.Model,ModelPrefabs.Cube());
+        Model cube = ModelPrefabs.Cube();
+        SceneHierarchy.Instance.AddModel(HierarchyType.Model, cube);
+        SelectionManager.Instance.SelectModel(cube);
     }
 
-    public async void SummonObjectWithSteps(string title, string description,Func<int, Model> modelProducer, int width, int height)
+    public async void SummonObjectWithSteps(string title, string description, Func<int, Model> modelProducer, int width, int height)
     {
         var parentWindow = TopLevel.GetTopLevel(this) as Window;
         if (parentWindow == null) return;
@@ -183,7 +191,7 @@ public partial class HierarchyView : UserControl
         circleRadiusInput.ValueChanged += (_, e) => { circleRadius = (float)Math.Clamp(e.NewValue ?? 0, 0, 50000); };
 
         //Handle the redraw...
-        EventHandler<NumericUpDownValueChangedEventArgs> ? onUpdateHook = (_, e) =>
+        EventHandler<NumericUpDownValueChangedEventArgs>? onUpdateHook = (_, e) =>
         {
             SceneHierarchy.Instance.RemoveModel(HierarchyType.Model, model);
             model = ModelPrefabs.Torus(stepSize, stepSize, torusRadius, circleRadius);
@@ -199,7 +207,7 @@ public partial class HierarchyView : UserControl
             Orientation = Orientation.Vertical,
             Spacing = 8,
             VerticalAlignment = VerticalAlignment.Stretch,
-            Children =  { MenuPropertyCreator("Step", stepInput) , MenuPropertyCreator("Torus Radius", radiusInput), MenuPropertyCreator("Circle Radius", circleRadiusInput) }
+            Children = { MenuPropertyCreator("Step", stepInput), MenuPropertyCreator("Torus Radius", radiusInput), MenuPropertyCreator("Circle Radius", circleRadiusInput) }
         };
 
         var dialog = new ConfirmDialog("Add Torus", "Select values", 300, 275, panel);
