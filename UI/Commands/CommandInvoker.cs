@@ -17,8 +17,8 @@ public class CommandInvoker
     /// </summary>
     public event Action<ICommand?>? CommandTextUpdated;
 
-    private readonly FixedSizeStack<ICommand> _undoQueue = new(40);
-    private readonly FixedSizeStack<ICommand> _redoQueue = new(40);
+    private readonly FixedSizeList<ICommand> _undoQueue = new(40);
+    private readonly FixedSizeList<ICommand> _redoQueue = new(40);
 
     public void RunCommand(ICommand command, (KeyEventArgs? key, PointerEventArgs? mouse, CommandInfo info) args)
     {
