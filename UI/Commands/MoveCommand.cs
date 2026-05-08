@@ -1,11 +1,17 @@
-﻿using Avalonia.Input;
-using UI.ViewModels;
+﻿using Avalonia.Collections;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Input;
+using Avalonia.Media;
+using Core;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
-using Core;
 using System.Reflection.Metadata.Ecma335;
+using UI.ViewModels;
+using UI.Views;
 
 namespace UI.Commands;
 
@@ -47,9 +53,13 @@ public class MoveCommand : ICommand
     private readonly Dictionary<Model, Vector3> _modelsStartingPosition = [];
     private bool _isModelMove;
     private float _snapValue;
+
+    //UI stuff..
+    private Line? _uiLine;
+    private TextBlock? _textblock;
     private CommandState Initialize()
     {
-        _isModelMove = SelectionManager.Instance.CurrentSelectionMode == SelectionMode.Mesh;
+        _isModelMove = SelectionManager.Instance.CurrentSelectionMode == ViewModels.SelectionMode.Mesh;
         _cameraMoveDirections = Camera.Instance.GetRealitiveDirections();
         _snapValue = SelectionManager.Instance.SnapValue;
         if (_isModelMove == false)
@@ -80,6 +90,31 @@ public class MoveCommand : ICommand
                 _modelsStartingPosition.Add(model, model.Position);
             }
         }
+
+        //UI
+        if (MainWindow.Instance != null)
+        {
+            _uiLine = new()
+            {
+                StartPoint = new(0, 0),
+                EndPoint = new(0, 0),
+                Stroke = SelectionManager.SelectionColor,
+                StrokeThickness = 2,
+                StrokeDashArray = new AvaloniaList<double> { 4, 4 }
+            };
+
+            _textblock = new()
+            {
+                Text = "",
+                Foreground = SelectionManager.SelectionColor,
+                FontSize = 14,
+                IsVisible = false,
+            };
+
+            MainWindow.Instance.OverlayCanvas.Children.Add(_uiLine);
+            MainWindow.Instance.OverlayCanvas.Children.Add(_textblock);
+        }
+
         return CommandState.Idle;//Continue the command.
     }
 
@@ -104,23 +139,23 @@ public class MoveCommand : ICommand
         _normal.Normalize();
     }
 
-    static void CleanUp()
+    void CleanUp()
     {
         foreach(Model model in EditVisualizers.Instance.AllVisualizers)
         {
             model.Hidden = true;
             model.Position = Vector3.Zero;
         }
+        CleanUpUi();
     }
 
     private void MoveSelection(Vector2 mouseDelta)
     {
         Vector3 moveDirection = (_cameraMoveDirections.realitiveRight * mouseDelta.X) + (_cameraMoveDirections.realitiveUp * mouseDelta.Y);
         if (_useNormal)
-            moveDirection = _normal * mouseDelta.Length;
+            moveDirection = _normal * mouseDelta.X;
 
         moveDirection *= _moveDistanceScale;
-
 
         if (_isModelMove)
         {
@@ -173,6 +208,16 @@ public class MoveCommand : ICommand
             Vector2 mousePos = new((float)mouseInfo.X, (float)mouseInfo.Y);
             _mouseStartPos ??= mousePos;
             _moveDistance = mousePos - _mouseStartPos.Value;
+
+            _uiLine!.StartPoint = new Avalonia.Point(_mouseStartPos.Value.X, _mouseStartPos.Value.Y);
+            _uiLine!.EndPoint = new Avalonia.Point(mousePos.X, mousePos.Y);
+            if (_textblock is not null)
+            {
+                Vector2 textPosition = _mouseStartPos.Value + _moveDistance / 2;
+                _textblock.IsVisible = true;
+                _textblock!.RenderTransform = new TranslateTransform(textPosition.X, textPosition.Y);
+                _textblock.Text = (_moveDistance.LengthFast * _moveDistanceScale).ToString("F2", CultureInfo.InvariantCulture);
+            }
 
             MoveSelection(_moveDistance);
 
@@ -267,5 +312,14 @@ public class MoveCommand : ICommand
     public void Redo()
     {
         MoveSelection(_moveDistance);
+    }
+    private void CleanUpUi()
+    {
+        Canvas canvas = MainWindow.Instance.OverlayCanvas;
+
+        if (_uiLine is not null)
+            canvas.Children.Remove(_uiLine);
+        if (_textblock is not null)
+            canvas.Children.Remove(_textblock);
     }
 }
