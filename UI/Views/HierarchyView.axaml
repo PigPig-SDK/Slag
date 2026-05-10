@@ -69,6 +69,7 @@
                 <Button HorizontalAlignment="Center"
                     Focusable="False"
                     Click="ResetCamera"
+                    Margin="5"
                     CornerRadius="15" ToolTip.Tip="Reset Camera">
                     <Grid>
                         <iconPacks:PackIconBootstrapIcons Kind="Camera" Width="20" Height="20"/>
