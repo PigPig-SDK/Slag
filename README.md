@@ -3,9 +3,9 @@
   Slag
 </h1>
 Which stands for Simple Luminiferous Associated Geometrification, an acronym I made up just to waste your time.
-<br>
-<br>
-Built for learning purposes, not as a competitor to existing modeling tools. This project explores OpenGL rendering within [Avalonia UI](https://avaloniaui.net/), which turned out to be a surprisingly pleasant combination.
+
+
+Built for learning purposes, not as a competitor to existing modeling tools. This project explores OpenGL rendering within [Avalonia UI,](https://avaloniaui.net/) which turned out to be a surprisingly pleasant combination.
 
 ## Showcase
 
