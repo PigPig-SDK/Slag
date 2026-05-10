@@ -246,4 +246,9 @@ public partial class HierarchyView : UserControl
 
         return grid;
     }
+
+    private void ResetCamera(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        Camera.Instance.Reset();
+    }
 }

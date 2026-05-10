@@ -26,9 +26,13 @@ public class Camera
 
     //camera controls
     //Pitch and YAW are in radians
-    private float _pitch = float.Pi / 4;
-    private float _yaw = float.Pi / 4;
-    private float _zoom = 5.0f;
+    private const float _startPitch = float.Pi / 4;
+    private const float _startYaw = float.Pi / 4;
+    private const float _startZoom = 5.0f;
+
+    private float _pitch = _startPitch;
+    private float _yaw = _startYaw;
+    private float _zoom = _startZoom;
 
     private bool _isDragging;
     private Point _lastDragLocation;
@@ -150,6 +154,14 @@ public class Camera
         worldToScreen.Y = (float)GLControl.Instance.Bounds.Height - worldToScreen.Y; // flip Y
 
         return worldToScreen;
+    }
+
+    public void Reset()
+    {
+        _pitch = _startPitch;
+        _yaw = _startYaw;
+        _zoom = _startZoom;
+        _cameraOffset = new Vector3(0, 0, 0);
     }
 
     /// <summary>

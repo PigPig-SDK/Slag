@@ -66,6 +66,14 @@
                     </Button.ContextMenu>
                 </Button>
                 <ui:SunEditView/>
+                <Button HorizontalAlignment="Center"
+                    Focusable="False"
+                    Click="ResetCamera"
+                    CornerRadius="15" ToolTip.Tip="Reset Camera">
+                    <Grid>
+                        <iconPacks:PackIconBootstrapIcons Kind="Camera" Width="20" Height="20"/>
+                    </Grid>
+                </Button>
             </StackPanel>
             <Separator Grid.Row="1"/>
             <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
