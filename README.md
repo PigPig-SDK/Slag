@@ -10,11 +10,8 @@ Built for learning purposes, not as a competitor to existing modeling tools. Thi
 ## Showcase
 
 <div align="center">
-    <video src="./images/torus.mp4" height="256">
-</div>
-
-<div align="center">
-    <video src="./images/import.mp4" height="256">
+  <video src="https://github.com/user-attachments/assets/4f5b794a-1bff-48a5-9b1f-02323d48b5cf" height="256" autoplay loop muted playsinline></video>
+  <video src="https://github.com/user-attachments/assets/d38d3ef3-e811-4424-a8c2-64a2ebbd6145" height="256" autoplay loop muted playsinline></video>
 </div>
 
 ## Features
