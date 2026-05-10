@@ -289,7 +289,7 @@ public static partial class ModelPrefabs
         return triangle;
     }
     /// <returns>An XYZ axis triad shape for debugging</returns>
-    public static Model AxisTriad()
+    public static Model AxisTriadOld()
     {
         Model triad = new Model();
         triad.ObjectName = "Triad";
@@ -341,5 +341,27 @@ public static partial class ModelPrefabs
         triad.AddEdge(new Edge(0, 1));
 
         return triad;
+    }
+
+    public static Model[] AxisTriad(string xname, string yname, string zname)
+    {
+        Model[] models = new Model[3];
+
+        models[0] = Cone(20, 1, 0.1f);
+        models[0].ObjectName = xname;
+        models[0].Rotation = new Vector3(-MathF.PI / 2, 0,0);
+        models[0].Position = new Vector3(0, 0, 1);
+
+        models[1] = Cone(20, 1, 0.1f);
+        models[1].ObjectName = yname;
+        models[1].Rotation = new Vector3(MathF.PI, 0, 0);
+        models[1].Position = new Vector3(0, 1, 0);
+
+        models[2] = Cone(20, 1, 0.1f);
+        models[2].ObjectName = zname;
+        models[2].Rotation = new Vector3(0, 0, MathF.PI/2);
+        models[2].Position = new Vector3(1, 0, 0);
+
+        return models;
     }
 }

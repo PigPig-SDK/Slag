@@ -8,6 +8,10 @@ public class SceneHierarchy
     public const string YPlaneName = "YPlane";
     public const string ZPlaneName = "ZPlane";
 
+    public const string ZAxisName = "ZTriad";
+    public const string YAxisName = "YTriad";
+    public const string XAxisName = "XTriad";
+
     public IReadOnlyDictionary<HierarchyType, List<Model>> HierarchyCategories => _hierarchyCategories;
     private Dictionary<HierarchyType, List<Model>> _hierarchyCategories = new()
     {
@@ -16,8 +20,8 @@ public class SceneHierarchy
         [   ModelPrefabs.Plane(40, XPlaneName),
             ModelPrefabs.Plane(40, YPlaneName),
             ModelPrefabs.Plane(40, ZPlaneName)] },
-        { HierarchyType.Tool, [
-            ModelPrefabs.AxisTriad()]},
+        { HierarchyType.Tool, 
+        [..ModelPrefabs.AxisTriad(XAxisName, YAxisName, ZAxisName)]},
     };
 
     public event Action<HierarchyType,Model>? OnModelAdded;

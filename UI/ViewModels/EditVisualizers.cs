@@ -8,10 +8,11 @@ namespace UI.ViewModels;
 public class EditVisualizers
 {
     public Model AxisVisualizerX { get; set; }
-
     public Model AxisVisualizerY { get; set; }
-
     public Model AxisVisualizerZ { get; set; }
+    public Model OriginVisualizerX { get; set; }
+    public Model OriginVisualizerY { get; set; }
+    public Model OriginVisualizerZ { get; set; }
 
     private static EditVisualizers? _instance;
     public static EditVisualizers Instance { 
@@ -51,6 +52,23 @@ public class EditVisualizers
             throw new InvalidOperationException("Failed to initialize edit visualizers, not all planes found!");
         }
 
+        foreach (Model model in SceneHierarchy.Instance.GetModels(HierarchyType.Tool))
+        {
+            switch (model.ObjectName)
+            {
+                case SceneHierarchy.XAxisName:
+                    OriginVisualizerX = model;
+                    break;
+                case SceneHierarchy.YAxisName:
+                    OriginVisualizerY = model;
+                    break;
+                case SceneHierarchy.ZAxisName:
+                    OriginVisualizerZ = model;
+                    break;
+
+            }
+        }
+
         GLComponent.OnBoundToModel += OnGlComponentBound;
 
     }
@@ -61,12 +79,15 @@ public class EditVisualizers
     {
         switch (component.Model.ObjectName)
         {
+            case SceneHierarchy.XAxisName:
             case SceneHierarchy.XPlaneName:
                 component.Color = new OpenTK.Mathematics.Color4(1, 0, 0, 1.0f);
                 break;
+            case SceneHierarchy.YAxisName:
             case SceneHierarchy.YPlaneName:
                 component.Color = new OpenTK.Mathematics.Color4(0, 1, 0, 1.0f);
                 break;
+            case SceneHierarchy.ZAxisName:
             case SceneHierarchy.ZPlaneName:
                 component.Color = new OpenTK.Mathematics.Color4(0, 0, 1, 1.0f);
                 break;
@@ -76,7 +97,13 @@ public class EditVisualizers
 
         component.IsFullbright = true;
         component.UseTilemapRendering = true;
-        component.Hidden = true;//Start hidden, only show when needed.
+
+        if (component.Model.ObjectName.Equals(SceneHierarchy.ZPlaneName, StringComparison.Ordinal)
+            || component.Model.ObjectName.Equals(SceneHierarchy.XPlaneName, StringComparison.Ordinal)
+            || component.Model.ObjectName.Equals(SceneHierarchy.YPlaneName, StringComparison.Ordinal))
+        {
+            component.Hidden = true;//Start hidden, only show when needed.
+        }
     }
 
     public IEnumerable<Model> AllVisualizers
