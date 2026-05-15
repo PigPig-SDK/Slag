@@ -13,7 +13,7 @@ public class Edge : ICloneable
     public uint Vertex2 { get; internal set; }
     public bool IsSharp { get; set; }
 
-    public List<Face> Faces { get; set; } = [];
+    public HashSet<Face> Faces { get; } = [];
 
     public Edge(uint vertex1, uint vertex2, params Face[] faces) : this(vertex1, vertex2)
     {

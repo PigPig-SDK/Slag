@@ -4,6 +4,9 @@ using Avalonia.OpenGL.Controls;
 using Core;
 using OpenTK.Mathematics;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace UI.ViewModels;
 
@@ -93,14 +96,14 @@ public class Camera
         );
     }
 
-    public RaycastHit? FindRaycastHit(Vector2 screenLocation, HierarchyType hierarchySelection = HierarchyType.Model)
+    public RaycastHit? FindRaycastHit(Vector2 screenLocation, IEnumerable<Model> models)
     {
         double width = _glBase.Bounds.Width;
         double height = _glBase.Bounds.Height;
         float aspect = (float)(width / height);
         Vector2 screenSize = new Vector2((float)width, (float)height);
 
-        return Raycast.GetObjectHitScreenLocation(SceneHierarchy.Instance.GetModels(hierarchySelection), Origin, WorldUp, LookAt, aspect, FOV, screenLocation, screenSize);
+        return Raycast.GetObjectHitScreenLocation(models, Origin, WorldUp, LookAt, aspect, FOV, screenLocation, screenSize);
     }
 
     public void OnMouseDown(object? sender, PointerPressedEventArgs e)

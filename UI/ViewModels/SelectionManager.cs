@@ -118,7 +118,7 @@ public class SelectionManager
 
     private void CheckForMeshSelection(Vector2 screenPosition, bool isDrag)
     {
-        RaycastHit? hit = Camera.Instance.FindRaycastHit(screenPosition);
+        RaycastHit? hit = Camera.Instance.FindRaycastHit(screenPosition, SceneHierarchy.Instance.GetModels(HierarchyType.Model));
         if (hit != null)
         {
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
@@ -133,15 +133,15 @@ public class SelectionManager
 
     private void CheckForVertexSelection(Vector2 screenPosition, bool isDrag)
     {
+        if (CurrentModel is null) return;
         if (!IsSelectionTimingValid(isDrag)) return;
 
-        VertexHit? hit = Raycast.GetVertexHit(SceneHierarchy.Instance.GetModels(HierarchyType.Selected),
+        VertexHit? hit = Raycast.GetVertexHit([CurrentModel],
             Camera.Instance.ScreenToGlCoords(screenPosition), Camera.Instance.ViewMatrix);
 
         if (hit != null)
         {
-            if (hit.Model != CurrentModel) return;
-            SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>() ?? throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
+            SelectionComponent? ms = GetSelectionComponent();
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
 
@@ -159,17 +159,19 @@ public class SelectionManager
     private void CheckForEdgeSelection(Vector2 screenPosition, bool isDrag)
     {
         if (!IsSelectionTimingValid(isDrag)) return;
+        if (CurrentModel is null) return;
 
         EdgeHit? hit = Raycast.GetEdgeHit(
-            SceneHierarchy.Instance.GetModels(HierarchyType.Selected), 
+            [CurrentModel], 
             Camera.Instance.ScreenToGlCoords(screenPosition), 
             Camera.Instance.ViewMatrix,
             Camera.Instance.Origin);
 
         if (hit != null)
         {
-            if (hit.Model != CurrentModel) return;
-            SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>() ?? throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!"); ;
+            SelectionComponent? ms = GetSelectionComponent();
+            if (ms is null) return;
+
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
 
@@ -196,13 +198,14 @@ public class SelectionManager
     private void CheckForFaceSelection(Vector2 screenPosition, bool isDrag)
     {
         if (!IsSelectionTimingValid(isDrag)) return;
+        if (CurrentModel is null) return;
 
-        RaycastHit? hit = Camera.Instance.FindRaycastHit(screenPosition, HierarchyType.Selected);
+        RaycastHit? hit = Camera.Instance.FindRaycastHit(screenPosition, [CurrentModel]);
         if (hit != null)
         {
-            if (hit.Model != CurrentModel) return;
+            SelectionComponent? ms = GetSelectionComponent();
+            if (ms is null) return;
 
-            SelectionComponent? ms = hit!.Model.GetComponent<SelectionComponent>() ?? throw new InvalidOperationException($"Model dosn't contain {nameof(SelectionComponent)}!");
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
 
@@ -226,7 +229,7 @@ public class SelectionManager
     public void DeleteCurrentSelection()
     {
         if(CurrentModel == null) return;
-        SelectionComponent? component = CurrentModel.GetComponent<SelectionComponent>();
+        SelectionComponent? component = GetSelectionComponent();
         if (component is null) return;
 
         var selectionBucket = component!.SelectionBucket().ToArray();

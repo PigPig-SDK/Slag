@@ -56,7 +56,7 @@ public class DebugCommand : ICommand
                         $"Neighbors: [{string.Join(",", hit.Model.VertexEdgeMap[(int)hit.VertexIndex])}]\n";
                 }
 
-                RaycastHit? faceHit = Camera.Instance.FindRaycastHit(args.mouseEvent.GetScreenPos());
+                RaycastHit? faceHit = Camera.Instance.FindRaycastHit(args.mouseEvent.GetScreenPos(), SceneHierarchy.Instance.GetModels(HierarchyType.Model));
                 if (faceHit != null)
                 {
                     info += $"Face Hit:\n{faceHit.Face.ToString()}\n";

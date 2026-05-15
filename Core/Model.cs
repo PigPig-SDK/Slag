@@ -92,7 +92,8 @@ public class Model
         Edge retEdge;
         if (_edges.TryGetValue(edge, out Edge? hashEdge) && hashEdge != null)
         {
-            hashEdge.Faces.AddRange(edge.Faces);
+            foreach(Face face in edge.Faces)
+                hashEdge.Faces.Add(face);
             retEdge = hashEdge;
         }
         else
@@ -105,8 +106,6 @@ public class Model
 
         UpdateAllComponents(updateType);
         return retEdge;
-
-
     }
 
 
@@ -145,36 +144,22 @@ public class Model
 
         //Clear out edgemap and our neighbors
         uint uIndex = (uint)index;
-        //Remove US from our NEIGHBORS
-        foreach (uint neighbor in _vertexEdgeMap[index])
-        {
-            if (neighbor < _vertexEdgeMap.Count)
-                _vertexEdgeMap[(int)neighbor].Remove(uIndex);
-        }
-        //Remove US
-        _vertexEdgeMap.RemoveAt(index);
-
-        //Decrement edgemap set
-        foreach (HashSet<uint> edgeIndices in _vertexEdgeMap)
-        {
-            foreach (uint neighbor in edgeIndices.ToArray())
-            {
-                if(neighbor > index)
-                {
-                    //Decrement!
-                    edgeIndices.Remove(neighbor);
-                    edgeIndices.Add(neighbor - 1);
-                }
-            }
-        }
 
         //Manage faces
-        _faces.RemoveAll(x => x.Contains(uIndex));
+        foreach(Face face in _faces.ToArray())
+        {
+            if(face.Contains(uIndex))
+                RemoveFace(face, UpdateType.Ignore);
+        }
+
         _faces.ForEach(face => face.DecrementForIndex(index));
 
         //Manage edges
-        _edges.RemoveWhere(x => x.Contains(index));
-
+        foreach(Edge edge in  _edges.ToArray())
+        {
+            if(edge.Contains(index)) 
+                RemoveEdge(edge, UpdateType.Ignore);
+        }
 
         HashSet<Edge> overflowEdges = [];
         //Remap old edges by replacing them with new ones.
@@ -189,6 +174,29 @@ public class Model
         //Add edges we couldn't due to hash issues.
         foreach (Edge edge in overflowEdges) _edges.Add(edge);
 
+        //Remove US from our NEIGHBORS
+        foreach (uint neighbor in _vertexEdgeMap[index])
+        {
+            if (neighbor < _vertexEdgeMap.Count)
+                _vertexEdgeMap[(int)neighbor].Remove(uIndex);
+        }
+
+        //Remove US from edgemap
+        _vertexEdgeMap.RemoveAt(index);
+
+        //Decrement edgemap set
+        foreach (HashSet<uint> edgeIndices in _vertexEdgeMap)
+        {
+            foreach (uint neighbor in edgeIndices.ToArray())
+            {
+                if (neighbor > index)
+                {
+                    //Decrement!
+                    edgeIndices.Remove(neighbor);
+                    edgeIndices.Add(neighbor - 1);
+                }
+            }
+        }
 
         _verticies.RemoveAt(index);
         UpdateAllComponents(info);

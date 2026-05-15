@@ -10,7 +10,7 @@ public class Face : ICloneable
 {
     public List<uint> Indices { get; }
 
-    public List<Edge> Edges { get; private set; } = [];
+    public HashSet<Edge> Edges { get; private set; } = [];
 
     public Model? ParentModel { get; set; }
 
