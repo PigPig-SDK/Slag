@@ -3,18 +3,15 @@
   Slag
 </h1>
 Which stands for Simple Luminiferous Associated Geometrification, an acronym I made up just to waste your time.
-<br>
-<br>
-Built for learning purposes, not as a competitor to existing modeling tools. This project explores OpenGL rendering within [Avalonia UI](https://avaloniaui.net/), which turned out to be a surprisingly pleasant combination.
+
+
+Built for learning purposes, not as a competitor to existing modeling tools. This project explores OpenGL rendering within [Avalonia UI,](https://avaloniaui.net/) which turned out to be a surprisingly pleasant combination.
 
 ## Showcase
 
 <div align="center">
-    <video src="./images/torus.mp4" height="256">
-</div>
-
-<div align="center">
-    <video src="./images/import.mp4" height="256">
+  <video src="https://github.com/user-attachments/assets/4f5b794a-1bff-48a5-9b1f-02323d48b5cf" height="256" autoplay loop muted playsinline></video>
+  <video src="https://github.com/user-attachments/assets/d38d3ef3-e811-4424-a8c2-64a2ebbd6145" height="256" autoplay loop muted playsinline></video>
 </div>
 
 ## Features
