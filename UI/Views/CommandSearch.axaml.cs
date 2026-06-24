@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,21 +8,12 @@ using System.Globalization;
 using System.Linq;
 using UI.Commands;
 using UI.ViewModels;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace UI;
 
 public partial class CommandSearch : UserControl
 {
-    HashSet<Type> _commands = new ()
-    {
-        typeof(MoveCommand),
-        typeof(RotateCommand),
-        typeof(ScaleCommand),
-        typeof(ExtrudeCommand),
-        typeof(MergeCommand),
-        typeof(FlipCommand),
-        typeof(DebugCommand),
-    };
     public CommandSearch()
     {
         InitializeComponent();
@@ -61,12 +51,11 @@ public partial class CommandSearch : UserControl
     {
         if (text is not null)
         {
-            foreach (var commandType in _commands)
+            foreach (var commandType in Enum.GetValues<CommandTypes>())
             {
-                if (Activator.CreateInstance(commandType) is not ICommand command) continue;
-
-                if (command.Name.ToLower(CultureInfo.CurrentCulture).Contains(text.ToLower(CultureInfo.CurrentCulture), StringComparison.CurrentCulture))
-                    yield return command;
+                var producer = CommandLookup.CommandFactory[commandType];
+                if (commandType.ToString().ToLower(CultureInfo.CurrentCulture).Contains(text.ToLower(CultureInfo.CurrentCulture), StringComparison.CurrentCulture))
+                    yield return producer(new CommandArguments(null, null, CommandInfo.Initialization)); ;
             }
         }
     }
@@ -86,19 +75,13 @@ public partial class CommandSearch : UserControl
         string? input = SearchBoxInput.Text;
         if (!string.IsNullOrWhiteSpace(input))
         {
-            foreach (Type commandType in _commands)
+            foreach (CommandTypes commandType in Enum.GetValues<CommandTypes>())
             {
-                ICommand? command = Activator.CreateInstance(commandType) as ICommand;
-
-                if (command is null) goto End;
-
-                if(command.Name.ToLower(CultureInfo.CurrentCulture)
-                    .Equals(input.ToLower(CultureInfo.CurrentCulture), StringComparison.Ordinal)) 
-                    CommandInvoker.Singleton.RunCommand((ICommand)Activator.CreateInstance(commandType)!, new (null, null, CommandInfo.Initialization));
+                var producer = CommandLookup.CommandFactory[commandType];
+                if (commandType.ToString().ToLower(CultureInfo.CurrentCulture).Contains(input.ToLower(CultureInfo.CurrentCulture), StringComparison.CurrentCulture))
+                    CommandInvoker.Singleton.RunCommand(producer(new CommandArguments(null, null, CommandInfo.Initialization)));
             }
         }
-
-    End:
         SearchBoxInput.Text = string.Empty;
         GLControl.Instance?.Focus();
     }

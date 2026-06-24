@@ -52,6 +52,10 @@ public class RotateCommand : ICommand
     private List<Model> _models = [];
     private readonly Dictionary<Model, Matrix4> _modelsStartingTranslation = [];
 
+    public RotateCommand(CommandArguments args)
+    {
+        Initialize();
+    }
 
     private CommandState Initialize()
     {
@@ -148,8 +152,6 @@ public class RotateCommand : ICommand
     }
     public CommandState Execute(CommandArguments args)
     {
-        if(args.CommandInfo.HasFlag(CommandInfo.Initialization)) return Initialize();
-
         //Is a mouse input
         if ((args.CommandInfo & CommandInfo.MouseEvent) != 0)
         {

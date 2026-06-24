@@ -16,14 +16,14 @@ public class InputManager
 
     public UserControlMode UserControlMode { get; private set; } = UserControlMode.None;
 
-    private Dictionary<Key, Type> _keyBinds = new(){
-        {Key.G, typeof(MoveCommand)},
-        {Key.R, typeof(RotateCommand)},
-        {Key.S, typeof(ScaleCommand)},
-        {Key.E, typeof(ExtrudeCommand)},
-        {Key.F, typeof(FlipCommand)},
-        {Key.Delete, typeof(DeleteCommand)},
-    };
+    private Dictionary<Key, CommandTypes> _keyBindFactory = new(){
+    {Key.G, CommandTypes.Move},
+    {Key.R, CommandTypes.Rotate},
+    {Key.S, CommandTypes.Scale},
+    {Key.E, CommandTypes.Extrude},
+    {Key.F, CommandTypes.Flip},
+    {Key.Delete, CommandTypes.Delete},
+};
 
     public DateTime LastRightClick { get; private set; }
     public DateTime LastLeftClick { get; private set; }
@@ -95,12 +95,14 @@ public class InputManager
                 break;
             default:
                 {
-                    if(_keyBinds.TryGetValue(e.Key, out Type? value))
+                    if(_keyBindFactory.TryGetValue(e.Key, out CommandTypes commandTypes))
                     {
-                        if (value is null) return;
-                        if (Activator.CreateInstance(value) is not ICommand command) return;
+                        if (!CommandLookup.CommandFactory.TryGetValue(commandTypes, out Func<CommandArguments, ICommand>? factory)) return;
 
-                        CommandInvoker.Singleton?.RunCommand(command, cmdInfo);
+                        if (factory is null) return;
+
+                        ICommand command = factory.Invoke(cmdInfo);
+                        CommandInvoker.Singleton?.RunCommand(command);
                     }
                     break;
                 }

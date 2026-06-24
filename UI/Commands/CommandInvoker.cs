@@ -20,7 +20,7 @@ public class CommandInvoker
     private readonly FixedSizeList<ICommand> _undoQueue = new(40);
     private readonly FixedSizeList<ICommand> _redoQueue = new(40);
 
-    public void RunCommand(ICommand command, CommandArguments args)
+    public void RunCommand(ICommand command)
     {
         if(CurrentCommand != null)
         {
@@ -29,7 +29,6 @@ public class CommandInvoker
 
         CommandTextUpdated?.Invoke(command);
         CurrentCommand = command;
-        ExecuteCommandStep(args);
     }
     /// <param name="args">The user input to process</param>
     /// <returns>True if the command was processed, False if no command is active</returns>

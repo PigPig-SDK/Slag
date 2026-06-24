@@ -48,6 +48,11 @@ public class ScaleCommand : ICommand
     private float _snapValue;
     private Model _activeModel = null!;
 
+    public ScaleCommand(CommandArguments args)
+    {
+        Initialize();
+    }
+
     private CommandState Initialize()
     {
         _snapValue = SelectionManager.Instance.SnapValue;
@@ -124,8 +129,6 @@ public class ScaleCommand : ICommand
     {
         //No model, no command.
         if (SelectionManager.Instance.CurrentModel == null) return CommandState.Discard;
-        //Initialization
-        if (args.CommandInfo.HasFlag(CommandInfo.Initialization)) return Initialize();
         //Block keyup inputs
         if (args.CommandInfo.HasFlag(CommandInfo.KeyUp)) return CommandState.Idle;
 

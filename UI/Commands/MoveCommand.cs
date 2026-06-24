@@ -57,6 +57,12 @@ public class MoveCommand : ICommand
     //UI stuff..
     private Line? _uiLine;
     private TextBlock? _textblock;
+
+    public MoveCommand(CommandArguments args)
+    {
+        Initialize();
+    }
+
     private CommandState Initialize()
     {
         _isModelMove = SelectionManager.Instance.CurrentSelectionMode == ViewModels.SelectionMode.Mesh;
@@ -196,8 +202,6 @@ public class MoveCommand : ICommand
 
     public CommandState Execute(CommandArguments args)
     {
-        //Initialization
-        if (args.CommandInfo.HasFlag(CommandInfo.Initialization)) return Initialize();
         //Block keyup inputs
         if (args.CommandInfo.HasFlag(CommandInfo.KeyUp)) return CommandState.Idle;
 
