@@ -120,19 +120,19 @@ public class ScaleCommand : ICommand
         _activeModel.UpdateAllComponents(UpdateType.Locational);
     }
 
-    public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
+    public CommandState Execute(CommandArguments args)
     {
         //No model, no command.
         if (SelectionManager.Instance.CurrentModel == null) return CommandState.Discard;
         //Initialization
-        if (args.info.HasFlag(CommandInfo.Initialization)) return Initialize();
+        if (args.CommandInfo.HasFlag(CommandInfo.Initialization)) return Initialize();
         //Block keyup inputs
-        if (args.info.HasFlag(CommandInfo.KeyUp)) return CommandState.Idle;
+        if (args.CommandInfo.HasFlag(CommandInfo.KeyUp)) return CommandState.Idle;
 
         //Is a mouse input
-        if ((args.info & CommandInfo.MouseEvent) != 0)
+        if ((args.CommandInfo & CommandInfo.MouseEvent) != 0)
         {
-            var mouseInfo = args.mouseEvent!.GetPosition(GLControl.Instance);
+            var mouseInfo = args.MouseEvent!.GetPosition(GLControl.Instance);
 
             if(_uiLine is not null)
                 _uiLine.EndPoint = new(mouseInfo.X, mouseInfo.Y);
@@ -149,7 +149,7 @@ public class ScaleCommand : ICommand
             }    
 
             Scale(_scaleValue);
-            if (args.info.HasFlag(CommandInfo.MouseDown))//Accept.
+            if (args.CommandInfo.HasFlag(CommandInfo.MouseDown))//Accept.
             {
                 CleanUpUi();
                 return CommandState.Finished;
@@ -157,7 +157,7 @@ public class ScaleCommand : ICommand
         }
 
         //Keyboard input
-        switch (args.keyEvent?.Key)
+        switch (args.KeyPressEvent?.Key)
         {
             case Key.S://Accept.
                 CleanUpUi();

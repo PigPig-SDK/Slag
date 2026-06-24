@@ -2,6 +2,7 @@
 
 namespace UI.Commands;
 
+
 public interface ICommand
 {
     /// <summary>
@@ -12,13 +13,14 @@ public interface ICommand
     /// Executes the command
     /// </summary>
     /// <returns>The command state after execution</returns>
-    public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args);
+    public CommandState Execute(CommandArguments args);
 
     public string Name { get; }
 
     public string Description { get; }
 
     public bool DisplayToolText { get; }
+
     public bool AllowInMeshMode { get; }
 
     public string IconSource { get; }

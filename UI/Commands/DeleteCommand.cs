@@ -19,7 +19,7 @@ internal class DeleteCommand : MementoCommand
 
     public override bool DisplayToolText => false;
     public override bool AllowInMeshMode => true;
-    public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
+    public override CommandState Execute(CommandArguments args)
     {
         CreateState();
         SelectionManager.Instance.DeleteCurrentSelection();

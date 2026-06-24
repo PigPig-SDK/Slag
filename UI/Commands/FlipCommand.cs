@@ -27,7 +27,7 @@ public class FlipCommand : ICommand
     private HashSet<Face> _faces = [];
     private Model? _currentModel;
 
-    public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
+    public CommandState Execute(CommandArguments args)
     {
         _currentModel = SelectionManager.Instance.CurrentModel;
 

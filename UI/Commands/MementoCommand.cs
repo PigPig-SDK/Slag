@@ -16,7 +16,7 @@ public abstract class MementoCommand : ICommand
 
     public abstract bool DisplayToolText { get; }
 
-    public abstract CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args);
+    public abstract CommandState Execute(CommandArguments args);
 
     public Model? ModelState { get; set; }
     public Model? Model { get; set; }

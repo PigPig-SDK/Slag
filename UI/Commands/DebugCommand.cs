@@ -9,6 +9,7 @@ using UI.ViewModels;
 
 namespace UI.Commands;
 
+
 public class DebugCommand : ICommand
 {
     public ICommand? Next { get; set; }
@@ -25,24 +26,24 @@ public class DebugCommand : ICommand
 
     public bool AllowInMeshMode => false;
 
-    public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
+    public CommandState Execute(CommandArguments args)
     {
 
-        if(args.keyEvent != null)
+        if(args.KeyPressEvent != null)
         {
-            if(args.keyEvent.Key == Key.Escape)
+            if(args.KeyPressEvent.Key == Key.Escape)
             {
                 return CommandState.Discard;
             }
         }
-        if(args.mouseEvent != null)
+        if(args.MouseEvent != null)
         {
             string info = "Vertex:\n";
 
-            var properties = args.mouseEvent.GetCurrentPoint(null).Properties;
+            var properties = args.MouseEvent.GetCurrentPoint(null).Properties;
             if (properties.IsLeftButtonPressed)
             {
-                var screenCoordsGL = Camera.Instance.ScreenToGlCoords(args.mouseEvent.GetScreenPos());
+                var screenCoordsGL = Camera.Instance.ScreenToGlCoords(args.MouseEvent.GetScreenPos());
                 var cameraMatrix = Camera.Instance.ViewMatrix;
 
                 VertexHit? hit = Raycast.GetVertexHit(
@@ -56,7 +57,7 @@ public class DebugCommand : ICommand
                         $"Neighbors: [{string.Join(",", hit.Model.VertexEdgeMap[(int)hit.VertexIndex])}]\n";
                 }
 
-                RaycastHit? faceHit = Camera.Instance.FindRaycastHit(args.mouseEvent.GetScreenPos(), SceneHierarchy.Instance.GetModels(HierarchyType.Model));
+                RaycastHit? faceHit = Camera.Instance.FindRaycastHit(args.MouseEvent.GetScreenPos(), SceneHierarchy.Instance.GetModels(HierarchyType.Model));
                 if (faceHit != null)
                 {
                     info += $"Face Hit:\n{faceHit.Face.ToString()}\n";

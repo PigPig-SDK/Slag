@@ -20,7 +20,7 @@ public class CommandInvoker
     private readonly FixedSizeList<ICommand> _undoQueue = new(40);
     private readonly FixedSizeList<ICommand> _redoQueue = new(40);
 
-    public void RunCommand(ICommand command, (KeyEventArgs? key, PointerEventArgs? mouse, CommandInfo info) args)
+    public void RunCommand(ICommand command, CommandArguments args)
     {
         if(CurrentCommand != null)
         {
@@ -33,7 +33,7 @@ public class CommandInvoker
     }
     /// <param name="args">The user input to process</param>
     /// <returns>True if the command was processed, False if no command is active</returns>
-    public bool ExecuteCommandStep((KeyEventArgs? key, PointerEventArgs? mouse, CommandInfo info) args)
+    public bool ExecuteCommandStep(CommandArguments args)
     {
         if(CurrentCommand == null)
             return false;

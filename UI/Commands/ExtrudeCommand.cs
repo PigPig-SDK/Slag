@@ -20,7 +20,7 @@ public class ExtrudeCommand : MementoCommand
 
     public override string IconSource => "avares://Slag/Assets/icons/extrude.png";
     public override bool AllowInMeshMode => false;
-    public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
+    public override CommandState Execute(CommandArguments args)
     {
         SelectionManager sm = SelectionManager.Instance;
         if (sm.CurrentModel is null) return CommandState.Discard;

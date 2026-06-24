@@ -94,7 +94,7 @@ public partial class CommandSearch : UserControl
 
                 if(command.Name.ToLower(CultureInfo.CurrentCulture)
                     .Equals(input.ToLower(CultureInfo.CurrentCulture), StringComparison.Ordinal)) 
-                    CommandInvoker.Singleton.RunCommand((ICommand)Activator.CreateInstance(commandType)!, (null, null, CommandInfo.Initialization));
+                    CommandInvoker.Singleton.RunCommand((ICommand)Activator.CreateInstance(commandType)!, new (null, null, CommandInfo.Initialization));
             }
         }
 

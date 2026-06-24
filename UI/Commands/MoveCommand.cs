@@ -194,17 +194,17 @@ public class MoveCommand : ICommand
         }
     }
 
-    public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
+    public CommandState Execute(CommandArguments args)
     {
         //Initialization
-        if (args.info.HasFlag(CommandInfo.Initialization)) return Initialize();
+        if (args.CommandInfo.HasFlag(CommandInfo.Initialization)) return Initialize();
         //Block keyup inputs
-        if (args.info.HasFlag(CommandInfo.KeyUp)) return CommandState.Idle;
+        if (args.CommandInfo.HasFlag(CommandInfo.KeyUp)) return CommandState.Idle;
 
         //Is a mouse input
-        if ((args.info & CommandInfo.MouseEvent) != 0)
+        if ((args.CommandInfo & CommandInfo.MouseEvent) != 0)
         {
-            var mouseInfo = args.mouseEvent!.GetPosition(GLControl.Instance);
+            var mouseInfo = args.MouseEvent!.GetPosition(GLControl.Instance);
             Vector2 mousePos = new((float)mouseInfo.X, (float)mouseInfo.Y);
             _mouseStartPos ??= mousePos;
             _moveDistance = mousePos - _mouseStartPos.Value;
@@ -221,7 +221,7 @@ public class MoveCommand : ICommand
 
             MoveSelection(_moveDistance);
 
-            if (args.info.HasFlag(CommandInfo.MouseDown))
+            if (args.CommandInfo.HasFlag(CommandInfo.MouseDown))
             {
                 CleanUp();
                 return CommandState.Finished;
@@ -229,7 +229,7 @@ public class MoveCommand : ICommand
         }
 
         //Keyboard input
-        switch(args.keyEvent?.Key)
+        switch(args.KeyPressEvent?.Key)
         {
             case Key.G:
                 {

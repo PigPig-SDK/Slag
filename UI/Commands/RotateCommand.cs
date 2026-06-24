@@ -146,14 +146,14 @@ public class RotateCommand : ICommand
         }
         return CommandState.Idle;//Continue the command.
     }
-    public CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
+    public CommandState Execute(CommandArguments args)
     {
-        if(args.info.HasFlag(CommandInfo.Initialization)) return Initialize();
+        if(args.CommandInfo.HasFlag(CommandInfo.Initialization)) return Initialize();
 
         //Is a mouse input
-        if ((args.info & CommandInfo.MouseEvent) != 0)
+        if ((args.CommandInfo & CommandInfo.MouseEvent) != 0)
         {
-            var mouseInfo = args.mouseEvent!.GetPosition(GLControl.Instance);
+            var mouseInfo = args.MouseEvent!.GetPosition(GLControl.Instance);
             Vector2 mousePos = new((float)mouseInfo.X, (float)mouseInfo.Y);
             if (_mouseStart is null)
             {
@@ -188,7 +188,7 @@ public class RotateCommand : ICommand
 
             _totalRotation = angle - _initialRotation.Value;
 
-            if (args.mouseEvent.KeyModifiers == KeyModifiers.Control)
+            if (args.MouseEvent.KeyModifiers == KeyModifiers.Control)
             {
                 float clampFactor = _totalRotation % (MathF.PI / 16);//Snap to 11.25 degree increments when ctrl is held.
                 _totalRotation -= clampFactor;
@@ -197,16 +197,16 @@ public class RotateCommand : ICommand
             _textblock!.Text = (_totalRotation * (180.0 / MathF.PI)).ToString("F1", CultureInfo.InvariantCulture);
 
             Rotate(_totalRotation);
-            if (args.info.HasFlag(CommandInfo.MouseDown))
+            if (args.CommandInfo.HasFlag(CommandInfo.MouseDown))
             {
                 CleanUpUi();
                 return CommandState.Finished;
             }
         }
 
-        if(args.info.HasFlag(CommandInfo.KeyDown))
+        if(args.CommandInfo.HasFlag(CommandInfo.KeyDown))
         {
-            switch(args.keyEvent!.Key)
+            switch(args.KeyPressEvent!.Key)
             {
                 case Key.X:
                     {

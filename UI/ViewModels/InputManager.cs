@@ -31,8 +31,8 @@ public class InputManager
     //TOTO: REFACTOR THIS.
     public void OnKeyDown(object? sender, KeyEventArgs e)
     {
-        if (CommandInvoker.Singleton.ExecuteCommandStep((e, null, CommandInfo.KeyDown))) return;
-        (KeyEventArgs?, PointerEventArgs?, CommandInfo) cmdInfo = (e, null, CommandInfo.Initialization | CommandInfo.KeyDown);
+        if (CommandInvoker.Singleton.ExecuteCommandStep(new CommandArguments(e, null, CommandInfo.KeyDown))) return;
+        CommandArguments cmdInfo = new(e, null, CommandInfo.Initialization | CommandInfo.KeyDown);
         switch (e.Key)
         {
             case Key.LeftCtrl:
@@ -109,7 +109,7 @@ public class InputManager
 
     public void OnKeyUp(object? sender, KeyEventArgs e)
     {
-        if (CommandInvoker.Singleton.ExecuteCommandStep((e, null, CommandInfo.KeyUp))) return;
+        if (CommandInvoker.Singleton.ExecuteCommandStep(new CommandArguments(e, null, CommandInfo.KeyUp))) return;
         switch (e.Key)
         {
             case Key.LeftCtrl:
@@ -119,12 +119,11 @@ public class InputManager
                     break;
                 }
         }
-
     }
 
     public void OnMouseUp(object? sender, PointerReleasedEventArgs e)
     {
-        if (CommandInvoker.Singleton.ExecuteCommandStep((null, e, CommandInfo.MouseUp))) return;
+        if (CommandInvoker.Singleton.ExecuteCommandStep(new CommandArguments(null, e, CommandInfo.MouseUp))) return;
 
         Camera.Instance.OnMouseUp(sender, e);
         
@@ -132,7 +131,7 @@ public class InputManager
 
     public void OnPointerMove(object? sender, PointerEventArgs e)
     {
-        if (CommandInvoker.Singleton.ExecuteCommandStep((null, e, CommandInfo.MouseMove))) return;
+        if (CommandInvoker.Singleton.ExecuteCommandStep(new CommandArguments(null, e, CommandInfo.MouseMove))) return;
 
         var properties = e.GetCurrentPoint(GLControl.Instance).Properties;
         if(properties.IsRightButtonPressed)
@@ -154,7 +153,7 @@ public class InputManager
         if (properties.IsRightButtonPressed)
             LastRightClick = DateTime.Now;
 
-        if (CommandInvoker.Singleton.ExecuteCommandStep((null, e, CommandInfo.MouseDown))) return;
+        if (CommandInvoker.Singleton.ExecuteCommandStep(new CommandArguments(null, e, CommandInfo.MouseDown))) return;
 
         if (properties.IsRightButtonPressed)
         {

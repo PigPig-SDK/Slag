@@ -20,15 +20,15 @@ public class MergeCommand : MementoCommand
 
     public override bool AllowInMeshMode => false;
 
-    public override CommandState Execute((KeyEventArgs? keyEvent, PointerEventArgs? mouseEvent, CommandInfo info) args)
+    public override CommandState Execute(CommandArguments args)
     {
         if (SelectionManager.Instance.CurrentModel is null) return CommandState.Discard;
-        if (args.mouseEvent is null) return CommandState.Idle;
+        if (args.MouseEvent is null) return CommandState.Idle;
 
         SelectionComponent? selection = SelectionManager.Instance.GetSelectionComponent();
         if (selection is null) return CommandState.Discard;
 
-        var properties = args.mouseEvent.GetCurrentPoint(null).Properties;
+        var properties = args.MouseEvent.GetCurrentPoint(null).Properties;
 
 
         if (properties.IsLeftButtonPressed)
@@ -36,7 +36,7 @@ public class MergeCommand : MementoCommand
             CreateState();
             VertexHit? hit = Raycast.GetVertexHit(
                 [selection.Model],
-                Camera.Instance.ScreenToGlCoords(args.mouseEvent.GetScreenPos()),
+                Camera.Instance.ScreenToGlCoords(args.MouseEvent.GetScreenPos()),
                 Camera.Instance.ViewMatrix);
 
             if (hit is null) return CommandState.Finished;
