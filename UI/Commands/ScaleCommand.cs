@@ -13,7 +13,7 @@ using System.Globalization;
 
 namespace UI.Commands;
 
-public class ScaleCommand : ICommand
+public class ScaleCommand : ICommand, ICommandInitializer
 {
     public ICommand? Next { get; set; }
 
@@ -48,12 +48,8 @@ public class ScaleCommand : ICommand
     private float _snapValue;
     private Model _activeModel = null!;
 
-    public ScaleCommand(CommandArguments args)
-    {
-        Initialize();
-    }
 
-    private CommandState Initialize()
+    public CommandState Initialize()
     {
         _snapValue = SelectionManager.Instance.SnapValue;
         _activeModel = SelectionManager.Instance.CurrentModel ?? throw new InvalidOperationException("_active model cannot be null!");

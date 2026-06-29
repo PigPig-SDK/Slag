@@ -47,7 +47,7 @@ public partial class CommandSearch : UserControl
         SearchBoxInput.ClearSelectionOnLostFocus = true;
     }
 
-    IEnumerable<ICommand> CommandList(string? text)
+    static IEnumerable<ICommand> CommandList(string? text)
     {
         if (text is not null)
         {
@@ -55,7 +55,7 @@ public partial class CommandSearch : UserControl
             {
                 var producer = CommandLookup.CommandFactory[commandType];
                 if (commandType.ToString().ToLower(CultureInfo.CurrentCulture).Contains(text.ToLower(CultureInfo.CurrentCulture), StringComparison.CurrentCulture))
-                    yield return producer(new CommandArguments(null, null, CommandInfo.Initialization)); ;
+                    yield return producer(); ;
             }
         }
     }
@@ -79,7 +79,7 @@ public partial class CommandSearch : UserControl
             {
                 var producer = CommandLookup.CommandFactory[commandType];
                 if (commandType.ToString().ToLower(CultureInfo.CurrentCulture).Contains(input.ToLower(CultureInfo.CurrentCulture), StringComparison.CurrentCulture))
-                    CommandInvoker.Singleton.RunCommand(producer(new CommandArguments(null, null, CommandInfo.Initialization)));
+                    CommandInvoker.Singleton.RunCommand(producer());
             }
         }
         SearchBoxInput.Text = string.Empty;

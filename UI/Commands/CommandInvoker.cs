@@ -27,6 +27,12 @@ public class CommandInvoker
             return;
         }
 
+        if(command is ICommandInitializer initializer)
+        {
+            CommandState commandState = initializer.Initialize();
+            if (commandState == CommandState.Discard) return;
+        }
+
         CommandTextUpdated?.Invoke(command);
         CurrentCommand = command;
     }

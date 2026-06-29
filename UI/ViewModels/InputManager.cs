@@ -16,7 +16,7 @@ public class InputManager
 
     public UserControlMode UserControlMode { get; private set; } = UserControlMode.None;
 
-    private Dictionary<Key, CommandTypes> _keyBindFactory = new(){
+    private Dictionary<Key, CommandTypes> _keybinds = new(){
     {Key.G, CommandTypes.Move},
     {Key.R, CommandTypes.Rotate},
     {Key.S, CommandTypes.Scale},
@@ -32,7 +32,6 @@ public class InputManager
     public void OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (CommandInvoker.Singleton.ExecuteCommandStep(new CommandArguments(e, null, CommandInfo.KeyDown))) return;
-        CommandArguments cmdInfo = new(e, null, CommandInfo.Initialization | CommandInfo.KeyDown);
         switch (e.Key)
         {
             case Key.LeftCtrl:
@@ -95,13 +94,13 @@ public class InputManager
                 break;
             default:
                 {
-                    if(_keyBindFactory.TryGetValue(e.Key, out CommandTypes commandTypes))
+                    if(_keybinds.TryGetValue(e.Key, out CommandTypes commandTypes))
                     {
-                        if (!CommandLookup.CommandFactory.TryGetValue(commandTypes, out Func<CommandArguments, ICommand>? factory)) return;
+                        if (!CommandLookup.CommandFactory.TryGetValue(commandTypes, out Func<ICommand>? factory)) return;
 
                         if (factory is null) return;
 
-                        ICommand command = factory.Invoke(cmdInfo);
+                        ICommand command = factory.Invoke();
                         CommandInvoker.Singleton?.RunCommand(command);
                     }
                     break;

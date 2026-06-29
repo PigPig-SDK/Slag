@@ -15,7 +15,7 @@ using UI.Views;
 
 namespace UI.Commands;
 
-public class MoveCommand : ICommand
+public class MoveCommand : ICommand, ICommandInitializer
 {
     public ICommand? Next { get; set; }
 
@@ -58,12 +58,8 @@ public class MoveCommand : ICommand
     private Line? _uiLine;
     private TextBlock? _textblock;
 
-    public MoveCommand(CommandArguments args)
-    {
-        Initialize();
-    }
-
-    private CommandState Initialize()
+    
+    public CommandState Initialize()
     {
         _isModelMove = SelectionManager.Instance.CurrentSelectionMode == ViewModels.SelectionMode.Mesh;
         _cameraMoveDirections = Camera.Instance.GetRealitiveDirections();

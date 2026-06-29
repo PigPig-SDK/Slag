@@ -9,7 +9,6 @@ public enum CommandInfo
     MouseMove = 1 << 2,
     MouseDown = 1 << 3,
     MouseUp = 1 << 4 ,
-    Initialization = 1 << 5,
     MouseEvent = MouseMove | MouseDown | MouseUp,
     KeyInfo = KeyDown | KeyUp,
 }

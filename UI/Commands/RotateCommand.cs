@@ -13,7 +13,7 @@ using UI.Views;
 
 namespace UI.Commands;
 
-public class RotateCommand : ICommand
+public class RotateCommand : ICommand, ICommandInitializer
 {
     public ICommand? Next { get; set; }
     private Vector3 SelectionCenter { get; set; }
@@ -52,12 +52,7 @@ public class RotateCommand : ICommand
     private List<Model> _models = [];
     private readonly Dictionary<Model, Matrix4> _modelsStartingTranslation = [];
 
-    public RotateCommand(CommandArguments args)
-    {
-        Initialize();
-    }
-
-    private CommandState Initialize()
+    public CommandState Initialize()
     {
         _snapValue = SelectionManager.Instance.SnapValue;
         _isModelMove = SelectionManager.Instance.CurrentSelectionMode == ViewModels.SelectionMode.Mesh;
