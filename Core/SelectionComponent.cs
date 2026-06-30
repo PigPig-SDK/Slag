@@ -24,7 +24,7 @@ public class SelectionComponent : ModelComponent
 
     public void SelectIndex(uint index, UpdateType updateInfo = UpdateType.Selection)
     {
-        if(index >= Model.Indices.Length) throw new ArgumentOutOfRangeException($"The index {index} exceeds the possible selection range!");
+        if(index >= Model.Indices.Count) throw new ArgumentOutOfRangeException($"The index {index} exceeds the possible selection range!");
 
         _selectedIndices.Add(index);
         LastSelection = index;
@@ -47,12 +47,6 @@ public class SelectionComponent : ModelComponent
         _selectedIndices.Remove(index);
         OnSelectionChanged?.Invoke(false, updateInfo);
     }
-
-    public override void Dispose() 
-    {
-        GC.SuppressFinalize(this);
-    }
-
     public override void OnModelUpdate(Model model, UpdateType info)
     {
 

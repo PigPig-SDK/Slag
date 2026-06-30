@@ -19,19 +19,27 @@ public class Model
     public IReadOnlyList<Face> Faces => _faces;
     private readonly HashSet<Edge> _edges = [];
     public IReadOnlySet<Edge> Edges => _edges;
-    protected bool IsDisposed { get; set; }
-    public uint[] Indices = [];
+    
+    private uint[] _indices = [];
+    public IReadOnlyList<uint> Indices => _indices;
     public bool Hidden { get; set; }
     public HierarchyType HierarchyType { get; set; } = HierarchyType.All;
 
     private readonly Dictionary<Type, ModelComponent> _components = [];
 
+    //Override due to value type causing re-assignment to occur often.
+    //Makes the rest of the code appear clean.
+#pragma warning disable CA1051 // Do not declare visible instance fields
     public Vector3 Position = Vector3.Zero;
-    public Vector3 Rotation = Vector3.Zero;
-    public Vector3 Scale = Vector3.One;
+    public Vector3 Rotation  = Vector3.Zero;
+    public Vector3 Scale  = Vector3.One;
+#pragma warning restore CA1051 // Do not declare visible instance fields
+
 
     //Store starting index
-    public readonly Dictionary<(uint,uint,uint), Face> TriangleToFaceMapping = [];
+    private readonly Dictionary<(uint,uint,uint), Face> _triangleToFaceMapping = [];
+    public IReadOnlyDictionary<(uint, uint, uint), Face> TriangleToFaceMapping => _triangleToFaceMapping;
+    protected bool IsDisposed { get; set; }
 
     /// <summary>
     /// Model clone constructor.
@@ -231,13 +239,13 @@ public class Model
 
     private void GenerateIndices()
     {
-        TriangleToFaceMapping.Clear();
+        _triangleToFaceMapping.Clear();
         List<uint> indices = [];
         foreach (Face face in _faces)
         {
             face.Triangulate(ref indices);
         }
-        Indices = [.. indices];
+        _indices = [.. indices];
     }
 
     public uint[] GetEdgeIndices()
@@ -339,17 +347,17 @@ public class Model
 
     public IEnumerable<(uint v1,uint v2,uint v3)> AllTrianglesAsIndices()
     {
-        for(int i = 0; i < Indices.Length; i+=3)
+        for(int i = 0; i < _indices.Length; i+=3)
         {
-            yield return (Indices[i], Indices[i + 1], Indices[i + 2]);
+            yield return (_indices[i], _indices[i + 1], _indices[i + 2]);
         }
     }
 
-    public void GenerateTriangulatedModel(ref Vertex[] verts, ref List<uint> indices)
+    public void GenerateTriangulatedModel(out Vertex[] verts, out uint[] indices)
     {
         verts = _verticies.BackingField();
         GenerateIndices();
-        indices = [.. Indices];
+        indices = [.. _indices];
     }
 
     ~Model() => Dispose();
@@ -359,7 +367,7 @@ public class Model
         IsDisposed = true;
         foreach (var component in _components.Values)
         {
-            component.Dispose();
+            if(component is IDisposable disposable) disposable.Dispose();
         }
     }
     /// <summary>
@@ -440,5 +448,42 @@ public class Model
             }
         }
         return false;
+    }
+    public void ComputeNormals(Vertex[] verts)
+    {
+
+        if (_indices.Length % 3 != 0) throw new ArgumentException($"{nameof(_indices)} must be a multiple of 3.");
+
+        //Reset normals
+        for (int i = 0; i < verts.Length; i++)
+        {
+            verts[i].Normal = new Vector3(0, 0, 0);
+        }
+
+        //Compute sum of normals
+        for (int i = 0; i < _indices.Length; i += 3)
+        {
+            //Get locations
+            Vector3 p1 = verts[_indices[i]].Position;
+            Vector3 p2 = verts[_indices[i + 1]].Position;
+            Vector3 p3 = verts[_indices[i + 2]].Position;
+
+            Vector3 normal = Vector3.Cross(p2 - p1, p3 - p1);
+
+            verts[_indices[i]].Normal += normal;
+            verts[_indices[i + 1]].Normal += normal;
+            verts[_indices[i + 2]].Normal += normal;
+        }
+
+        //Normalize
+        for (int i = 0; i < verts.Length; i++)
+        {
+            verts[i].Normal = Vector3.Normalize(verts[i].Normal);
+        }
+    }
+
+    internal void AddFaceMapping((uint fanSource, uint, uint) tuple, Face face)
+    {
+        _triangleToFaceMapping.Add(tuple, face);
     }
 }

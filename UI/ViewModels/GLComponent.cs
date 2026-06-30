@@ -11,7 +11,7 @@ using static UI.ViewModels.GlConstantsExtended;
 
 namespace UI.ViewModels;
 
-public class GLComponent : ModelComponent, IRenderObject
+public class GLComponent : ModelComponent, IRenderObject, IDisposable
 {
     private int? _vertexBufferObject;
     private int? _indicesBuffer;
@@ -87,7 +87,7 @@ public class GLComponent : ModelComponent, IRenderObject
 
         Vertex[] verts = Model.GetVertexBackingField();
         _vertexCount = Model.Verticies.Count;
-        ComputeNormals(verts, Model.Indices);
+        Model.ComputeNormals(verts);
 
         gl.BindBuffer(GL_ARRAY_BUFFER, _vertexBufferObject!.Value);
         fixed (Vertex* ptr = verts)
@@ -179,18 +179,13 @@ public class GLComponent : ModelComponent, IRenderObject
     {
         gl.BindVertexArray(_triangleArrayObject!.Value);
 
-        Vertex[] verts = [];
-        List<uint> indicesList = []; //List that will encounter lots of modification
-
-        Model.GenerateTriangulatedModel(ref verts, ref indicesList);
+        Model.GenerateTriangulatedModel(out Vertex[] verts, out uint[] indices);
 
         //Recalculates the model to account for 'sharp' edges
         //ComputeSmoothing(ref indicesList);
 
-        uint[] indices = [.. indicesList];
-
         //Manage edges
-        ComputeNormals(verts, indices);
+        Model.ComputeNormals(verts);
         _indicesCount = indices.Length;
         _vertexCount = Model.Verticies.Count;
 
@@ -221,7 +216,11 @@ public class GLComponent : ModelComponent, IRenderObject
     {
         if (!model.HasComponent(typeof(GLComponent)))
         {
-            if (model.AddComponent<GLComponent>(new GLComponent()) is not GLComponent glComponent) return false;
+            //Ignored here due to model handling dispose of components that are IDisposable.
+#pragma warning disable CA2000 // Dispose objects before losing scope
+            GLComponent glComponent = new();
+#pragma warning restore CA2000 // Dispose objects before losing scope
+            model.AddComponent<GLComponent>(glComponent);
             glComponent.GenerateBuffers(gl);
             OnBoundToModel?.Invoke(glComponent);
         }
@@ -260,37 +259,6 @@ public class GLComponent : ModelComponent, IRenderObject
         gl.BindVertexArray(0);
     }
 
-    public void ComputeNormals(Vertex[] verts, uint[] indices)
-    {
-        if (indices.Length % 3 != 0) throw new ArgumentException($"{nameof(indices)} must be a multiple of 3.");
-
-        //Reset normals
-        for (int i = 0; i < verts.Length; i++)
-        {
-            verts[i].Normal = new Vector3(0, 0, 0);
-        }
-
-        //Compute sum of normals
-        for (int i = 0; i < indices.Length; i += 3)
-        {
-            //Get locations
-            Vector3 p1 = verts[indices[i]].Position;
-            Vector3 p2 = verts[indices[i + 1]].Position;
-            Vector3 p3 = verts[indices[i + 2]].Position;
-
-            Vector3 normal = Vector3.Cross(p2 - p1, p3 - p1);
-
-            verts[indices[i]].Normal += normal;
-            verts[indices[i + 1]].Normal += normal;
-            verts[indices[i + 2]].Normal += normal;
-        }
-
-        //Normalize
-        for (int i = 0; i < verts.Length; i++)
-        {
-            verts[i].Normal = Vector3.Normalize(verts[i].Normal);
-        }
-    }
 
     public override void OnModelUpdate(Model model, UpdateType info)
     {
@@ -320,7 +288,11 @@ public class GLComponent : ModelComponent, IRenderObject
         }
     }
 
-    public override void Dispose()
+    ~GLComponent()
+    {
+       Dispose();
+    }
+    public void Dispose()
     {
         //Clean up the opengl resources.
         if (glInterface == null) return;

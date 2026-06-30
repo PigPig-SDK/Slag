@@ -72,7 +72,7 @@ public class Face : ICloneable
 
                         continue;
                 }
-                ParentModel.TriangleToFaceMapping.Add(tuple, this);
+                ParentModel.AddFaceMapping(tuple, this);
             }
         }
     }
