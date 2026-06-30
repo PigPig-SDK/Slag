@@ -153,10 +153,10 @@ public partial class HierarchyModel : UserControl
         if ((e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9))
             rejectKey = false;
         // Period: only allow if not already in text
-        else if ((e.Key == Key.OemPeriod || e.Key == Key.Decimal) && !tb.Text!.Contains('.'))
+        else if ((e.Key == Key.OemPeriod || e.Key == Key.Decimal) && !tb.Text!.Contains('.', StringComparison.CurrentCulture))
             rejectKey = false;
         // Minus: only at start and not already present
-        else if ((e.Key == Key.OemMinus || e.Key == Key.Subtract) && !tb.Text!.Contains('-'))
+        else if ((e.Key == Key.OemMinus || e.Key == Key.Subtract) && !tb.Text!.Contains('-', StringComparison.CurrentCulture))
             rejectKey = false;
 
         e.Handled = rejectKey;

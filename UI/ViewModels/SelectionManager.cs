@@ -144,6 +144,7 @@ public class SelectionManager
             SelectionComponent? ms = GetSelectionComponent();
             if (!InputManager.Singleton.UserControlMode.HasFlag(UserControlMode.Ctrl))//Not a CTRL selection.
                 ClearSelection();
+            if (ms is null) return;
 
             //Select
             if (!ms.IsVertexSelected(hit.VertexIndex))
